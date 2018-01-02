@@ -1,4 +1,4 @@
-package webtest
+package test
 
 import (
 	"github.com/gin-gonic/gin"
@@ -12,19 +12,19 @@ import (
 )
 
 type HttpClient struct {
-	cookie []string
+	Cookies []string
 }
 
 func (c *HttpClient) GetRequest(r *gin.Engine, url string) *httptest.ResponseRecorder {
 	req, _ := http.NewRequest("GET", url, nil)
-	if len(c.cookie) > 0 {
-		req.Header.Set("Cookie", strings.Join(c.cookie, ";"))
+	if len(c.Cookies) > 0 {
+		req.Header.Set("Cookie", strings.Join(c.Cookies, ";"))
 	}
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	cookie := GetCookie(w)
 	if len(cookie) > 0 {
-		c.cookie = cookie
+		c.Cookies = cookie
 	}
 	return w
 }
@@ -32,14 +32,14 @@ func (c *HttpClient) GetRequest(r *gin.Engine, url string) *httptest.ResponseRec
 func (c *HttpClient) PostFormRequest(r *gin.Engine, url string, values url.Values) *httptest.ResponseRecorder {
 	req, _ := http.NewRequest("POST", url, strings.NewReader(values.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	if len(c.cookie) > 0 {
-		req.Header.Set("Cookie", strings.Join(c.cookie, ";"))
+	if len(c.Cookies) > 0 {
+		req.Header.Set("Cookie", strings.Join(c.Cookies, ";"))
 	}
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	cookie := GetCookie(w)
 	if len(cookie) > 0 {
-		c.cookie = cookie
+		c.Cookies = cookie
 	}
 	return w
 }
@@ -54,14 +54,14 @@ func (c *HttpClient) PostJsonRequest(r *gin.Engine, url string, value interface{
 
 	req, _ := http.NewRequest("POST", url,b)
 	req.Header.Set("Content-Type", "application/json")
-	if len(c.cookie) > 0 {
-		req.Header.Set("Cookie", strings.Join(c.cookie, ";"))
+	if len(c.Cookies) > 0 {
+		req.Header.Set("Cookie", strings.Join(c.Cookies, ";"))
 	}
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	cookie := GetCookie(w)
 	if len(cookie) > 0 {
-		c.cookie = cookie
+		c.Cookies = cookie
 	}
 	return w
 }
@@ -69,14 +69,14 @@ func (c *HttpClient) PostJsonRequest(r *gin.Engine, url string, value interface{
 func (c *HttpClient) PostRequest(r *gin.Engine, url string, body io.Reader) *httptest.ResponseRecorder {
 
 	req, _ := http.NewRequest("POST", url, body)
-	if len(c.cookie) > 0 {
-		req.Header.Set("Cookie", strings.Join(c.cookie, ";"))
+	if len(c.Cookies) > 0 {
+		req.Header.Set("Cookie", strings.Join(c.Cookies, ";"))
 	}
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	cookie := GetCookie(w)
 	if len(cookie) > 0 {
-		c.cookie = cookie
+		c.Cookies = cookie
 	}
 	return w
 }

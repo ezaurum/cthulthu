@@ -11,26 +11,27 @@ import (
 )
 
 func TestCookie(t *testing.T) {
-	r := getDefault()
+
+	r := gin.New()
+	r.Use(Default().Handler())
 
 	r.GET("/", func(c *gin.Context) {
 		s := c.MustGet(ct.DefaultSessionContextKey).(session.Session)
 		c.String(http.StatusOK, s.ID())
 	})
 
+	client := test.HttpClient{}
+
 	// first request
-	w := webtest.GetRequest(r, "/")
-	cookie := w.HeaderMap["Set-Cookie"]
+	w := client.GetRequest(r, "/")
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, w.Body.String(), webtest.GetFirstCookieValue(cookie))
+	assert.Equal(t, w.Body.String(), test.GetFirstCookieValue(client.Cookies))
 
-	// first request with cookie
-	w0 := webtest.GetRequestWithCookie(r, "/", cookie)
-	_, isExist := w0.HeaderMap["Set-Cookie"]
+	// second request with cookie
+	w0 := client.GetRequest(r, "/")
 
 	assert.Equal(t, http.StatusOK, w0.Code)
-	assert.True(t, isExist)
 	assert.Equal(t, w0.Body.String(), w.Body.String())
 }
 
@@ -40,10 +41,3 @@ func TestCookie(t *testing.T) {
 //TODO create auth - 실제로 auth 를 생성하는 건 아니다. 그러면 여기서는 create 가 아니라 first? no auth info?
 //TODO invalid cookie
 //TODO no session 이지 invalid cookie 가 아니라
-
-func getDefault() *gin.Engine {
-	r := gin.Default()
-	authenticator := Default()
-	r.Use(authenticator.Handler())
-	return r
-}

@@ -1,4 +1,4 @@
-package webtest
+package test
 
 import (
 	"github.com/PuerkitoBio/goquery"
