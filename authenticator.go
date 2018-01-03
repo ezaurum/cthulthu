@@ -2,43 +2,56 @@ package cthulthu
 
 import (
 	ezs "github.com/ezaurum/session"
-	"github.com/gin-gonic/gin"
+	"time"
 )
 
 const (
-	DefaultSessionContextKey = "default session context key"
-	IdentifierSessionKey     = "Identifier session key"
-	DefaultSessionExpires = 60*15
+	IDTokenSessionKey     = "ID token session key tekelli-li"
 )
 
-type Identifier interface {
-	ID() int64
+type IDToken interface {
+	TokenString() string
 	IsPersisted() bool
 }
 
-func GetIdentifier(session ezs.Session) Identifier {
-	a := session.Get(IdentifierSessionKey)
-	return a.(Identifier)
-}
+func SetIDToken(session ezs.Session) bool {
+	a := session.Get(IDTokenSessionKey)
 
-func SetIdentifier(session ezs.Session, identifier Identifier) {
-	session.Set(IdentifierSessionKey, identifier)
-}
-
-func IsAuthenticated(session ezs.Session) bool {
-	a := session.Get(IdentifierSessionKey)
-
-	//TODO identifier 가 멀쩡한지 검증 안 해도 되나?
+	// TODO identifier 가 멀쩡한지 검증 안 해도 되나?
 
 	return a != nil
 }
 
-func Authenticate(session ezs.Session, identifier Identifier) {
-	SetIdentifier(session, identifier)
 
-	//TODO 로그나 뭐 그런 거?
+func GetIDToken(session ezs.Session) IDToken {
+	a :=  session.Get(IDTokenSessionKey)
+	if nil != a {
+		return a.(IDToken)
+	}
+	return nil
 }
 
-func GetSession(c *gin.Context) ezs.Session {
-	return c.MustGet(DefaultSessionContextKey).(ezs.Session)
+func HasIDToken(session ezs.Session) bool {
+	return nil != GetIDToken(session)
+}
+
+type LoginIdentity struct {
+	id int64
+	UserID       string
+	UserPassword string
+	isPersisted bool
+	expires		time.Time
+	Token string
+}
+
+func (l LoginIdentity) TokenString() string {
+	return l.Token
+}
+
+func (l LoginIdentity) IsPersisted() bool {
+	return l.isPersisted
+}
+
+func (l LoginIdentity) IsExpired() bool {
+	return time.Now().After(l.expires)
 }

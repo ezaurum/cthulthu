@@ -1,14 +1,14 @@
 package test
 
 import (
-	"github.com/gin-gonic/gin"
-	"net/http/httptest"
-	"strings"
-	"net/url"
-	"io"
-	"net/http"
 	"bytes"
 	"encoding/json"
+	"github.com/gin-gonic/gin"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"strings"
 )
 
 type HttpClient struct {
@@ -52,7 +52,7 @@ func (c *HttpClient) PostJsonRequest(r *gin.Engine, url string, value interface{
 		panic(e)
 	}
 
-	req, _ := http.NewRequest("POST", url,b)
+	req, _ := http.NewRequest("POST", url, b)
 	req.Header.Set("Content-Type", "application/json")
 	if len(c.Cookies) > 0 {
 		req.Header.Set("Cookie", strings.Join(c.Cookies, ";"))
@@ -80,4 +80,3 @@ func (c *HttpClient) PostRequest(r *gin.Engine, url string, body io.Reader) *htt
 	}
 	return w
 }
-

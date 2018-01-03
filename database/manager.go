@@ -1,13 +1,13 @@
 package database
 
 import (
-	"reflect"
 	"github.com/jinzhu/gorm"
+	"reflect"
 
 	//TODO 임포트 자체를 바꿔야 하나?
+	"github.com/bwmarrin/snowflake"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/bwmarrin/snowflake"
 )
 
 // gorm 래퍼가 되지

@@ -3,20 +3,24 @@ package cookie
 import (
 	ct "github.com/ezaurum/cthulthu"
 	ezs "github.com/ezaurum/session"
-	"github.com/gin-gonic/gin"
-	"time"
 	"github.com/ezaurum/session/generators/snowflake"
 	"github.com/ezaurum/session/stores/memstore"
+	"github.com/gin-gonic/gin"
+	"time"
 )
+
 const (
-	sessionIDCookieName    = "ca-default-name"
-	persistLoginCookieName = "ca-default-remember-me"
+	sessionIDCookieName    = "session-id-CTHULTHU"
+	persistedIDTokenCookieName = "persisted-id-token-CTHULTHU"
 )
 
 type cookieAuthenticator struct {
-	store ezs.Store
+	store  ezs.Store
 	MaxAge int
+	sessionIDCookieName string
+	persistedIDTokenCookieName string
 }
+
 
 func (ca cookieAuthenticator) Handler() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -25,16 +29,16 @@ func (ca cookieAuthenticator) Handler() gin.HandlerFunc {
 
 		if needSession {
 			session = ca.createSession(c)
-		} else if ct.IsAuthenticated(session) {
+		} else if ct.HasIDToken(session) {
 			//activate
 			ca.activateSession(c, session)
 			return
 		}
 
 		// remember me
-		identifier, needAuthentication := ca.findIdentifier(c, session)
+		IDToken, needAuthentication := ca.findIDToken(c, session)
 		if needAuthentication {
-			ca.authenticate(c, session, identifier)
+			ca.Authenticate(c, session, IDToken)
 		}
 
 		//activate
@@ -50,9 +54,13 @@ func (ca cookieAuthenticator) createSession(c *gin.Context) ezs.Session {
 	return session
 }
 
-func (ca cookieAuthenticator) findIdentifier(c *gin.Context, session ezs.Session) (ct.Identifier, bool) {
+func (ca cookieAuthenticator) PersistIDToken(c *gin.Context, session ezs.Session, idToken ct.IDToken) {
+	c.SetCookie(ca.persistedIDTokenCookieName, session.ID(),365*24*60*60*10, "","", false, true)
+}
 
-	loginCookie, e := c.Cookie(persistLoginCookieName)
+func (ca cookieAuthenticator) findIDToken(c *gin.Context, session ezs.Session) (ct.IDToken, bool) {
+
+	loginCookie, e := c.Cookie(ca.persistedIDTokenCookieName)
 	hasCookie := nil == e
 
 	if hasCookie {
@@ -62,12 +70,12 @@ func (ca cookieAuthenticator) findIdentifier(c *gin.Context, session ezs.Session
 			return nil, false
 		}
 
-		//TODO db identifier 에서 가져오기
+		//TODO db IDToken 에서 가져오기
 
-		//TODO valid 한 identifier 생성?
-		var identifier ct.Identifier
+		//TODO valid 한 IDToken 생성?
+		var IDToken ct.IDToken
 		//TODO 쿠키에다 값 리프레시?
-		return identifier, true
+		return IDToken, true
 	}
 
 	// TODO 필요하면 DB에다 회원가입을 시키고?
@@ -75,18 +83,19 @@ func (ca cookieAuthenticator) findIdentifier(c *gin.Context, session ezs.Session
 	return nil, false
 }
 
-func (ca cookieAuthenticator) authenticate(c *gin.Context, session ezs.Session, identifier ct.Identifier) {
-	ct.SetIdentifier(session, identifier)
+func (ca cookieAuthenticator) Authenticate(c *gin.Context, session ezs.Session, IDToken ct.IDToken) {
+	//TOdo session.Set()
+	//TODO ct.SetIDToken(session, IDToken)
 }
 
 func (ca cookieAuthenticator) activateSession(c *gin.Context, session ezs.Session) {
-	//TODO refresh session expires
-	c.Set(ct.DefaultSessionContextKey, session)
+	//refresh session expires
+	ct.SetSession(c, session)
 	ca.SetSessionIDCookie(c, session)
 }
 
 func (ca cookieAuthenticator) findSession(c *gin.Context) (ezs.Session, bool) {
-	sessionIDCookie, e := c.Cookie(sessionIDCookieName)
+	sessionIDCookie, e := c.Cookie(ca.sessionIDCookieName)
 	isSessionIdCookieExist := nil == e
 	var session ezs.Session
 	var noSession bool
@@ -108,11 +117,11 @@ func (ca cookieAuthenticator) findSession(c *gin.Context) (ezs.Session, bool) {
 }
 
 func (ca cookieAuthenticator) ClearSessionIDCookie(c *gin.Context) {
-	c.SetCookie(sessionIDCookieName, "", -1, "/", "", false, true)
+	c.SetCookie(ca.sessionIDCookieName, "", -1, "/", "", false, true)
 }
 
 func (ca cookieAuthenticator) SetSessionIDCookie(c *gin.Context, session ezs.Session) {
-	c.SetCookie(sessionIDCookieName, session.ID(),
+	c.SetCookie(ca.sessionIDCookieName, session.ID(),
 		ca.MaxAge,
 		"/", "",
 		false, true)
@@ -122,19 +131,21 @@ func Default() ct.GinMiddleware {
 	return NewMem(0, ct.DefaultSessionExpires)
 }
 
-func NewMem(node int64, expiresInSeconds int) ct.GinMiddleware {
+func NewMem(node int64, expiresInSeconds int) *cookieAuthenticator {
 	duration := time.Duration(expiresInSeconds) * time.Second
 	k := snowflake.New(node)
 	m := memstore.New(k, duration, duration*2)
-	middleware := newMiddleware(m).(*cookieAuthenticator)
+	middleware := newMiddleware(m)
 	middleware.MaxAge = expiresInSeconds
 	return middleware
 }
 
-func newMiddleware(store ezs.Store) ct.GinMiddleware {
+func newMiddleware(store ezs.Store) *cookieAuthenticator {
 	return &cookieAuthenticator{
-		store: store,
+		store:  store,
 		MaxAge: ct.DefaultSessionExpires,
+		persistedIDTokenCookieName:persistedIDTokenCookieName,
+		sessionIDCookieName:sessionIDCookieName,
 	}
 }
 
