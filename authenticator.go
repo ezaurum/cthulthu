@@ -14,14 +14,12 @@ type IDToken interface {
 	IsPersisted() bool
 }
 
-func SetIDToken(session ezs.Session) bool {
-	a := session.Get(IDTokenSessionKey)
+func SetIDToken(session ezs.Session, token IDToken) {
+	session.Set(IDTokenSessionKey, token)
 
 	// TODO identifier 가 멀쩡한지 검증 안 해도 되나?
 
-	return a != nil
 }
-
 
 func GetIDToken(session ezs.Session) IDToken {
 	a :=  session.Get(IDTokenSessionKey)

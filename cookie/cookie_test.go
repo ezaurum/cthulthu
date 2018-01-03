@@ -99,13 +99,21 @@ func TestPersistToken (t *testing.T) {
 func TestPersistedTokenLoad (t *testing.T) {
 	r := gin.New()
 	middleware := NewMem(0, 1)
-	r.Use(middleware.Handler())
 
 	token := ct.LoginIdentity{
 		UserID: "test",
 		UserPassword: "test",
 		Token : "WTF",
 	}
+
+	middleware.LoadIDToken = func(context *gin.Context, s string) (ct.IDToken, bool) {
+		assert.Equal(t, s, token.TokenString())
+		return token, true
+	}
+
+	assert.NotNil(t, middleware.LoadIDToken)
+
+	r.Use(middleware.Handler())
 
 	r.GET("/", func(c *gin.Context) {
 		s := c.MustGet(ct.DefaultSessionContextKey).(session.Session)

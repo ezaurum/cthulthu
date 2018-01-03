@@ -14,13 +14,15 @@ const (
 	persistedIDTokenCookieName = "persisted-id-token-CTHULTHU"
 )
 
+type IDLoader func(*gin.Context, string) (ct.IDToken, bool)
+
 type cookieAuthenticator struct {
 	store  ezs.Store
 	MaxAge int
 	sessionIDCookieName string
 	persistedIDTokenCookieName string
+	LoadIDToken IDLoader
 }
-
 
 func (ca cookieAuthenticator) Handler() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -47,35 +49,37 @@ func (ca cookieAuthenticator) Handler() gin.HandlerFunc {
 }
 
 func (ca cookieAuthenticator) createSession(c *gin.Context) ezs.Session {
-	// set cookie
-	session := ca.store.GetNew()
 	// created
+	session := ca.store.GetNew()
 
 	return session
 }
 
 func (ca cookieAuthenticator) PersistIDToken(c *gin.Context, session ezs.Session, idToken ct.IDToken) {
-	c.SetCookie(ca.persistedIDTokenCookieName, session.ID(),365*24*60*60*10, "","", false, true)
+	c.SetCookie(ca.persistedIDTokenCookieName, idToken.TokenString(),
+		365*24*60*60*10, "","", false, true)
 }
 
 func (ca cookieAuthenticator) findIDToken(c *gin.Context, session ezs.Session) (ct.IDToken, bool) {
 
+	//TODO 쿠키가 유효한지 체크를 해 봐야지.
 	loginCookie, e := c.Cookie(ca.persistedIDTokenCookieName)
 	hasCookie := nil == e
 
 	if hasCookie {
 
-		//TODO 쿠키가 유효한지 체크를 해 봐야지.
-		if loginCookie == "WTF" {
-			return nil, false
+		//IDToken 가져오기
+		if nil != ca.LoadIDToken {
+			idToken, exist := ca.LoadIDToken(c, loginCookie)
+
+			if exist {
+				return idToken, true
+			}
+
 		}
 
-		//TODO db IDToken 에서 가져오기
+		//TODO 가져오기가 없으면 무시?
 
-		//TODO valid 한 IDToken 생성?
-		var IDToken ct.IDToken
-		//TODO 쿠키에다 값 리프레시?
-		return IDToken, true
 	}
 
 	// TODO 필요하면 DB에다 회원가입을 시키고?
@@ -84,8 +88,11 @@ func (ca cookieAuthenticator) findIDToken(c *gin.Context, session ezs.Session) (
 }
 
 func (ca cookieAuthenticator) Authenticate(c *gin.Context, session ezs.Session, IDToken ct.IDToken) {
-	//TOdo session.Set()
-	//TODO ct.SetIDToken(session, IDToken)
+	ct.SetIDToken(session, IDToken)
+
+	if IDToken.IsPersisted() {
+		ca.PersistIDToken(c, session, IDToken)
+	}
 }
 
 func (ca cookieAuthenticator) activateSession(c *gin.Context, session ezs.Session) {
