@@ -18,7 +18,7 @@ func Init(r *gin.Engine) ct.GinMiddleware {
 	ca := Default()
 	r.Use(ca.Handler())
 
-	return &ca
+	return ca
 }
 
 type IDLoader func(*gin.Context, string) (IDToken, bool)

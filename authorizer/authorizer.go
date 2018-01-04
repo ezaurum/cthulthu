@@ -2,7 +2,7 @@ package authorizer
 
 import (
 	"github.com/casbin/casbin"
-	"github.com/gin-contrib/sessions"
+	"github.com/ezaurum/cthulthu/session"
 )
 
 const (
@@ -26,7 +26,7 @@ type Authorizer struct {
 	enforcer *casbin.Enforcer
 }
 
-func SetUserRole(session sessions.Session, userRole string) {
+func SetUserRole(session session.Session, userRole string) {
 	session.Set(SessionUserRoleKey, userRole)
 	session.Save()
 }
