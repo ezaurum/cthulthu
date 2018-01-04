@@ -57,7 +57,8 @@ func MakeJSON(gameHandler SessionHandlerFunc) gin.HandlerFunc {
 func HTMLOnlyAuth(sessionHandler SessionHandlerFunc, page string, redirect string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := auth.GetSession(c)
-		if auth.IsAuthenticated(session) {
+		//TODO 이거 자체가 잘못 되어 있다. authorizer는 다른 곳에.
+		if auth.HasIDToken(session) {
 			code, result := sessionHandler(session)
 			c.HTML(code, page, result)
 		} else {
