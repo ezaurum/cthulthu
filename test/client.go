@@ -11,6 +11,8 @@ import (
 	"strings"
 )
 
+// gin 용 테스트 클라이언트. 쿠키 저장 때문에 따로 만들었다
+
 type HttpClient struct {
 	Cookies []string
 }

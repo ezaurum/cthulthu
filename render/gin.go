@@ -2,9 +2,9 @@ package render
 
 import (
 	"github.com/ezaurum/cthulthu/render/boongeoppang"
+	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
 	"html/template"
-	"github.com/gin-gonic/gin"
 )
 
 //check implementation
@@ -25,7 +25,7 @@ func New(templateDir string) Render {
 	}
 
 	return Render{
-		templateContainer:b,
+		templateContainer: b,
 	}
 }
 
@@ -35,12 +35,12 @@ type Render struct {
 
 // Instance find by name
 func (r Render) Instance(name string, data interface{}) render.Render {
-	layout, isExist :=  r.templateContainer.Get(name)
+	layout, isExist := r.templateContainer.Get(name)
 	if !isExist {
 		panic("not exist template " + name)
 	}
 	return render.HTML{
-		Template:layout.Layout.(*template.Template),
+		Template: layout.Layout.(*template.Template),
 		Data:     data,
 	}
 }

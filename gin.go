@@ -8,4 +8,3 @@ import (
 type GinMiddleware interface {
 	Handler() gin.HandlerFunc
 }
-

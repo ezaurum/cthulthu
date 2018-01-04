@@ -1,8 +1,8 @@
 package route
 
 import (
-	auth "github.com/ezaurum/cthulthu"
-	"github.com/ezaurum/session"
+	"github.com/ezaurum/cthulthu/authenticator"
+	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -12,7 +12,7 @@ type SessionContextHandlerFunc func(c *gin.Context, session session.Session) (in
 
 func MakeHTML(gameHandler SessionHandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		session := auth.GetSession(c)
+		session := session.GetSession(c)
 		code, result := gameHandler(session)
 		//TODO 페이지 뽑아오는 로직이 필요함
 		page := "index"
@@ -22,20 +22,20 @@ func MakeHTML(gameHandler SessionHandlerFunc) gin.HandlerFunc {
 
 func MakeRedirect(sessionHandler SessionContextHandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		session := auth.GetSession(c)
+		session := session.GetSession(c)
 		code, page := sessionHandler(c, session)
 		c.Redirect(code, page.(string))
 	}
 }
 
 func RunRedirect(c *gin.Context, sessionHandler SessionContextHandlerFunc) {
-	session := auth.GetSession(c)
+	session := session.GetSession(c)
 	code, page := sessionHandler(c, session)
 	c.Redirect(code, page.(string))
 }
 
 func RunJson(c *gin.Context, gameHandler SessionContextHandlerFunc) {
-	session := auth.GetSession(c)
+	session := session.GetSession(c)
 	code, result := gameHandler(c, session)
 	c.JSON(code, result)
 }
@@ -48,7 +48,7 @@ func MakeJustHTML(page string) gin.HandlerFunc {
 
 func MakeJSON(gameHandler SessionHandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		session := auth.GetSession(c)
+		session := session.GetSession(c)
 		code, result := gameHandler(session)
 		c.JSON(code, result)
 	}
@@ -56,9 +56,9 @@ func MakeJSON(gameHandler SessionHandlerFunc) gin.HandlerFunc {
 
 func HTMLOnlyAuth(sessionHandler SessionHandlerFunc, page string, redirect string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		session := auth.GetSession(c)
+		session := session.GetSession(c)
 		//TODO 이거 자체가 잘못 되어 있다. authorizer는 다른 곳에.
-		if auth.HasIDToken(session) {
+		if authenticator.HasIDToken(session) {
 			code, result := sessionHandler(session)
 			c.HTML(code, page, result)
 		} else {

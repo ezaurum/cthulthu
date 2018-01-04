@@ -1,19 +1,19 @@
 package cthulthu
 
 import (
+	"github.com/ezaurum/cthulthu/render"
 	"github.com/gin-gonic/gin"
-	"bitbucket.org/congkong-revivals/admin/congkong"
 )
 
-func Run(config string)  {
+func Run(addr ...string) {
 
 	r := gin.Default()
-	r.HTMLRender = gin.Default()
+	r.HTMLRender = render.Default()
 
-	disconnect := congkong.SetupDB(r)
-	defer disconnect()
+	//TODO disconnect := .SetupDB(r)
+	//TODO defer disconnect()
 
-	congkong.SetupRoute(r)
+	//TODO congkong.SetupRoute(r)
 
-	r.Run(":8989")
+	r.Run(addr...)
 }

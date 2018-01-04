@@ -1,13 +1,19 @@
-package cthulthu
+package authenticator
 
 import (
-	ezs "github.com/ezaurum/session"
+	ezs "github.com/ezaurum/cthulthu/session"
 	"time"
 )
 
 const (
-	IDTokenSessionKey     = "ID token session key tekelli-li"
+	IDTokenSessionKey = "ID token session key tekelli-li"
+
+	GuestRole = "Guest Role"
 )
+
+type Identity interface {
+	Role() string
+}
 
 type IDToken interface {
 	TokenString() string
@@ -22,7 +28,7 @@ func SetIDToken(session ezs.Session, token IDToken) {
 }
 
 func GetIDToken(session ezs.Session) IDToken {
-	a :=  session.Get(IDTokenSessionKey)
+	a := session.Get(IDTokenSessionKey)
 	if nil != a {
 		return a.(IDToken)
 	}
@@ -34,12 +40,12 @@ func HasIDToken(session ezs.Session) bool {
 }
 
 type LoginIdentity struct {
-	id int64
+	id           int64
 	UserID       string
 	UserPassword string
-	isPersisted bool
-	expires		time.Time
-	Token string
+	isPersisted  bool
+	expires      time.Time
+	Token        string
 }
 
 func (l LoginIdentity) TokenString() string {

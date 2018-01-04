@@ -20,26 +20,32 @@
 #  name = "github.com/x/y"
 #  version = "2.4.0"
 
-[[constraint]]
-  name = "github.com/PuerkitoBio/goquery"
-  branch = "master"
-
+# 제네레이터 사용 - db, session 에서 사용
 [[constraint]]
   branch = "master"
   name = "github.com/bwmarrin/snowflake"
 
+# 세션 메모리 스토어가 사용
 [[constraint]]
-  name = "github.com/ezaurum/session"
-  branch = "develop"
+  name = "github.com/patrickmn/go-cache"
+  version = "2.1.0"
 
+# gin
 [[constraint]]
   name = "github.com/gin-gonic/gin"
   branch = "master"
 
+# DB
 [[constraint]]
   name = "github.com/jinzhu/gorm"
   branch = "master"
 
+# authorizer
 [[constraint]]
   name = "github.com/casbin/casbin"
+  branch = "master"
+
+# 테스트
+[[constraint]]
+  name = "github.com/PuerkitoBio/goquery"
   branch = "master"

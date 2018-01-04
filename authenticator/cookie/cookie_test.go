@@ -1,15 +1,15 @@
 package cookie
 
 import (
-	ct "github.com/ezaurum/cthulthu"
+	"github.com/ezaurum/cthulthu/authenticator"
+	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
-	"github.com/ezaurum/session"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
-	"strings"
 )
 
 func TestCookie(t *testing.T) {
@@ -18,7 +18,7 @@ func TestCookie(t *testing.T) {
 	r.Use(Default().Handler())
 
 	r.GET("/", func(c *gin.Context) {
-		s := c.MustGet(ct.DefaultSessionContextKey).(session.Session)
+		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
 		c.String(http.StatusOK, s.ID())
 	})
 
@@ -44,7 +44,7 @@ func TestExpire(t *testing.T) {
 	r.Use(n.Handler())
 
 	r.GET("/", func(c *gin.Context) {
-		s := c.MustGet(ct.DefaultSessionContextKey).(session.Session)
+		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
 		c.String(http.StatusOK, s.ID())
 	})
 
@@ -62,19 +62,19 @@ func TestExpire(t *testing.T) {
 	assert.NotEqual(t, w0.Body.String(), w.Body.String())
 }
 
-func TestPersistToken (t *testing.T) {
+func TestPersistToken(t *testing.T) {
 	r := gin.New()
 	middleware := NewMem(0, 1)
 	r.Use(middleware.Handler())
 
-	token := ct.LoginIdentity{
-		UserID: "test",
+	token := authenticator.LoginIdentity{
+		UserID:       "test",
 		UserPassword: "test",
-		Token : "WTF",
+		Token:        "WTF",
 	}
 
 	r.GET("/", func(c *gin.Context) {
-		s := c.MustGet(ct.DefaultSessionContextKey).(session.Session)
+		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
 		middleware.PersistIDToken(c, s, token)
 		c.String(http.StatusOK, token.TokenString())
 	})
@@ -96,17 +96,17 @@ func TestPersistToken (t *testing.T) {
 
 	assert.True(t, e)
 }
-func TestPersistedTokenLoad (t *testing.T) {
+func TestPersistedTokenLoad(t *testing.T) {
 	r := gin.New()
 	middleware := NewMem(0, 1)
 
-	token := ct.LoginIdentity{
-		UserID: "test",
+	token := authenticator.LoginIdentity{
+		UserID:       "test",
 		UserPassword: "test",
-		Token : "WTF",
+		Token:        "WTF",
 	}
 
-	middleware.LoadIDToken = func(context *gin.Context, s string) (ct.IDToken, bool) {
+	middleware.LoadIDToken = func(context *gin.Context, s string) (authenticator.IDToken, bool) {
 		assert.Equal(t, s, token.TokenString())
 		return token, true
 	}
@@ -116,14 +116,14 @@ func TestPersistedTokenLoad (t *testing.T) {
 	r.Use(middleware.Handler())
 
 	r.GET("/", func(c *gin.Context) {
-		s := c.MustGet(ct.DefaultSessionContextKey).(session.Session)
+		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
 		middleware.PersistIDToken(c, s, token)
 		c.String(http.StatusOK, token.TokenString())
 	})
 
 	r.GET("/1", func(c *gin.Context) {
-		s := c.MustGet(ct.DefaultSessionContextKey).(session.Session)
-		t := ct.GetIDToken(s)
+		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
+		t := authenticator.GetIDToken(s)
 		c.String(http.StatusOK, t.TokenString())
 	})
 
