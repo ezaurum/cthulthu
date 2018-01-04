@@ -39,3 +39,7 @@
 [[constraint]]
   name = "github.com/jinzhu/gorm"
   branch = "master"
+
+[[constraint]]
+  name = "github.com/casbin/casbin"
+  branch = "master"

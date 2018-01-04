@@ -78,6 +78,8 @@ func (ca cookieAuthenticator) findIDToken(c *gin.Context, session ezs.Session) (
 
 		}
 
+		// TODO
+
 		//TODO 가져오기가 없으면 무시?
 
 	}
