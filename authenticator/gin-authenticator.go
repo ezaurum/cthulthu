@@ -1,8 +1,7 @@
-package cookie
+package authenticator
 
 import (
 	ct "github.com/ezaurum/cthulthu"
-	authen "github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/generators/snowflake"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/session/stores/memstore"
@@ -15,7 +14,14 @@ const (
 	persistedIDTokenCookieName = "persisted-id-token-CTHULTHU"
 )
 
-type IDLoader func(*gin.Context, string) (authen.IDToken, bool)
+func Init(r *gin.Engine) ct.GinMiddleware {
+	ca := Default()
+	r.Use(ca.Handler())
+
+	return &ca
+}
+
+type IDLoader func(*gin.Context, string) (IDToken, bool)
 
 type cookieAuthenticator struct {
 	store                      session.Store
@@ -32,7 +38,7 @@ func (ca cookieAuthenticator) Handler() gin.HandlerFunc {
 
 		if needSession {
 			session = ca.createSession(c)
-		} else if authen.HasIDToken(session) {
+		} else if HasIDToken(session) {
 			//activate
 			ca.activateSession(c, session)
 			return
@@ -56,12 +62,12 @@ func (ca cookieAuthenticator) createSession(c *gin.Context) session.Session {
 	return session
 }
 
-func (ca cookieAuthenticator) PersistIDToken(c *gin.Context, session session.Session, idToken authen.IDToken) {
+func (ca cookieAuthenticator) PersistIDToken(c *gin.Context, session session.Session, idToken IDToken) {
 	c.SetCookie(ca.persistedIDTokenCookieName, idToken.TokenString(),
 		365*24*60*60*10, "", "", false, true)
 }
 
-func (ca cookieAuthenticator) findIDToken(c *gin.Context, session session.Session) (authen.IDToken, bool) {
+func (ca cookieAuthenticator) findIDToken(c *gin.Context, session session.Session) (IDToken, bool) {
 
 	//TODO 쿠키가 유효한지 체크를 해 봐야지.
 	loginCookie, e := c.Cookie(ca.persistedIDTokenCookieName)
@@ -90,8 +96,8 @@ func (ca cookieAuthenticator) findIDToken(c *gin.Context, session session.Sessio
 	return nil, false
 }
 
-func (ca cookieAuthenticator) Authenticate(c *gin.Context, session session.Session, IDToken authen.IDToken) {
-	authen.SetIDToken(session, IDToken)
+func (ca cookieAuthenticator) Authenticate(c *gin.Context, session session.Session, IDToken IDToken) {
+	SetIDToken(session, IDToken)
 
 	if IDToken.IsPersisted() {
 		ca.PersistIDToken(c, session, IDToken)

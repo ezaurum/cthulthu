@@ -1,14 +1,11 @@
 package authenticator
 
 import (
-	ezs "github.com/ezaurum/cthulthu/session"
-	"time"
+	"github.com/ezaurum/cthulthu/session"
 )
 
 const (
 	IDTokenSessionKey = "ID token session key tekelli-li"
-
-	GuestRole = "Guest Role"
 )
 
 type Identity interface {
@@ -20,14 +17,14 @@ type IDToken interface {
 	IsPersisted() bool
 }
 
-func SetIDToken(session ezs.Session, token IDToken) {
+func SetIDToken(session session.Session, token IDToken) {
 	session.Set(IDTokenSessionKey, token)
 
 	// TODO identifier 가 멀쩡한지 검증 안 해도 되나?
 
 }
 
-func GetIDToken(session ezs.Session) IDToken {
+func GetIDToken(session session.Session) IDToken {
 	a := session.Get(IDTokenSessionKey)
 	if nil != a {
 		return a.(IDToken)
@@ -35,27 +32,6 @@ func GetIDToken(session ezs.Session) IDToken {
 	return nil
 }
 
-func HasIDToken(session ezs.Session) bool {
+func HasIDToken(session session.Session) bool {
 	return nil != GetIDToken(session)
-}
-
-type LoginIdentity struct {
-	id           int64
-	UserID       string
-	UserPassword string
-	isPersisted  bool
-	expires      time.Time
-	Token        string
-}
-
-func (l LoginIdentity) TokenString() string {
-	return l.Token
-}
-
-func (l LoginIdentity) IsPersisted() bool {
-	return l.isPersisted
-}
-
-func (l LoginIdentity) IsExpired() bool {
-	return time.Now().After(l.expires)
 }

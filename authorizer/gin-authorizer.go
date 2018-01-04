@@ -14,13 +14,20 @@ type AuthorizeMiddleware struct {
 	authorizer *Authorizer
 }
 
+func InitWithAuthenticator(r *gin.Engine) {
+	authenticator.Init(r)
+	Init(r)
+}
+
 func Init(r *gin.Engine) {
+
 
 	auth := AuthorizeMiddleware{
 		authorizer: Default(),
 	}
 
 	r.Use(auth.Handler())
+
 }
 
 func (a *AuthorizeMiddleware) Handler() gin.HandlerFunc {

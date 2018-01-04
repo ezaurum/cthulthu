@@ -1,7 +1,6 @@
-package cookie
+package authenticator
 
 import (
-	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/gin-gonic/gin"
@@ -67,7 +66,7 @@ func TestPersistToken(t *testing.T) {
 	middleware := NewMem(0, 1)
 	r.Use(middleware.Handler())
 
-	token := authenticator.LoginIdentity{
+	token := LoginIdentity{
 		UserID:       "test",
 		UserPassword: "test",
 		Token:        "WTF",
@@ -100,13 +99,13 @@ func TestPersistedTokenLoad(t *testing.T) {
 	r := gin.New()
 	middleware := NewMem(0, 1)
 
-	token := authenticator.LoginIdentity{
+	token := LoginIdentity{
 		UserID:       "test",
 		UserPassword: "test",
 		Token:        "WTF",
 	}
 
-	middleware.LoadIDToken = func(context *gin.Context, s string) (authenticator.IDToken, bool) {
+	middleware.LoadIDToken = func(context *gin.Context, s string) (IDToken, bool) {
 		assert.Equal(t, s, token.TokenString())
 		return token, true
 	}
@@ -123,7 +122,7 @@ func TestPersistedTokenLoad(t *testing.T) {
 
 	r.GET("/1", func(c *gin.Context) {
 		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
-		t := authenticator.GetIDToken(s)
+		t := GetIDToken(s)
 		c.String(http.StatusOK, t.TokenString())
 	})
 
