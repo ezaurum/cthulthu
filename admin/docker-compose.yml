@@ -1,0 +1,23 @@
+# dev stack 개발용
+# Run 도커 stack 으로 실행
+# docker stack deploy -c dev-stack.yml mysql
+# or 도커 컴포즈로 실행
+# docker-compose -f dev-stack.yml up
+
+version: "3.1"
+services:
+
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: dev
+    ports:
+      - 3306:3306
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080

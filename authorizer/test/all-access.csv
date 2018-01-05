@@ -1,0 +1,2 @@
+p, *, *, (GET)|(POST)|(DELETE)|(PUT), allow
+p, *, /blocked, (GET)|(POST)|(DELETE)|(PUT), deny

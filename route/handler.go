@@ -2,6 +2,7 @@ package route
 
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
+	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -9,6 +10,25 @@ import (
 
 type SessionHandlerFunc func(session session.Session) (int, interface{})
 type SessionContextHandlerFunc func(c *gin.Context, session session.Session) (int, interface{})
+type FullContextHandlerFunc func(c *gin.Context, session session.Session, manager *database.Manager) (int, interface{})
+
+func GetProcess(page string, f FullContextHandlerFunc) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		dbm := database.GetDatatbase(c)
+		s := session.GetSession(c)
+		code, result := f(c, s, dbm)
+
+		//TODO
+		switch code {
+		case http.StatusFound:
+			c.Redirect(code, result.(string))
+			break
+		default:
+			c.HTML(code, page, result)
+			break
+		}
+	}
+}
 
 func MakeHTML(gameHandler SessionHandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {

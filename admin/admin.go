@@ -1,28 +1,28 @@
-package main
+package admin
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/ezaurum/cthulthu/authorizer"
+	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/render"
+	"github.com/ezaurum/cthulthu/route"
+	"github.com/gin-gonic/gin"
 	"path/filepath"
-	"os"
-	"log"
 )
 
 const (
-	staticDir = "admin/static"
+	staticDir   = "admin/static"
 	templateDir = "admin/templates"
 )
 
 var (
-	defaultConfig = []interface{}{"admin/model.conf", "admin/policy.csv",}
+	defaultConfig = []interface{}{"admin/model.conf", "admin/policy.csv"}
 )
 
 func DefaultRun() {
 	Run(":9999")
 }
 
-func Run(addr...string) {
+func Run(addr ...string) {
 
 	r := gin.Default()
 
@@ -30,38 +30,35 @@ func Run(addr...string) {
 	// authenticator 를 초기화한다
 	authorizer.InitWithAuthenticator(r, defaultConfig...)
 
+
+	//TODO login redirect page 지정 필요
+
+	//DB
+	manager := database.Default()
+	db := manager.Connect()
+	defer db.Close()
+
+	manager.AutoMigrate(&FormIDToken{}, &Identity{})
+
+	r.Use(manager.Handler())
+
+	// renderer
 	r.HTMLRender = render.New(templateDir)
+
+	// static
 
 	//TODO 디렉토리 여러 군데서 찾도록 하는 것도 필요
 	//TODO skin 시스템을 상속가능하도록 하려면...
 
-	// add static dirs
-	r.Static("/js", staticDir + "/js")
-	r.Static("/fonts", staticDir + "/fonts")
-	r.Static("/css",staticDir +  "/css")
+	route.AddAll(r, Login())
+	route.AddAll(r, Register())
 
-	filepath.Walk(staticDir, func(path string, info os.FileInfo, err error) error {
-		if nil != err {
-			log.Printf("err before %v, %v", path, err)
-		}
+	r.Static("/js", staticDir+"/js")
+	r.Static("/fonts", staticDir+"/fonts")
+	r.Static("/css", staticDir+"/css")
 
-		// 디렉토리는 패스
-		if info.IsDir() {
-			return nil
-		}
+	filepath.Walk(staticDir, route.SetStaticFile(r))
 
-		//TODO ignored files?
-
-		base := filepath.Base(path)
-		r.StaticFile(base,path)
-		return nil
-	})
-
-
-	//TODO disconnect := .SetupDB(r)
-	//TODO defer disconnect()
-
-	//TODO congkong.SetupRoute(r)
-
+	// run
 	r.Run(addr...)
 }

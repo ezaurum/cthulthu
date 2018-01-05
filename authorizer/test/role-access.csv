@@ -1,0 +1,2 @@
+p, SuperAdmin, /blocked, (GET)|(POST)|(DELETE)|(PUT), allow
+p, *, /login, (GET)|(POST), allow

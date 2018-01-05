@@ -2,11 +2,6 @@ package authorizer
 
 import (
 	"github.com/casbin/casbin"
-	"github.com/ezaurum/cthulthu/session"
-)
-
-const (
-	SessionUserRoleKey = "template/UserRole"
 )
 
 // NewAuthorizer returns the authorizer, uses a Casbin enforcer as input
@@ -24,11 +19,6 @@ func Default() *Authorizer {
 // Authorizer stores the casbin handler
 type Authorizer struct {
 	enforcer *casbin.Enforcer
-}
-
-func SetUserRole(session session.Session, userRole string) {
-	session.Set(SessionUserRoleKey, userRole)
-	session.Save()
 }
 
 // CheckPermission checks the user/method/path combination from the request.

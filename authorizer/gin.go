@@ -4,22 +4,20 @@ import (
 	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/gin-gonic/gin"
 	"net/http"
-)
-
-const (
-	IdentityContextKey = "identity context key"
+	"github.com/ezaurum/cthulthu/session"
 )
 
 type AuthorizeMiddleware struct {
 	authorizer *Authorizer
 }
 
-func InitWithAuthenticator(r *gin.Engine, config...interface{}) {
-	authenticator.Init(r)
-	Init(r, config...)
+func InitWithAuthenticator(r *gin.Engine, config ...interface{}) (authenticator.Authenticator, *AuthorizeMiddleware) {
+	ac := authenticator.Init(r)
+	auth := Init(r, config...)
+	return ac, auth
 }
 
-func Init(r *gin.Engine, config...interface{}) {
+func Init(r *gin.Engine, config ...interface{}) *AuthorizeMiddleware {
 
 	var authorizer *Authorizer
 	if len(config) < 1 {
@@ -34,11 +32,13 @@ func Init(r *gin.Engine, config...interface{}) {
 
 	r.Use(auth.Handler())
 
+	return &auth
+
 }
 
 func (a *AuthorizeMiddleware) Handler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if a.CheckPermission(c) {
+		if a.CheckPermission(c, session.GetSession(c)) {
 			return
 		}
 		writeRequirePermission(c)
@@ -70,15 +70,14 @@ func writeRequirePermission(c *gin.Context) {
 
 // CheckPermission checks the user/method/path combination from the request.
 // Returns true (permission granted) or false (permission forbidden)
-func (a *AuthorizeMiddleware) CheckPermission(c *gin.Context) bool {
+func (a *AuthorizeMiddleware) CheckPermission(c *gin.Context, session session.Session) bool {
 
 	path := c.Request.URL.Path
 	method := c.Request.Method
 	userRole := "*"
 
-	identity, exists := c.Get(IdentityContextKey)
-	if exists {
-		userRole = identity.(authenticator.Identity).Role()
+	if authenticator.IsAuthenticated(session) {
+		userRole = authenticator.GetIdentity(session).Role()
 	}
 
 	return a.authorizer.CheckPermission(path, method, userRole)

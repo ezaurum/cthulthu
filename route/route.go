@@ -11,11 +11,18 @@ type Holder struct {
 
 type Routes map[string][]Holder
 
+func (routes Routes) POST(relativePath string, handlerFunc gin.HandlerFunc) Routes {
+	return routes.Add("POST", relativePath, handlerFunc)
+}
+
 func (routes Routes) Add(method string, relativePath string, handlerFunc gin.HandlerFunc) Routes {
 	slice := routes[method]
 	slice = append(slice, Holder{Handler: handlerFunc, RelativePath: relativePath})
 	routes[method] = slice
 	return routes
+}
+func (routes Routes) AddPage(relativePath string, page string) Routes {
+	return routes.Add("GET", relativePath, MakeJustHTML(page))
 }
 
 func AddTo(routes Routes, method string, relativePath string, handlerFunc gin.HandlerFunc) Routes {

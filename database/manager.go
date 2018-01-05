@@ -4,8 +4,10 @@ import (
 	"github.com/jinzhu/gorm"
 	"reflect"
 
+	"github.com/ezaurum/cthulthu/generators"
+
 	//TODO 임포트 자체를 바꿔야 하나?
-	"github.com/bwmarrin/snowflake"
+	"github.com/ezaurum/cthulthu/generators/snowflake"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
@@ -14,47 +16,44 @@ import (
 type Manager struct {
 	connectionString string
 	dialect          string
-	nodes            map[string]*snowflake.Node
+	nodes            map[string]generators.IDGenerator
 	NodeNumber       int64
 	db               *gorm.DB
 }
 
-func Default() Manager {
+func Default() *Manager {
 	// mysql connect
-	return Manager{
+	return &Manager{
 		connectionString: "root:example@tcp(127.0.0.1:3306)/dev?charset=utf8&parseTime=True&loc=Local",
 		dialect:          "mysql",
-		nodes:            make(map[string]*snowflake.Node),
+		nodes:            make(map[string]generators.IDGenerator),
 	}
 }
 
-func Test() Manager {
+func Test() *Manager {
 	// mysql connect
-	return Manager{
+	return &Manager{
 		connectionString: "test.db",
 		dialect:          "sqlite3",
-		nodes:            make(map[string]*snowflake.Node),
+		nodes:            make(map[string]generators.IDGenerator),
 	}
 }
 
-func (dbm Manager) DB() *gorm.DB {
+func (dbm *Manager) DB() *gorm.DB {
 	return dbm.db
 }
-func (dbm Manager) Generate(typeName string) int64 {
-	return dbm.nodes[typeName].Generate().Int64()
+func (dbm *Manager) Generate(typeName string) int64 {
+	return dbm.nodes[typeName].GenerateInt64()
 }
 
-func (dbm Manager) GenerateByType(v interface{}) int64 {
-	return dbm.nodes[reflect.TypeOf(v).Name()].Generate().Int64()
+func (dbm *Manager) GenerateByType(v interface{}) int64 {
+	return dbm.nodes[reflect.TypeOf(v).Name()].GenerateInt64()
 }
 
-func (dbm Manager) AutoMigrate(values ...interface{}) {
+func (dbm *Manager) AutoMigrate(values ...interface{}) {
 
 	for _, v := range values {
-		n, err := snowflake.NewNode(dbm.NodeNumber)
-		if nil != err {
-			panic(err)
-		}
+		n := snowflake.New(dbm.NodeNumber)
 		dbm.nodes[reflect.TypeOf(v).Name()] = n
 	}
 
@@ -64,10 +63,7 @@ func (dbm Manager) AutoMigrate(values ...interface{}) {
 		break
 	}
 	dbm.db.AutoMigrate(values...)
-	node, err := snowflake.NewNode(0)
-	if nil != err {
-		panic(err)
-	}
+	node := snowflake.New(0)
 	dbm.nodes["Spin"] = node
 }
 
@@ -93,24 +89,24 @@ func (dbm *Manager) Connect() *gorm.DB {
 	dbm.db = db
 	return db
 }
-func (dbm Manager) Create(target interface{}) interface{} {
+func (dbm *Manager) Create(target interface{}) interface{} {
 	dbm.assignIDWhenNotAssigned(target)
 	dbm.db.Create(target)
 	return target
 }
 
-func (dbm Manager) Save(target interface{}) {
+func (dbm *Manager) Save(target interface{}) {
 	dbm.db.Save(target)
 }
 
-func (dbm Manager) SaveAll(targets ...interface{}) {
+func (dbm *Manager) SaveAll(targets ...interface{}) {
 	dbm.transaction(func(tx *gorm.DB, v interface{}) {
 		d := tx.Save(v)
 		checkError(d, tx)
 	}, targets...)
 }
 
-func (dbm Manager) CreateAll(targets ...interface{}) {
+func (dbm *Manager) CreateAll(targets ...interface{}) {
 	action := func(tx *gorm.DB, v interface{}) {
 		d := tx.Create(v)
 		checkError(d, tx)
@@ -137,7 +133,7 @@ func (dbm *Manager) transaction(action TransactionHandlerFunc, targets ...interf
 
 type TransactionHandlerFunc func(*gorm.DB, interface{})
 
-func (dbm Manager) assignIDWhenNotAssigned(target interface{}) int64 {
+func (dbm *Manager) assignIDWhenNotAssigned(target interface{}) int64 {
 	stype := reflect.ValueOf(target).Elem()
 	m := stype.FieldByName("Model")
 	if m.Kind() == reflect.Struct {
@@ -152,4 +148,12 @@ func (dbm Manager) assignIDWhenNotAssigned(target interface{}) int64 {
 		}
 	}
 	return 0
+}
+
+func (dbm *Manager) Find(token interface{}, where interface{}) interface{} {
+	db := dbm.db.Find(token, where)
+	if nil != db.Error {
+		return db.Error
+	}
+	return nil
 }

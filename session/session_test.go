@@ -10,5 +10,11 @@ func TestDefaultGet(t *testing.T) {
 	s.Set("t", "haha")
 
 	assert.Equal(t, "test", s.ID())
-	assert.Equal(t, "haha", s.Get("t"))
+	r, b := s.Get("t")
+	assert.True(t, b)
+	assert.Equal(t, "haha", r)
+
+	r1, b1 := s.Get("q")
+	assert.True(t, !b1)
+	assert.Nil(t, r1)
 }

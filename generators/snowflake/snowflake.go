@@ -24,3 +24,7 @@ type snowflakeGenerator struct {
 func (g snowflakeGenerator) Generate() string {
 	return g.node.Generate().String()
 }
+
+func (g snowflakeGenerator) GenerateInt64() int64 {
+	return g.node.Generate().Int64()
+}

@@ -14,31 +14,28 @@ const (
 	persistedIDTokenCookieName = "persisted-id-token-CTHULTHU"
 )
 
-func Init(r *gin.Engine) ct.GinMiddleware {
-	ca := Default()
-	r.Use(ca.Handler())
-
-	return ca
-}
-
-type IDLoader func(*gin.Context, string) (IDToken, bool)
+type IDTokenLoader func(*gin.Context, string) (IDToken, bool)
+type IDLoader func(*gin.Context, IDToken) (Identity, bool)
 
 type cookieAuthenticator struct {
 	store                      session.Store
 	MaxAge                     int
 	sessionIDCookieName        string
 	persistedIDTokenCookieName string
-	LoadIDToken                IDLoader
+	LoadIDToken                IDTokenLoader
+	LoadIdentity               IDLoader
 }
 
 func (ca cookieAuthenticator) Handler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
+		SetAuthenticator(c, ca)
+
 		session, needSession := ca.findSession(c)
 
 		if needSession {
 			session = ca.createSession(c)
-		} else if HasIDToken(session) {
+		} else if IsAuthenticated(session) {
 			//activate
 			ca.activateSession(c, session)
 			return
@@ -96,15 +93,26 @@ func (ca cookieAuthenticator) findIDToken(c *gin.Context, session session.Sessio
 	return nil, false
 }
 
-func (ca cookieAuthenticator) Authenticate(c *gin.Context, session session.Session, IDToken IDToken) {
-	SetIDToken(session, IDToken)
+func (ca cookieAuthenticator) Authenticate(c *gin.Context, session session.Session, idToken IDToken) {
 
-	if IDToken.IsPersisted() {
-		ca.PersistIDToken(c, session, IDToken)
+	identity, b := ca.LoadIdentity(c, idToken)
+
+	if !b {
+		//TODO error
+		panic("Not exist identity")
+	}
+
+	SetIdentity(session, identity)
+	SetIDToken(session, idToken)
+	session.Save()
+
+	if idToken.IsPersisted() {
+		ca.PersistIDToken(c, session, idToken)
 	}
 }
 
-func (ca cookieAuthenticator) activateSession(c *gin.Context, s session.Session) {
+func (ca *cookieAuthenticator) activateSession(c *gin.Context, s session.Session) {
+
 	//refresh session expires
 	session.SetSession(c, s)
 	ca.SetSessionIDCookie(c, s)
@@ -143,7 +151,7 @@ func (ca cookieAuthenticator) SetSessionIDCookie(c *gin.Context, session session
 		false, true)
 }
 
-func Default() ct.GinMiddleware {
+func Default() Authenticator {
 	return NewMem(0, session.DefaultSessionExpires)
 }
 

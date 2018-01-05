@@ -130,6 +130,10 @@ func (t *TemplateContainer) Load(rootDir string) *TemplateContainer {
 			break
 		}
 
+		if t.debug {
+			log.Printf("key:%v, name:%v, path:%v", templateKey, layoutName, path)
+		}
+
 		return err
 	})
 
