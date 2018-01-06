@@ -186,12 +186,12 @@ func getTestAuthenticator(t *testing.T, token IDToken, identity Identity, expire
 
 	middleware := NewMem(0, expiresInSecond)
 
-	middleware.LoadIDToken = func(context *gin.Context, s string) (IDToken, bool) {
+	middleware.LoadIDToken = func(s string) (IDToken, bool) {
 		assert.Equal(t, s, token.TokenString())
 		return token, true
 	}
 
-	middleware.LoadIdentity = func(c *gin.Context, token IDToken) (Identity, bool) {
+	middleware.LoadIdentity = func(token IDToken) (Identity, bool) {
 		assert.NotNil(t, token)
 		assert.NotNil(t, identity)
 		return identity, true
@@ -208,6 +208,11 @@ type FormIDToken struct {
 	isPersisted  bool
 	expires      time.Time
 	Token        string
+	IdentityID int64
+}
+
+func (l FormIDToken) IdentityKey() int64 {
+	return l.IdentityID
 }
 
 func (l FormIDToken) TokenString() string {

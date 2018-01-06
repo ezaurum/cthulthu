@@ -19,21 +19,24 @@ func InitWithAuthenticator(r *gin.Engine, config ...interface{}) (authenticator.
 
 func Init(r *gin.Engine, config ...interface{}) *AuthorizeMiddleware {
 
+	auth := GetAuthorizer(config...)
+
+	r.Use(auth.Handler())
+
+	return &auth
+
+}
+func GetAuthorizer(config ...interface{}) AuthorizeMiddleware {
 	var authorizer *Authorizer
 	if len(config) < 1 {
 		authorizer = Default()
 	} else {
 		authorizer = New(config...)
 	}
-
 	auth := AuthorizeMiddleware{
 		authorizer: authorizer,
 	}
-
-	r.Use(auth.Handler())
-
-	return &auth
-
+	return auth
 }
 
 func (a *AuthorizeMiddleware) Handler() gin.HandlerFunc {
@@ -50,8 +53,14 @@ func (a *AuthorizeMiddleware) Handler() gin.HandlerFunc {
 func redirectToLogin(c *gin.Context) {
 	s := c.Request.URL.Path
 	redirect := "/login"
-	if s != "/" {
+	switch s {
+	case "/":
+	case "/login":
+	case "/register":
+		break
+	default:
 		redirect = redirect + "?redirect=" + s
+		break
 	}
 	c.Redirect(http.StatusFound, redirect)
 }

@@ -1,8 +1,7 @@
 p, SuperAdmin, /*, (GET)|(POST)|(DELETE)|(PUT)
-
-p, *, /css/*, GET
-p, *, /js/*, GET
-p, *, /fonts/*, GET
-
+p, User, /, GET
+p, *, /css/*, (GET)|(HEAD)
+p, *, /js/*, (GET)|(HEAD)
+p, *, /fonts/*, (GET)|(HEAD)
 p, *, /login, (GET)|(POST)
 p, *, /register, (GET)|(POST)

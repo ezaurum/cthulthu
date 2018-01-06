@@ -30,8 +30,9 @@ func Register() route.Routes {
 				//TODO 에러를 감싸든가...
 				switch findErr {
 				case gorm.ErrRecordNotFound:
-					ac := c.MustGet("CA").(authenticator.Authenticator)
-					ac.Authenticate(c, s, token)
+					tk := CreateUserByForm(loginForm, m)
+					ac := authenticator.GetAuthenticator(c)
+					ac.Authenticate(c, s, tk)
 					return http.StatusFound, "/"
 					break
 				case nil:
@@ -59,7 +60,7 @@ func CreateUserByForm(registerForm FormIDToken, m *database.Manager) authenticat
 		AccountName:     registerForm.AccountName,
 		AccountPassword: registerForm.AccountPassword,
 		Model:           i,
-		Identity:        id,
+		IdentityID:id.ID,
 		RememberLogin:   registerForm.RememberLogin,
 		Token:           strconv.FormatInt(i.ID, 10),
 		expires:         time.Now().Add(time.Hour * 24 * 365),

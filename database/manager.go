@@ -10,6 +10,8 @@ import (
 	"github.com/ezaurum/cthulthu/generators/snowflake"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"time"
+	"fmt"
 )
 
 // gorm 래퍼가 되지
@@ -26,15 +28,6 @@ func Default() *Manager {
 	return &Manager{
 		connectionString: "root:example@tcp(127.0.0.1:3306)/dev?charset=utf8&parseTime=True&loc=Local",
 		dialect:          "mysql",
-		nodes:            make(map[string]generators.IDGenerator),
-	}
-}
-
-func Test() *Manager {
-	// mysql connect
-	return &Manager{
-		connectionString: "test.db",
-		dialect:          "sqlite3",
 		nodes:            make(map[string]generators.IDGenerator),
 	}
 }
@@ -150,10 +143,46 @@ func (dbm *Manager) assignIDWhenNotAssigned(target interface{}) int64 {
 	return 0
 }
 
-func (dbm *Manager) Find(token interface{}, where interface{}) interface{} {
-	db := dbm.db.Find(token, where)
+func (dbm *Manager) Find(token interface{}, where...interface{}) interface{} {
+	db := dbm.db.Find(token, where...)
 	if nil != db.Error {
 		return db.Error
 	}
 	return nil
+}
+
+func (dbm *Manager) IsExist(t interface{}, where...interface{}) bool {
+	error := dbm.Find(t, where...)
+	switch error {
+	case nil:
+		return true
+	case gorm.ErrRecordNotFound:
+		return false
+	default:
+		panic(error)
+	}
+}
+
+
+// 이거 테스트 때만 쓰긴 하는데...
+
+func TestNew() *Manager {
+
+	file := fmt.Sprintf("test%v.db", time.Now().Unix())
+
+	// mysql connect
+	return &Manager{
+		connectionString: file,
+		dialect:          "sqlite3",
+		nodes:            make(map[string]generators.IDGenerator),
+	}
+}
+
+func Test() *Manager {
+	// mysql connect
+	return &Manager{
+		connectionString: "test.db",
+		dialect:          "sqlite3",
+		nodes:            make(map[string]generators.IDGenerator),
+	}
 }

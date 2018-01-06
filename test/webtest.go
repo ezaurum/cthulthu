@@ -57,3 +57,12 @@ func GetDocument(w *httptest.ResponseRecorder, t *testing.T) *goquery.Document {
 	}
 	return doc
 }
+
+func IsRedirect(recorder *httptest.ResponseRecorder) bool {
+	location := recorder.HeaderMap["Location"]
+	return len(location) > 0
+}
+
+func GetRedirect(recorder *httptest.ResponseRecorder) string {
+	return recorder.HeaderMap["Location"][0]
+}

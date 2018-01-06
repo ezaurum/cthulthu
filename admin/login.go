@@ -31,9 +31,8 @@ func Login() route.Routes {
 					return http.StatusFound, "/login?err=not"
 					break
 				case nil:
-					tk := CreateUserByForm(loginForm, m)
 					ac := authenticator.GetAuthenticator(c)
-					ac.Authenticate(c, s, tk)
+					ac.Authenticate(c, s, token)
 					return http.StatusFound, "/"
 				default:
 					panic(findErr)

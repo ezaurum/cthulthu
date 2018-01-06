@@ -14,8 +14,6 @@ const (
 	persistedIDTokenCookieName = "persisted-id-token-CTHULTHU"
 )
 
-type IDTokenLoader func(*gin.Context, string) (IDToken, bool)
-type IDLoader func(*gin.Context, IDToken) (Identity, bool)
 
 type cookieAuthenticator struct {
 	store                      session.Store
@@ -26,7 +24,21 @@ type cookieAuthenticator struct {
 	LoadIdentity               IDLoader
 }
 
-func (ca cookieAuthenticator) Handler() gin.HandlerFunc {
+func (ca *cookieAuthenticator) SetActions(loadIDToken IDTokenLoader, loadIdentity IDLoader) {
+	ca.LoadIdentity = loadIdentity
+	ca.LoadIDToken = loadIDToken
+}
+
+func (ca *cookieAuthenticator) Handler() gin.HandlerFunc {
+
+	if nil == ca.LoadIDToken {
+		panic("LoadIdToken is nil")
+	}
+
+	if nil == ca.LoadIdentity {
+		panic("LoadIdentity is nil")
+	}
+
 	return func(c *gin.Context) {
 
 		SetAuthenticator(c, ca)
@@ -60,6 +72,7 @@ func (ca cookieAuthenticator) createSession(c *gin.Context) session.Session {
 }
 
 func (ca cookieAuthenticator) PersistIDToken(c *gin.Context, session session.Session, idToken IDToken) {
+	//TODO db에도 써야지
 	c.SetCookie(ca.persistedIDTokenCookieName, idToken.TokenString(),
 		365*24*60*60*10, "", "", false, true)
 }
@@ -74,7 +87,7 @@ func (ca cookieAuthenticator) findIDToken(c *gin.Context, session session.Sessio
 
 		//IDToken 가져오기
 		if nil != ca.LoadIDToken {
-			idToken, exist := ca.LoadIDToken(c, loginCookie)
+			idToken, exist := ca.LoadIDToken(loginCookie)
 
 			if exist {
 				return idToken, true
@@ -95,7 +108,7 @@ func (ca cookieAuthenticator) findIDToken(c *gin.Context, session session.Sessio
 
 func (ca cookieAuthenticator) Authenticate(c *gin.Context, session session.Session, idToken IDToken) {
 
-	identity, b := ca.LoadIdentity(c, idToken)
+	identity, b := ca.LoadIdentity(idToken)
 
 	if !b {
 		//TODO error

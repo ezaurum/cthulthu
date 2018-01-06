@@ -10,6 +10,9 @@ const (
 	IdentitySessionKey= "ID session key tekelli-li"
 )
 
+type IDTokenLoader func(string) (IDToken, bool)
+type IDLoader func(IDToken) (Identity, bool)
+
 type Identity interface {
 	Role() string
 }
@@ -17,6 +20,7 @@ type Identity interface {
 type IDToken interface {
 	TokenString() string
 	IsPersisted() bool
+	IdentityKey() int64
 }
 
 func SetIDToken(session session.Session, token IDToken) {
