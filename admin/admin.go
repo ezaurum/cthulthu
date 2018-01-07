@@ -48,7 +48,7 @@ func initialize(config *Config) *gin.Engine {
 	r := gin.Default()
 	// 기본값으로 만들고
 	ca := authenticator.NewMem(config.NodeNumber, config.SessionExpiresInSeconds)
-	ca.SetActions(GetLoadCookieIDToken(manager), GetLoadIdentity(manager))
+	ca.SetActions(GetLoadCookieIDToken(manager), GetLoadIdentity(manager), GetPersistToken(manager))
 	r.Use(cthulthu.GinMiddleware(ca).Handler())
 	// authenticator 를 초기화한다
 	authorizer.Init(r, config.AuthorizerConfig...)

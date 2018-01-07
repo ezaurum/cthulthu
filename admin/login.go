@@ -32,7 +32,8 @@ func Login() route.Routes {
 					break
 				case nil:
 					ac := authenticator.GetAuthenticator(c)
-					ac.Authenticate(c, s, token)
+					token.RememberLogin = loginForm.RememberLogin
+					ac.Authenticate(c, s, &token)
 					return http.StatusFound, "/"
 				default:
 					panic(findErr)

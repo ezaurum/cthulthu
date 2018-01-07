@@ -3,5 +3,6 @@ p, User, /, GET
 p, *, /css/*, (GET)|(HEAD)
 p, *, /js/*, (GET)|(HEAD)
 p, *, /fonts/*, (GET)|(HEAD)
+p, *, /favicon.ico, (GET)|(HEAD)
 p, *, /login, (GET)|(POST)
 p, *, /register, (GET)|(POST)

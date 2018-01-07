@@ -10,7 +10,7 @@ type FormIDToken struct {
 	database.Model
 	AccountName     string `form:"accountName" binding:"required"`
 	AccountPassword string `form:"accountPassword" binding:"required"`
-	RememberLogin   bool   `form:"rememberLogin" gorm:"-"`
+	RememberLogin   string   `form:"rememberLogin" gorm:"-"`
 	IdentityID      int64
 	expires         time.Time
 	Token           string
@@ -21,7 +21,7 @@ func (l FormIDToken) TokenString() string {
 }
 
 func (l FormIDToken) IsPersisted() bool {
-	return l.RememberLogin
+	return "checked" == l.RememberLogin
 }
 
 func (l FormIDToken) IsExpired() bool {

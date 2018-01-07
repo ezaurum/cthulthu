@@ -7,11 +7,11 @@ import (
 	"github.com/ezaurum/cthulthu/generators"
 
 	//TODO 임포트 자체를 바꿔야 하나?
-	"fmt"
 	"github.com/ezaurum/cthulthu/generators/snowflake"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
+	"fmt"
 )
 
 // gorm 래퍼가 되지
@@ -132,7 +132,7 @@ func (dbm *Manager) assignIDWhenNotAssigned(target interface{}) int64 {
 	if m.Kind() == reflect.Struct {
 		f0 := m.FieldByName("ID")
 		if f0.IsValid() {
-			if 0 != f0.Int() {
+			if 0 == f0.Int() {
 				id := dbm.Generate(reflect.TypeOf(target).Name())
 				f0.SetInt(id)
 			} else {

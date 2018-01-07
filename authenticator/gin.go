@@ -17,7 +17,7 @@ func SetAuthenticator(c *gin.Context, ca Authenticator) {
 type Authenticator interface {
 	Authenticate(c *gin.Context, session session.Session, idToken IDToken)
 	PersistIDToken(c *gin.Context, session session.Session, idToken IDToken)
-	SetActions(loadIDToken IDTokenLoader, loadIdentity IDLoader)
+	SetActions(loadIDToken IDTokenLoader, loadIdentity IDLoader, persistIDToken TokenSaver)
 }
 
 func Init(r *gin.Engine) Authenticator {

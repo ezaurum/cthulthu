@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	sessionIDCookieName        = "session-id-CTHULTHU"
-	persistedIDTokenCookieName = "persisted-id-token-CTHULTHU"
+	SessionIDCookieName        = "session-id-CTHULTHU"
+	PersistedIDTokenCookieName = "persisted-id-token-CTHULTHU"
 )
 
 type cookieAuthenticator struct {
@@ -21,11 +21,13 @@ type cookieAuthenticator struct {
 	persistedIDTokenCookieName string
 	LoadIDToken                IDTokenLoader
 	LoadIdentity               IDLoader
+	PersistToken			TokenSaver
 }
 
-func (ca *cookieAuthenticator) SetActions(loadIDToken IDTokenLoader, loadIdentity IDLoader) {
+func (ca *cookieAuthenticator) SetActions(loadIDToken IDTokenLoader, loadIdentity IDLoader, tokenSaver TokenSaver) {
 	ca.LoadIdentity = loadIdentity
 	ca.LoadIDToken = loadIDToken
+	ca.PersistToken = tokenSaver
 }
 
 func (ca *cookieAuthenticator) Handler() gin.HandlerFunc {
@@ -71,36 +73,24 @@ func (ca cookieAuthenticator) createSession(c *gin.Context) session.Session {
 }
 
 func (ca cookieAuthenticator) PersistIDToken(c *gin.Context, session session.Session, idToken IDToken) {
-	//TODO db에도 써야지
+	ca.PersistToken(idToken)
 	c.SetCookie(ca.persistedIDTokenCookieName, idToken.TokenString(),
 		365*24*60*60*10, "", "", false, true)
 }
 
 func (ca cookieAuthenticator) findIDToken(c *gin.Context, session session.Session) (IDToken, bool) {
 
-	//TODO 쿠키가 유효한지 체크를 해 봐야지.
 	loginCookie, e := c.Cookie(ca.persistedIDTokenCookieName)
 	hasCookie := nil == e
 
-	if hasCookie {
-
-		//IDToken 가져오기
-		if nil != ca.LoadIDToken {
-			idToken, exist := ca.LoadIDToken(loginCookie)
-
-			if exist {
-				return idToken, true
-			}
-
-		}
-
-		// TODO
-
-		//TODO 가져오기가 없으면 무시?
-
+	if !hasCookie {
+		return nil, false
 	}
 
-	// TODO 필요하면 DB에다 회원가입을 시키고?
+	idToken, exist := ca.LoadIDToken(loginCookie)
+	if exist {
+		return idToken, true
+		}
 
 	return nil, false
 }
@@ -110,7 +100,6 @@ func (ca cookieAuthenticator) Authenticate(c *gin.Context, session session.Sessi
 	identity, b := ca.LoadIdentity(idToken)
 
 	if !b {
-		//TODO error
 		panic("Not exist identity")
 	}
 
@@ -178,10 +167,10 @@ func NewMem(node int64, expiresInSeconds int) *cookieAuthenticator {
 
 func newMiddleware(store session.Store) *cookieAuthenticator {
 	return &cookieAuthenticator{
-		store:  store,
-		MaxAge: session.DefaultSessionExpires,
-		persistedIDTokenCookieName: persistedIDTokenCookieName,
-		sessionIDCookieName:        sessionIDCookieName,
+		store:                      store,
+		MaxAge:                     session.DefaultSessionExpires,
+		persistedIDTokenCookieName: PersistedIDTokenCookieName,
+		sessionIDCookieName:        SessionIDCookieName,
 	}
 }
 
