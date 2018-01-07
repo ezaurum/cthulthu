@@ -5,6 +5,7 @@ import (
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"github.com/ezaurum/cthulthu/session"
 )
 
 func TestRegister(t *testing.T) {
@@ -12,7 +13,7 @@ func TestRegister(t *testing.T) {
 	testDB := database.TestNew()
 	db := testDB.Connect()
 	defer db.Close()
-	r := initialize(testDB, testTemplateDir, testStaticDir, testConfig...)
+	r := initializeTest(testDB, session.DefaultSessionExpires)
 
 	//loginForm := webtest.GetStatusOKDoc(r, redirectLocation, t)
 	//assert.Equal(t, 1, loginForm.Find("form").Length())
@@ -40,7 +41,7 @@ func TestAfterRegisterAuthenticated(t *testing.T) {
 	testDB := database.TestNew()
 	db := testDB.Connect()
 	defer db.Close()
-	r := initialize(testDB, testTemplateDir, testStaticDir, testConfig...)
+	r := initializeTest(testDB, session.DefaultSessionExpires)
 
 	form := getRegisterFormPostData()
 

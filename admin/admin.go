@@ -9,15 +9,7 @@ import (
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/gin-gonic/gin"
 	"path/filepath"
-)
-
-const (
-	staticDir   = "admin/static"
-	templateDir = "admin/templates"
-)
-
-var (
-	defaultConfig = []interface{}{"admin/model.conf", "admin/policy.csv"}
+	"github.com/ezaurum/cthulthu/session"
 )
 
 func DefaultRun() {
@@ -31,32 +23,43 @@ func Run(addr ...string) {
 	db := manager.Connect()
 	defer db.Close()
 
-	r := initialize(manager, templateDir, staticDir, defaultConfig...)
+	r := initialize(&Config{
+		DBManager:manager,
+		TemplateDir:templateDir,
+		StaticDir:staticDir,
+		NodeNumber:0,
+		SessionExpiresInSeconds:session.DefaultSessionExpires,
+		AutoMigrates:[]interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}},
+		AuthorizerConfig:defaultConfig,
+	})
 
 	// run
 	r.Run(addr...)
 }
 
-func initialize(manager *database.Manager, templateDir string, staticDir string, params ...interface{}) *gin.Engine {
+func initialize(config *Config) *gin.Engine {
+
+	manager := config.DBManager
 
 	//TODO related
-	manager.AutoMigrate(&FormIDToken{}, &CookieIDToken{}, &Identity{})
+	manager.AutoMigrate(config.AutoMigrates...)
 
 	//gin
 	r := gin.Default()
 	// 기본값으로 만들고
-	ca := authenticator.Default()
+	ca := authenticator.NewMem(config.NodeNumber, config.SessionExpiresInSeconds)
 	ca.SetActions(GetLoadCookieIDToken(manager), GetLoadIdentity(manager))
-	r.Use(ca.(cthulthu.GinMiddleware).Handler())
+	r.Use(cthulthu.GinMiddleware(ca).Handler())
 	// authenticator 를 초기화한다
-	authorizer.Init(r, params...)
+	authorizer.Init(r, config.AuthorizerConfig...)
 	//TODO login redirect page 지정 필요
 	r.Use(manager.Handler())
 	// renderer
-	r.HTMLRender = render.New(templateDir)
+	r.HTMLRender = render.New(config.TemplateDir)
 	// static
 	//TODO 디렉토리 여러 군데서 찾도록 하는 것도 필요
 	//TODO skin 시스템을 상속가능하도록 하려면...
+	staticDir := config.StaticDir
 	route.AddAll(r, Login())
 	route.AddAll(r, Register())
 	r.Static("/js", staticDir+"/js")

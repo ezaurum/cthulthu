@@ -6,15 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/url"
 	"testing"
-)
-
-const (
-	testTemplateDir = "templates"
-	testStaticDir   = "templates"
-)
-
-var (
-	testConfig = []interface{}{"model.conf", "policy.csv"}
+	"github.com/ezaurum/cthulthu/session"
+	"github.com/gin-gonic/gin"
 )
 
 func getRegisterFormPostData() url.Values {
@@ -24,12 +17,24 @@ func getRegisterFormPostData() url.Values {
 	return form
 }
 
+func initializeTest(manager *database.Manager, expires int) *gin.Engine {
+	return initialize(&Config{
+		DBManager:               manager,
+		TemplateDir:             testTemplateDir,
+		StaticDir:               testStaticDir,
+		NodeNumber:              0,
+		SessionExpiresInSeconds: expires,
+		AutoMigrates:            []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}},
+		AuthorizerConfig:        testAuthorizerConfig,
+	})
+}
+
 func TestRoleAccess(t *testing.T) {
 
 	testDB := database.Test()
 	db := testDB.Connect()
 	defer db.Close()
-	r := initialize(testDB, testTemplateDir, testStaticDir, testConfig...)
+	r := initializeTest(testDB, session.DefaultSessionExpires)
 
 	client := test.HttpClient{}
 	w0 := client.GetRequest(r, "/")
