@@ -9,7 +9,7 @@ import (
 func GetLoadCookieIDToken(dbm *database.Manager) authenticator.IDTokenLoader {
 	return func(tokenString string) (authenticator.IDToken, bool) {
 		var token CookieIDToken
-		if dbm.IsExist(&token, &CookieIDToken{Token: tokenString}) && !token.IsExpired(){
+		if dbm.IsExist(&token, &CookieIDToken{Token: tokenString}) && !token.IsExpired() {
 			return token, true
 		} else {
 			return nil, false

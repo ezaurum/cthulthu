@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	IDTokenSessionKey = "ID token session key tekelli-li"
-	IdentitySessionKey= "ID session key tekelli-li"
+	IDTokenSessionKey  = "ID token session key tekelli-li"
+	IdentitySessionKey = "ID session key tekelli-li"
 )
 
 type IDTokenLoader func(string) (IDToken, bool)
@@ -48,12 +48,12 @@ func IsAuthenticated(session session.Session) bool {
 }
 
 func GetIdentity(session session.Session) Identity {
-	i, _ :=  session.Get(IdentitySessionKey)
+	i, _ := session.Get(IdentitySessionKey)
 	return i.(Identity)
 }
 
 func FindIdentity(session session.Session) (Identity, bool) {
-	id, e :=  session.Get(IdentitySessionKey)
+	id, e := session.Get(IdentitySessionKey)
 	if e {
 		return id.(Identity), true
 	}
@@ -67,4 +67,3 @@ func SetIdentity(session session.Session, identity Identity) {
 func GetAuthenticator(c *gin.Context) Authenticator {
 	return c.MustGet(ContextKey).(Authenticator)
 }
-

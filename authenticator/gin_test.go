@@ -1,6 +1,7 @@
 package authenticator
 
 import (
+	"fmt"
 	"github.com/ezaurum/cthulthu"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
@@ -10,7 +11,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-	"fmt"
 )
 
 func TestCookie(t *testing.T) {
@@ -208,7 +208,7 @@ type FormIDToken struct {
 	isPersisted  bool
 	expires      time.Time
 	Token        string
-	IdentityID int64
+	IdentityID   int64
 }
 
 func (l FormIDToken) IdentityKey() int64 {

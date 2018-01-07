@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	ContextKey         = "Authenticator-context-key-CTHULTHU"
+	ContextKey = "Authenticator-context-key-CTHULTHU"
 )
 
 func SetAuthenticator(c *gin.Context, ca Authenticator) {

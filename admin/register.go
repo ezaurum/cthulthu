@@ -60,7 +60,7 @@ func CreateUserByForm(registerForm FormIDToken, m *database.Manager) authenticat
 		AccountName:     registerForm.AccountName,
 		AccountPassword: registerForm.AccountPassword,
 		Model:           i,
-		IdentityID:id.ID,
+		IdentityID:      id.ID,
 		RememberLogin:   registerForm.RememberLogin,
 		Token:           strconv.FormatInt(i.ID, 10),
 		expires:         time.Now().Add(time.Hour * 24 * 365),

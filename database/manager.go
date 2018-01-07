@@ -7,11 +7,11 @@ import (
 	"github.com/ezaurum/cthulthu/generators"
 
 	//TODO 임포트 자체를 바꿔야 하나?
+	"fmt"
 	"github.com/ezaurum/cthulthu/generators/snowflake"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
-	"fmt"
 )
 
 // gorm 래퍼가 되지
@@ -143,7 +143,7 @@ func (dbm *Manager) assignIDWhenNotAssigned(target interface{}) int64 {
 	return 0
 }
 
-func (dbm *Manager) Find(token interface{}, where...interface{}) interface{} {
+func (dbm *Manager) Find(token interface{}, where ...interface{}) interface{} {
 	db := dbm.db.Find(token, where...)
 	if nil != db.Error {
 		return db.Error
@@ -151,7 +151,7 @@ func (dbm *Manager) Find(token interface{}, where...interface{}) interface{} {
 	return nil
 }
 
-func (dbm *Manager) IsExist(t interface{}, where...interface{}) bool {
+func (dbm *Manager) IsExist(t interface{}, where ...interface{}) bool {
 	error := dbm.Find(t, where...)
 	switch error {
 	case nil:
@@ -163,12 +163,11 @@ func (dbm *Manager) IsExist(t interface{}, where...interface{}) bool {
 	}
 }
 
-
 // 이거 테스트 때만 쓰긴 하는데...
 
 func TestNew() *Manager {
 
-	file := fmt.Sprintf("test%v.db", time.Now().Unix())
+	file := fmt.Sprintf("test%v.db", time.Now().UnixNano())
 
 	// mysql connect
 	return &Manager{

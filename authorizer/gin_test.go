@@ -15,7 +15,7 @@ func TestBlocked(t *testing.T) {
 		Token:        "testToken",
 		UserID:       "account",
 		UserPassword: "WTF",
-	}, TestIdentity{},"test/model.conf", "test/all-access.csv")
+	}, TestIdentity{}, "test/model.conf", "test/all-access.csv")
 
 	r.GET("/blocked", func(c *gin.Context) {
 		assert.Fail(t, "blocked is not runnable")
@@ -40,10 +40,10 @@ func TestRoleAccess(t *testing.T) {
 	}
 
 	identity := TestIdentity{
-		IdentityRole:"SuperAdmin",
+		IdentityRole: "SuperAdmin",
 	}
 
-	r := getDefault(t, token,identity, "test/model.conf", "test/role-access.csv")
+	r := getDefault(t, token, identity, "test/model.conf", "test/role-access.csv")
 
 	count := 0
 	r.GET("/blocked", func(c *gin.Context) {
@@ -71,11 +71,11 @@ func getDefault(t *testing.T, token authenticator.IDToken,
 
 	ac := authenticator.NewMem(0, 100)
 
-	ac.LoadIDToken = func( s string) (authenticator.IDToken, bool) {
+	ac.LoadIDToken = func(s string) (authenticator.IDToken, bool) {
 		assert.Equal(t, s, token.TokenString())
 		return token, true
 	}
-	ac.LoadIdentity = func( tk authenticator.IDToken) (authenticator.Identity, bool) {
+	ac.LoadIdentity = func(tk authenticator.IDToken) (authenticator.Identity, bool) {
 		return identity, true
 	}
 
@@ -101,7 +101,7 @@ type TestIDToken struct {
 	isPersisted  bool
 	expires      time.Time
 	Token        string
-	IdentityID int64
+	IdentityID   int64
 }
 
 func (l TestIDToken) TokenString() string {
@@ -126,4 +126,3 @@ type TestIdentity struct {
 func (i TestIdentity) Role() string {
 	return i.IdentityRole
 }
-

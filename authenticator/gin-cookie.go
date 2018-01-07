@@ -14,7 +14,6 @@ const (
 	persistedIDTokenCookieName = "persisted-id-token-CTHULTHU"
 )
 
-
 type cookieAuthenticator struct {
 	store                      session.Store
 	MaxAge                     int

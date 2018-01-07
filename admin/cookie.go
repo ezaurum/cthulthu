@@ -1,16 +1,16 @@
 package admin
 
 import (
+	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/database"
 	"time"
-	"github.com/ezaurum/cthulthu/authenticator"
 )
 
 type CookieIDToken struct {
 	database.Model
-	IdentityID	int64
-	expires         time.Time
-	Token           string
+	IdentityID int64
+	expires    time.Time
+	Token      string
 }
 
 func (l CookieIDToken) TokenString() string {

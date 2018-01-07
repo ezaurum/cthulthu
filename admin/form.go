@@ -1,9 +1,9 @@
 package admin
 
 import (
+	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/database"
 	"time"
-	"github.com/ezaurum/cthulthu/authenticator"
 )
 
 type FormIDToken struct {
@@ -11,7 +11,7 @@ type FormIDToken struct {
 	AccountName     string `form:"accountName" binding:"required"`
 	AccountPassword string `form:"accountPassword" binding:"required"`
 	RememberLogin   bool   `form:"rememberLogin" gorm:"-"`
-	IdentityID		int64
+	IdentityID      int64
 	expires         time.Time
 	Token           string
 }

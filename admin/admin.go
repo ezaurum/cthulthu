@@ -1,14 +1,14 @@
 package admin
 
 import (
+	"github.com/ezaurum/cthulthu"
+	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/authorizer"
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/render"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/gin-gonic/gin"
 	"path/filepath"
-	"github.com/ezaurum/cthulthu/authenticator"
-	"github.com/ezaurum/cthulthu"
 )
 
 const (
@@ -31,13 +31,13 @@ func Run(addr ...string) {
 	db := manager.Connect()
 	defer db.Close()
 
-	r := initialize(manager,templateDir, staticDir, defaultConfig...)
+	r := initialize(manager, templateDir, staticDir, defaultConfig...)
 
 	// run
 	r.Run(addr...)
 }
 
-func initialize(manager *database.Manager, templateDir string, staticDir string, params...interface{}) *gin.Engine {
+func initialize(manager *database.Manager, templateDir string, staticDir string, params ...interface{}) *gin.Engine {
 
 	//TODO related
 	manager.AutoMigrate(&FormIDToken{}, &CookieIDToken{}, &Identity{})

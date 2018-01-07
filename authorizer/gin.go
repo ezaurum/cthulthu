@@ -2,9 +2,9 @@ package authorizer
 
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
+	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"github.com/ezaurum/cthulthu/session"
 )
 
 type AuthorizeMiddleware struct {
