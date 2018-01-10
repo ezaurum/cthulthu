@@ -16,7 +16,8 @@ import (
 func TestCookie(t *testing.T) {
 
 	r := gin.New()
-	r.Use(Default().(cthulthu.GinMiddleware).Handler())
+	authenticator := getDefault()
+	r.Use(authenticator.(cthulthu.GinMiddleware).Handler())
 
 	r.GET("/", func(c *gin.Context) {
 		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
@@ -37,11 +38,11 @@ func TestCookie(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w0.Code)
 	assert.Equal(t, w0.Body.String(), w.Body.String())
 }
-
 func TestExpire(t *testing.T) {
 
 	r := gin.New()
 	n := NewMem(0, 1)
+	setNilFunctions(n)
 	r.Use(n.Handler())
 
 	r.GET("/", func(c *gin.Context) {
@@ -66,6 +67,7 @@ func TestExpire(t *testing.T) {
 func TestPersistToken(t *testing.T) {
 	r := gin.New()
 	middleware := NewMem(0, 1)
+	setNilFunctions(middleware)
 	r.Use(middleware.Handler())
 
 	token := FormIDToken{
@@ -97,6 +99,7 @@ func TestPersistToken(t *testing.T) {
 
 	assert.True(t, e)
 }
+
 func TestPersistedTokenLoad(t *testing.T) {
 	r := gin.New()
 
@@ -111,8 +114,15 @@ func TestPersistedTokenLoad(t *testing.T) {
 	}
 
 	middleware := getTestAuthenticator(t, token, identity, 1)
+	middleware.SetActions(func(s string) (IDToken, bool) {
+		return token, true
+	}, func(token IDToken) (Identity, bool) {
+		return identity, true
+	}, func(token IDToken) {
 
-	r.Use(middleware.(cthulthu.GinMiddleware).Handler())
+	})
+
+	r.Use(cthulthu.GinMiddleware(middleware).Handler())
 
 	r.GET("/", func(c *gin.Context) {
 		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
@@ -145,7 +155,6 @@ func TestPersistedTokenLoad(t *testing.T) {
 
 	assert.NotEqual(t, w0Cookie, w1Cookie)
 }
-
 func TestIdentityRole(t *testing.T) {
 	r := gin.New()
 
@@ -160,8 +169,15 @@ func TestIdentityRole(t *testing.T) {
 	}
 
 	middleware := getTestAuthenticator(t, token, identity, 10)
+	setNilFunctions(middleware)
+	middleware.LoadIdentity = func(tkn IDToken) (Identity, bool) {
+		if tkn.TokenString() == token.TokenString() {
+			return identity, true
+		}
+		return nil, false
+	}
 
-	r.Use(middleware.(cthulthu.GinMiddleware).Handler())
+	r.Use((cthulthu.GinMiddleware(middleware)).Handler())
 
 	r.GET("/", func(c *gin.Context) {
 		ac := GetAuthenticator(c)
@@ -182,9 +198,11 @@ func TestIdentityRole(t *testing.T) {
 	client.GetRequest(r, "/")
 	client.GetRequest(r, "/1")
 }
-func getTestAuthenticator(t *testing.T, token IDToken, identity Identity, expiresInSecond int) Authenticator {
+
+func getTestAuthenticator(t *testing.T, token IDToken, identity Identity, expiresInSecond int) *cookieAuthenticator {
 
 	middleware := NewMem(0, expiresInSecond)
+	setNilFunctions(middleware)
 
 	middleware.LoadIDToken = func(s string) (IDToken, bool) {
 		assert.Equal(t, s, token.TokenString())
@@ -233,6 +251,21 @@ type TestIdentity struct {
 
 func (i TestIdentity) Role() string {
 	return i.IdentityRole
+}
+
+func getDefault() interface{} {
+	authenticator := Default()
+	setNilFunctions(authenticator)
+	return authenticator
+}
+func setNilFunctions(authenticator Authenticator) {
+	authenticator.SetActions(func(s string) (IDToken, bool) {
+		return nil, false
+	}, func(token IDToken) (Identity, bool) {
+		return nil, false
+	}, func(token IDToken) {
+
+	})
 }
 
 //TODO create

@@ -8,11 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"net/http"
+	"time"
 )
 
 func Login() route.Routes {
 	rt := make(route.Routes)
-	rt.AddPageWith("/login", "common/login", gin.H{"GoogleClientID":"629871792762-uvt14107uj1shd35lq9i0sgodp20vd77.apps.googleusercontent.com"}).
+	rt.AddPageWith("/login", "common/login", gin.H{"GoogleClientID": "629871792762-uvt14107uj1shd35lq9i0sgodp20vd77.apps.googleusercontent.com"}).
 		POST("/login", route.GetProcess("/",
 			func(c *gin.Context, s session.Session, m *database.Manager) (int, interface{}) {
 
@@ -32,8 +33,14 @@ func Login() route.Routes {
 					break
 				case nil:
 					ac := authenticator.GetAuthenticator(c)
-					token.RememberLogin = loginForm.RememberLogin
 					ac.Authenticate(c, s, &token)
+					if loginForm.IsPersisted() {
+						ac.PersistIDToken(c, s, &CookieIDToken{
+							IdentityID: token.IdentityID,
+							Token:      token.TokenString(),
+							Expires:    time.Now().Add(time.Hour * 24 * 365),
+						})
+					}
 					return http.StatusFound, "/"
 				default:
 					panic(findErr)

@@ -20,7 +20,6 @@ type Identity interface {
 
 type IDToken interface {
 	TokenString() string
-	IsPersisted() bool
 	IdentityKey() int64
 }
 

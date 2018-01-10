@@ -5,12 +5,12 @@ import (
 	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/authorizer"
 	"github.com/ezaurum/cthulthu/database"
+	"github.com/ezaurum/cthulthu/helper"
 	"github.com/ezaurum/cthulthu/render"
 	"github.com/ezaurum/cthulthu/route"
+	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
 	"path/filepath"
-	"github.com/ezaurum/cthulthu/session"
-	"github.com/ezaurum/cthulthu/helper"
 )
 
 func DefaultRun() {
@@ -69,7 +69,7 @@ func Initialize(config *Config) *gin.Engine {
 	//TODO login redirect page 지정 필요
 	// renderer
 	if helper.IsEmpty(config.TemplateDir) {
-	 	r.HTMLRender = render.New(config.TemplateDir)
+		r.HTMLRender = render.New(config.TemplateDir)
 	}
 	return r
 }
@@ -83,7 +83,7 @@ func InitStateFiles(r *gin.Engine, config *Config) {
 	// static
 	//TODO 디렉토리 여러 군데서 찾도록 하는 것도 필요
 	//TODO skin 시스템을 상속가능하도록 하려면...
-		staticDir := config.StaticDir
+	staticDir := config.StaticDir
 	r.Static("/js", staticDir+"/js")
 	r.Static("/fonts", staticDir+"/fonts")
 	r.Static("/css", staticDir+"/css")

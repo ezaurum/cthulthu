@@ -8,4 +8,3 @@ const (
 var (
 	testAuthorizerConfig = []interface{}{"model.conf", "policy.csv"}
 )
-

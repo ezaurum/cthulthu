@@ -21,7 +21,7 @@ type cookieAuthenticator struct {
 	persistedIDTokenCookieName string
 	LoadIDToken                IDTokenLoader
 	LoadIdentity               IDLoader
-	PersistToken			TokenSaver
+	PersistToken               TokenSaver
 }
 
 func (ca *cookieAuthenticator) SetActions(loadIDToken IDTokenLoader, loadIdentity IDLoader, tokenSaver TokenSaver) {
@@ -79,6 +79,7 @@ func (ca cookieAuthenticator) createSession(c *gin.Context) session.Session {
 func (ca cookieAuthenticator) PersistIDToken(c *gin.Context, session session.Session, idToken IDToken) {
 	ca.PersistToken(idToken)
 	c.SetCookie(ca.persistedIDTokenCookieName, idToken.TokenString(),
+		//tODO max age from token
 		365*24*60*60*10, "", "", false, true)
 }
 
@@ -94,7 +95,7 @@ func (ca cookieAuthenticator) findIDToken(c *gin.Context, session session.Sessio
 	idToken, exist := ca.LoadIDToken(loginCookie)
 	if exist {
 		return idToken, true
-		}
+	}
 
 	return nil, false
 }
@@ -168,11 +169,12 @@ func NewMem(node int64, expiresInSeconds int) *cookieAuthenticator {
 
 func newMiddleware(store session.Store) *cookieAuthenticator {
 	return &cookieAuthenticator{
-		store:                      store,
-		MaxAge:                     session.DefaultSessionExpires,
+		store:  store,
+		MaxAge: session.DefaultSessionExpires,
 		persistedIDTokenCookieName: PersistedIDTokenCookieName,
 		sessionIDCookieName:        SessionIDCookieName,
 	}
 }
 
 var _ ct.GinMiddleware = &cookieAuthenticator{}
+var _ Authenticator = &cookieAuthenticator{}

@@ -87,7 +87,7 @@ func GetNewIdentity(m *database.Manager) Identity {
 		ID: m.GenerateByType(&Identity{}),
 	}
 	id := Identity{
-		Model:        i,
+		Model: i,
 		//TODO default 유저 롤
 		IdentityRole: "User",
 	}

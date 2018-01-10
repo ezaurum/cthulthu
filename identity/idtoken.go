@@ -10,9 +10,9 @@ type OAuthIDToken struct {
 	database.Model
 	IdentityID int64
 	expires    time.Time
-	TokenID  string `form:"tokenID" binding:"required"`
-	Token string `form:"token" binding:"required"`
-	Provider string
+	TokenID    string `form:"tokenID" binding:"required"`
+	Token      string `form:"token" binding:"required"`
+	Provider   string
 }
 
 func (l OAuthIDToken) TokenString() string {
@@ -44,11 +44,6 @@ func (l CookieIDToken) TokenString() string {
 	return l.Token
 }
 
-//TODO 이건 필요없나?
-func (l CookieIDToken) IsPersisted() bool {
-	return true
-}
-
 func (l CookieIDToken) IsExpired() bool {
 	return time.Now().After(l.Expires)
 }
@@ -63,7 +58,7 @@ type FormIDToken struct {
 	database.Model
 	AccountName     string `form:"accountName" binding:"required"`
 	AccountPassword string `form:"accountPassword" binding:"required"`
-	RememberLogin   string   `form:"rememberLogin" gorm:"-"`
+	RememberLogin   string `form:"rememberLogin" gorm:"-"`
 	IdentityID      int64
 	expires         time.Time
 	Token           string
@@ -86,5 +81,3 @@ func (l FormIDToken) IdentityKey() int64 {
 }
 
 var _ authenticator.IDToken = FormIDToken{}
-
-

@@ -72,8 +72,6 @@ func MakeHTMLWith(page string, obj interface{}) gin.HandlerFunc {
 	}
 }
 
-
-
 func MakeJSON(gameHandler SessionHandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := session.GetSession(c)

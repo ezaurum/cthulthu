@@ -8,8 +8,8 @@ import (
 func FindOAuthToken(r OAuthIDToken, dbm *database.Manager) (OAuthIDToken, bool) {
 	var i OAuthIDToken
 	exist := dbm.IsExist(&i, OAuthIDToken{
-		TokenID:r.TokenID,
-		Provider:r.Provider,
+		TokenID:  r.TokenID,
+		Provider: r.Provider,
 	})
 	return i, exist
 }
@@ -19,6 +19,5 @@ func UpdateOAuthToken(token OAuthIDToken, tokenString string, expires time.Time,
 	//TODO expires
 	token.Token = tokenString
 	dbm.Save(&token)
-
 
 }

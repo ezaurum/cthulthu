@@ -1,14 +1,14 @@
 package identity
 
 import (
+	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/database"
+	"github.com/ezaurum/cthulthu/helper"
+	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"github.com/ezaurum/cthulthu/session"
 	"time"
-	"github.com/ezaurum/cthulthu/authenticator"
-	"github.com/ezaurum/cthulthu/helper"
 )
 
 func TestLogin(t *testing.T) {
@@ -17,6 +17,8 @@ func TestLogin(t *testing.T) {
 	db := testDB.Connect()
 	defer db.Close()
 	r := initializeTest(testDB, session.DefaultSessionExpires)
+
+	initRoute(r, nil)
 
 	form := getRegisterFormPostData()
 
@@ -34,6 +36,7 @@ func TestCookiePersistLogin(t *testing.T) {
 	db := testDB.Connect()
 	defer db.Close()
 	r := initializeTest(testDB, 1)
+	initRoute(r, nil)
 
 	form := getRegisterFormPostData()
 

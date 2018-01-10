@@ -2,17 +2,16 @@ package google
 
 import (
 	"github.com/ezaurum/cthulthu/database"
-	"github.com/ezaurum/cthulthu/test"
-	"github.com/stretchr/testify/assert"
-	"testing"
-	"github.com/ezaurum/cthulthu/session"
-	"time"
-	"github.com/gin-gonic/gin"
 	"github.com/ezaurum/cthulthu/identity"
-	"net/url"
 	"github.com/ezaurum/cthulthu/route"
+	"github.com/ezaurum/cthulthu/session"
+	"github.com/ezaurum/cthulthu/test"
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
+	"net/url"
+	"testing"
+	"time"
 )
-
 
 func TestGoogleRegister(t *testing.T) {
 
@@ -33,7 +32,7 @@ func TestGoogleRegister(t *testing.T) {
 	var result identity.OAuthIDToken
 	b := testDB.IsExist(&result,
 		&identity.OAuthIDToken{Provider: ProviderName,
-		TokenID:form.Get("tokenID"), Token:form.Get("token") })
+			TokenID: form.Get("tokenID"), Token: form.Get("token")})
 
 	var identity identity.Identity
 	b0 := testDB.IsExist(&identity, result.IdentityKey())

@@ -3,13 +3,14 @@ package google
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/database"
+	"github.com/ezaurum/cthulthu/identity"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"github.com/ezaurum/cthulthu/identity"
 	"time"
 )
+
 const (
 	ProviderName = "Google"
 )
@@ -43,7 +44,7 @@ func CreateIdentity(c *gin.Context, s session.Session, m *database.Manager) (int
 	if b {
 		// 토큰은 이미 valid 하니까 덮어씌우자
 		//TODo expires
-		expires := time.Now().Add(time.Hour*24*365)
+		expires := time.Now().Add(time.Hour * 24 * 365)
 		identity.UpdateOAuthToken(tk, form.TokenString(), expires, m)
 	} else {
 		tk = identity.CreateIdentityByOAuth(form, m)

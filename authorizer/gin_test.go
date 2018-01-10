@@ -79,6 +79,10 @@ func getDefault(t *testing.T, token authenticator.IDToken,
 		return identity, true
 	}
 
+	ac.PersistToken = func(token authenticator.IDToken) {
+
+	}
+
 	assert.NotNil(t, ac.LoadIDToken)
 	assert.NotNil(t, ac.LoadIdentity)
 

@@ -2,10 +2,10 @@ package identity
 
 import (
 	"github.com/ezaurum/cthulthu/database"
+	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"github.com/ezaurum/cthulthu/session"
 )
 
 func TestRegister(t *testing.T) {
@@ -14,6 +14,7 @@ func TestRegister(t *testing.T) {
 	db := testDB.Connect()
 	defer db.Close()
 	r := initializeTest(testDB, session.DefaultSessionExpires)
+	initRoute(r, nil)
 
 	//loginForm := webtest.GetStatusOKDoc(r, redirectLocation, t)
 	//assert.Equal(t, 1, loginForm.Find("form").Length())
@@ -42,6 +43,8 @@ func TestAfterRegisterAuthenticated(t *testing.T) {
 	db := testDB.Connect()
 	defer db.Close()
 	r := initializeTest(testDB, session.DefaultSessionExpires)
+
+	initRoute(r, nil)
 
 	form := getRegisterFormPostData()
 
