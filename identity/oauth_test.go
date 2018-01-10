@@ -19,8 +19,7 @@ func TestOauthRegister(t *testing.T) {
 		Token:"test token",
 	}
 
-	CreateUserByOAuth(form, testDB)
-
+	CreateIdentityByOAuth(form, testDB)
 
 	var r OAuthIDToken
 	b := testDB.IsExist(&r, &form)

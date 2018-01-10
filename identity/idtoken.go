@@ -10,8 +10,8 @@ type OAuthIDToken struct {
 	database.Model
 	IdentityID int64
 	expires    time.Time
-	TokenID  string
-	Token      string
+	TokenID  string `form:"tokenID" binding:"required"`
+	Token string `form:"token" binding:"required"`
 	Provider string
 }
 

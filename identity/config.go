@@ -9,7 +9,7 @@ const (
 
 var (
 	defaultConfig = []interface{}{"admin/model.conf", "admin/policy.csv"}
-	AutoMigrates = []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}}
+	AutoMigrates = []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}, &OAuthIDToken{}}
 )
 
 type Config struct {

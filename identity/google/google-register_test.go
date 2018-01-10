@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ezaurum/cthulthu/identity"
 	"net/url"
+	"github.com/ezaurum/cthulthu/route"
 )
 
 
@@ -19,8 +20,9 @@ func TestGoogleRegister(t *testing.T) {
 	db := testDB.Connect()
 	defer db.Close()
 	r := initializeTest(testDB, session.DefaultSessionExpires)
+	route.AddAll(r, Register())
 
-	form := getRegisterFormPostData()
+	form := getGoogleRegisterForm()
 
 	client := test.HttpClient{}
 	w0 := client.PostFormRequest(r, "/google/register", form)
@@ -31,7 +33,8 @@ func TestGoogleRegister(t *testing.T) {
 	var result identity.OAuthIDToken
 	b := testDB.IsExist(&result,
 		&identity.OAuthIDToken{Provider: ProviderName,
-		TokenID:form.Get("googleID"), Token:form.Get("googleToken") })
+		TokenID:form.Get("tokenID"), Token:form.Get("token") })
+
 	var identity identity.Identity
 	b0 := testDB.IsExist(&identity, result.IdentityKey())
 
@@ -45,8 +48,9 @@ func TestGoogleAfterRegisterAuthenticated(t *testing.T) {
 	db := testDB.Connect()
 	defer db.Close()
 	r := initializeTest(testDB, session.DefaultSessionExpires)
+	route.AddAll(r, Register())
 
-	form := getRegisterFormPostData()
+	form := getGoogleRegisterForm()
 
 	client := test.HttpClient{}
 	client.PostFormRequest(r, "/register", form)
@@ -61,8 +65,9 @@ func TestGoogleRegisterRememberLogin(t *testing.T) {
 	db := testDB.Connect()
 	defer db.Close()
 	r := initializeTest(testDB, 1)
+	route.AddAll(r, Register())
 
-	form := getRegisterFormPostData()
+	form := getGoogleRegisterForm()
 
 	client := test.HttpClient{}
 	client.PostFormRequest(r, "/register", form)
@@ -82,9 +87,9 @@ func initializeTest(manager *database.Manager, expires int) *gin.Engine {
 	})
 }
 
-func getRegisterFormPostData() url.Values {
+func getGoogleRegisterForm() url.Values {
 	form := make(url.Values)
-	form.Set("googleID", "112115032355210618122")
-	form.Set("googleIDToken", "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEwNWM2ZDVkNWIwYjI2ODA5ZmQxM2QxMzI5ZmJlY2E5ZmI0MTQyODIifQ.eyJhenAiOiI2Mjk4NzE3OTI3NjItdXZ0MTQxMDd1ajFzaGQzNWxxOWkwc2dvZHAyMHZkNzcuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI2Mjk4NzE3OTI3NjItdXZ0MTQxMDd1ajFzaGQzNWxxOWkwc2dvZHAyMHZkNzcuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTIxMTUwMzIzNTUyMTA2MTgxMjIiLCJlbWFpbCI6ImV6YXVydW1AZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF0X2hhc2giOiJ5LXdEUXhmc0ZNX2xudEk5LW5GN2pBIiwiaXNzIjoiYWNjb3VudHMuZ29vZ2xlLmNvbSIsImp0aSI6IjkzNTgzMDNlODc5YWJlZjY1MzkwYmE4NDIwMGY0N2E5NWFhZWU4ZTkiLCJpYXQiOjE1MTUzMTcyMzIsImV4cCI6MTUxNTMyMDgzMiwibmFtZSI6IuyhsOyEneq3nCIsInBpY3R1cmUiOiJodHRwczovL2xoNi5nb29nbGV1c2VyY29udGVudC5jb20vLUd4RW1UMFNrNVJZL0FBQUFBQUFBQUFJL0FBQUFBQUFBRUhFL1cxaUZpMV9UZ0dJL3M5Ni1jL3Bob3RvLmpwZyIsImdpdmVuX25hbWUiOiLshJ3qt5wiLCJmYW1pbHlfbmFtZSI6IuyhsCIsImxvY2FsZSI6ImVuIn0.jJEQZnKN2lJ2Mtz-xkD_XNImcb70gj1cpr7fircLldPZD12RKTP6jymfPN-rnd73mCG60kowMBJsu1Q0BSKhX_hVv3pYr5626TtjlOolS268i7CCNrAsVSw9pMnb9Py9MS2bvezte5bHt0lLECQcsHswJgm2Ehuy5PFORqgz3rPZrUcnSGk8LpTwLvCZAOq19LDhmNQ2kF6y6pRMWuwlu_MvBdyZ1p-dSKdpiVLn3NKxW8865JRsAVwH5LwACAkw5wMSDjQoLLwSmM81emTPyPCOdK3wN2FgqOYoeJvl5R9HEFi61AFOuR_ducSq05A7Q5VA9MVHuw0G054fY2YXzw")
+	form.Set("tokenID", "112115032355210618122")
+	form.Set("token", "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEwNWM2ZDVkNWIwYjI2ODA5ZmQxM2QxMzI5ZmJlY2E5ZmI0MTQyODIifQ.eyJhenAiOiI2Mjk4NzE3OTI3NjItdXZ0MTQxMDd1ajFzaGQzNWxxOWkwc2dvZHAyMHZkNzcuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI2Mjk4NzE3OTI3NjItdXZ0MTQxMDd1ajFzaGQzNWxxOWkwc2dvZHAyMHZkNzcuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTIxMTUwMzIzNTUyMTA2MTgxMjIiLCJlbWFpbCI6ImV6YXVydW1AZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF0X2hhc2giOiJ5LXdEUXhmc0ZNX2xudEk5LW5GN2pBIiwiaXNzIjoiYWNjb3VudHMuZ29vZ2xlLmNvbSIsImp0aSI6IjkzNTgzMDNlODc5YWJlZjY1MzkwYmE4NDIwMGY0N2E5NWFhZWU4ZTkiLCJpYXQiOjE1MTUzMTcyMzIsImV4cCI6MTUxNTMyMDgzMiwibmFtZSI6IuyhsOyEneq3nCIsInBpY3R1cmUiOiJodHRwczovL2xoNi5nb29nbGV1c2VyY29udGVudC5jb20vLUd4RW1UMFNrNVJZL0FBQUFBQUFBQUFJL0FBQUFBQUFBRUhFL1cxaUZpMV9UZ0dJL3M5Ni1jL3Bob3RvLmpwZyIsImdpdmVuX25hbWUiOiLshJ3qt5wiLCJmYW1pbHlfbmFtZSI6IuyhsCIsImxvY2FsZSI6ImVuIn0.jJEQZnKN2lJ2Mtz-xkD_XNImcb70gj1cpr7fircLldPZD12RKTP6jymfPN-rnd73mCG60kowMBJsu1Q0BSKhX_hVv3pYr5626TtjlOolS268i7CCNrAsVSw9pMnb9Py9MS2bvezte5bHt0lLECQcsHswJgm2Ehuy5PFORqgz3rPZrUcnSGk8LpTwLvCZAOq19LDhmNQ2kF6y6pRMWuwlu_MvBdyZ1p-dSKdpiVLn3NKxW8865JRsAVwH5LwACAkw5wMSDjQoLLwSmM81emTPyPCOdK3wN2FgqOYoeJvl5R9HEFi61AFOuR_ducSq05A7Q5VA9MVHuw0G054fY2YXzw")
 	return form
 }
