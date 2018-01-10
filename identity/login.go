@@ -1,4 +1,4 @@
-package admin
+package identity
 
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
@@ -12,7 +12,7 @@ import (
 
 func Login() route.Routes {
 	rt := make(route.Routes)
-	rt.AddPage("/login", "common/login").
+	rt.AddPageWith("/login", "common/login", gin.H{"GoogleClientID":"629871792762-uvt14107uj1shd35lq9i0sgodp20vd77.apps.googleusercontent.com"}).
 		POST("/login", route.GetProcess("/",
 			func(c *gin.Context, s session.Session, m *database.Manager) (int, interface{}) {
 

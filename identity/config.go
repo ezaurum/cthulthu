@@ -1,4 +1,4 @@
-package admin
+package identity
 
 import "github.com/ezaurum/cthulthu/database"
 
@@ -9,6 +9,7 @@ const (
 
 var (
 	defaultConfig = []interface{}{"admin/model.conf", "admin/policy.csv"}
+	AutoMigrates = []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}}
 )
 
 type Config struct {

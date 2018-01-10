@@ -1,12 +1,12 @@
 {{define "google-meta"}}
 <meta name="google-signin-scope" content="profile email">
-<meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
+<meta name="google-signin-client_id" content="{{- .GoogleClientID -}}">
 <script src="https://apis.google.com/js/platform.js" async defer></script>
 {{end}}
 
-        {{define "google-signin"}}
+{{define "google-signin"}}
 <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-        {{end}}
+{{end}}
 
         {{define "google-script"}}
 <script>

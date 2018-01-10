@@ -66,6 +66,14 @@ func MakeJustHTML(page string) gin.HandlerFunc {
 	}
 }
 
+func MakeHTMLWith(page string, obj interface{}) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.HTML(http.StatusOK, page, obj)
+	}
+}
+
+
+
 func MakeJSON(gameHandler SessionHandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := session.GetSession(c)

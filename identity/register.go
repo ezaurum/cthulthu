@@ -1,4 +1,4 @@
-package admin
+package identity
 
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
@@ -68,4 +68,28 @@ func CreateUserByForm(registerForm FormIDToken, m *database.Manager) authenticat
 
 	m.CreateAll(&id, &form)
 	return form
+}
+
+func GetNewIdentity(m *database.Manager) Identity {
+	i := database.Model{
+		ID: m.GenerateByType(&Identity{}),
+	}
+	id := Identity{
+		Model:        i,
+		IdentityRole: "User",
+	}
+	return id
+}
+
+func CreateUserByOAuth(form OAuthIDToken, m *database.Manager) authenticator.IDToken {
+	id := GetNewIdentity(m)
+	f := OAuthIDToken {
+		IdentityID:      id.ID,
+		Provider:form.Provider,
+		Token:form.Token,
+		TokenID:form.TokenID,
+		expires: time.Now().Add(time.Hour * 24 * 365),
+	}
+	m.CreateAll(&id, &f)
+	return f
 }

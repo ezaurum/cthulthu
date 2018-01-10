@@ -25,6 +25,10 @@ func (routes Routes) AddPage(relativePath string, page string) Routes {
 	return routes.Add("GET", relativePath, MakeJustHTML(page))
 }
 
+func (routes Routes) AddPageWith(relativePath string, page string, obj interface{}) Routes {
+	return routes.Add("GET", relativePath, MakeHTMLWith(page, obj))
+}
+
 func AddTo(routes Routes, method string, relativePath string, handlerFunc gin.HandlerFunc) Routes {
 	return routes.Add(method, relativePath, handlerFunc)
 }

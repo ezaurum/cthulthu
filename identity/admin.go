@@ -1,4 +1,4 @@
-package admin
+package identity
 
 import (
 	"github.com/ezaurum/cthulthu"
@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"path/filepath"
 	"github.com/ezaurum/cthulthu/session"
+	"github.com/ezaurum/cthulthu/helper"
 )
 
 func DefaultRun() {
@@ -23,21 +24,30 @@ func Run(addr ...string) {
 	db := manager.Connect()
 	defer db.Close()
 
-	r := initialize(&Config{
-		DBManager:manager,
-		TemplateDir:templateDir,
-		StaticDir:staticDir,
-		NodeNumber:0,
-		SessionExpiresInSeconds:session.DefaultSessionExpires,
-		AutoMigrates:[]interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}},
-		AuthorizerConfig:defaultConfig,
-	})
+	config := Config{
+		DBManager:               manager,
+		TemplateDir:             templateDir,
+		StaticDir:               staticDir,
+		NodeNumber:              0,
+		SessionExpiresInSeconds: session.DefaultSessionExpires,
+		AutoMigrates:            []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}},
+		AuthorizerConfig:        defaultConfig,
+	}
+
+	r := Initialize(&config)
+
+	initRoute(r, &config)
+	InitStateFiles(r, &config)
 
 	// run
 	r.Run(addr...)
 }
 
-func initialize(config *Config) *gin.Engine {
+func Initialize(config *Config) *gin.Engine {
+
+	if nil == config.DBManager {
+		panic("DB manager cannot be nil")
+	}
 
 	manager := config.DBManager
 
@@ -47,24 +57,35 @@ func initialize(config *Config) *gin.Engine {
 	//gin
 	r := gin.Default()
 	// 기본값으로 만들고
+	// authenticator 를 초기화한다
 	ca := authenticator.NewMem(config.NodeNumber, config.SessionExpiresInSeconds)
 	ca.SetActions(GetLoadCookieIDToken(manager), GetLoadIdentity(manager), GetPersistToken(manager))
 	r.Use(cthulthu.GinMiddleware(ca).Handler())
-	// authenticator 를 초기화한다
-	authorizer.Init(r, config.AuthorizerConfig...)
-	//TODO login redirect page 지정 필요
+	if len(config.AuthorizerConfig) > 0 {
+		authorizer.Init(r, config.AuthorizerConfig...)
+	}
+
 	r.Use(manager.Handler())
+	//TODO login redirect page 지정 필요
 	// renderer
-	r.HTMLRender = render.New(config.TemplateDir)
+	if helper.IsEmpty(config.TemplateDir) {
+	 	r.HTMLRender = render.New(config.TemplateDir)
+	}
+	return r
+}
+
+func initRoute(r *gin.Engine, config *Config) {
+	route.AddAll(r, Login())
+	route.AddAll(r, Register())
+}
+
+func InitStateFiles(r *gin.Engine, config *Config) {
 	// static
 	//TODO 디렉토리 여러 군데서 찾도록 하는 것도 필요
 	//TODO skin 시스템을 상속가능하도록 하려면...
-	staticDir := config.StaticDir
-	route.AddAll(r, Login())
-	route.AddAll(r, Register())
+		staticDir := config.StaticDir
 	r.Static("/js", staticDir+"/js")
 	r.Static("/fonts", staticDir+"/fonts")
 	r.Static("/css", staticDir+"/css")
 	filepath.Walk(staticDir, route.SetStaticFile(r))
-	return r
 }

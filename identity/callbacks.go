@@ -1,4 +1,4 @@
-package admin
+package identity
 
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
@@ -34,7 +34,7 @@ func GetPersistToken(dbm *database.Manager) authenticator.TokenSaver {
 		dbm.Create(&CookieIDToken{
 			IdentityID:token.IdentityKey(),
 			Token:token.TokenString(),
-			expires:time.Now().Add(time.Hour * 24* 365),
+			Expires:time.Now().Add(time.Hour * 24* 365),
 		})
 	}
 }

@@ -1,4 +1,4 @@
-package admin
+package identity
 
 import (
 	"github.com/ezaurum/cthulthu/database"
@@ -18,7 +18,7 @@ func getRegisterFormPostData() url.Values {
 }
 
 func initializeTest(manager *database.Manager, expires int) *gin.Engine {
-	return initialize(&Config{
+	return Initialize(&Config{
 		DBManager:               manager,
 		TemplateDir:             testTemplateDir,
 		StaticDir:               testStaticDir,

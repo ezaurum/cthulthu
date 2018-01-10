@@ -40,6 +40,10 @@ func (ca *cookieAuthenticator) Handler() gin.HandlerFunc {
 		panic("LoadIdentity is nil")
 	}
 
+	if nil == ca.PersistToken {
+		panic("PersistToken is nil")
+	}
+
 	return func(c *gin.Context) {
 
 		SetAuthenticator(c, ca)
@@ -107,9 +111,6 @@ func (ca cookieAuthenticator) Authenticate(c *gin.Context, session session.Sessi
 	SetIDToken(session, idToken)
 	session.Save()
 
-	if idToken.IsPersisted() {
-		ca.PersistIDToken(c, session, idToken)
-	}
 }
 
 func (ca *cookieAuthenticator) activateSession(c *gin.Context, s session.Session) {

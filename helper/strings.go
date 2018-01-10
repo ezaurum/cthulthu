@@ -10,3 +10,7 @@ func Contains(target []string, substr string) bool {
 	}
 	return false
 }
+
+func IsEmpty(target string) bool {
+	return len(target) > 0
+}

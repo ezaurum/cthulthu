@@ -1,4 +1,4 @@
-package admin
+package identity
 
 const (
 	testTemplateDir = "templates"
