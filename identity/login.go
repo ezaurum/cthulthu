@@ -13,8 +13,10 @@ import (
 
 func Login() route.Routes {
 	rt := make(route.Routes)
-	rt.AddPageWith("/login", "common/login", gin.H{"GoogleClientID": "629871792762-uvt14107uj1shd35lq9i0sgodp20vd77.apps.googleusercontent.com"}).
-		POST("/login", route.GetProcess("/",
+	rt.AddPageWith("/login", "common/login",
+		//TODO
+		gin.H{"GoogleClientID": "test client id"}).
+		POST("/login", route.GetProcess("/scores",
 			func(c *gin.Context, s session.Session, m *database.Manager) (int, interface{}) {
 
 				//TODO 흠? 에러가 나면 걍 무시를 때려야 하나?
@@ -41,12 +43,12 @@ func Login() route.Routes {
 							Expires:    time.Now().Add(time.Hour * 24 * 365),
 						})
 					}
-					return http.StatusFound, "/"
+					return http.StatusFound, "/scores"
 				default:
 					panic(findErr)
 				}
 
-				return http.StatusFound, "/"
+				return http.StatusFound, "/scores"
 			}))
 	return rt
 }

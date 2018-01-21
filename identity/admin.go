@@ -30,8 +30,8 @@ func Run(addr ...string) {
 		StaticDir:               staticDir,
 		NodeNumber:              0,
 		SessionExpiresInSeconds: session.DefaultSessionExpires,
-		AutoMigrates:            []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}},
-		AuthorizerConfig:        defaultConfig,
+		AutoMigrates:            DefaultAutoMigrates,
+		AuthorizerConfig:        DefaultConfig,
 	}
 
 	r := Initialize(&config)
@@ -54,6 +54,10 @@ func Initialize(config *Config) *gin.Engine {
 	//TODO related
 	manager.AutoMigrate(config.AutoMigrates...)
 
+	CreateIdentityByForm(FormIDToken{
+		AccountName:"likepc",
+		AccountPassword:"like#pc$0218",
+	}, manager)
 	//gin
 	r := gin.Default()
 	// 기본값으로 만들고
@@ -76,7 +80,10 @@ func Initialize(config *Config) *gin.Engine {
 
 func initRoute(r *gin.Engine, config *Config) {
 	route.AddAll(r, Login())
-	route.AddAll(r, Register())
+	//route.AddAll(r, Register())
+
+	//TODO 분리 필요
+	route.AddAll(r, ScoreRoute())
 }
 
 func InitStateFiles(r *gin.Engine, config *Config) {
@@ -84,6 +91,7 @@ func InitStateFiles(r *gin.Engine, config *Config) {
 	//TODO 디렉토리 여러 군데서 찾도록 하는 것도 필요
 	//TODO skin 시스템을 상속가능하도록 하려면...
 	staticDir := config.StaticDir
+	r.Static("/images", staticDir+"/images")
 	r.Static("/js", staticDir+"/js")
 	r.Static("/fonts", staticDir+"/fonts")
 	r.Static("/css", staticDir+"/css")

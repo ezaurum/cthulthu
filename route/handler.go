@@ -16,7 +16,14 @@ func GetProcess(page string, f FullContextHandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		dbm := database.GetDatatbase(c)
 		s := session.GetSession(c)
+		if c.Writer.Written() {
+			panic("WTF? fdsfsd")
+		}
 		code, result := f(c, s, dbm)
+
+		if c.Writer.Written() {
+			panic("WTF?")
+		}
 
 		//TODO
 		switch code {

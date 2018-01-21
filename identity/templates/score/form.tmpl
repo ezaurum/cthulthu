@@ -1,0 +1,31 @@
+{{define "contents"}}
+<main id="event-likepc">
+    {{if .Error}}
+        <p> {{ .Error }}</p>
+    {{end}}
+        {{with .Score}}
+    <form action="/scores" method="post" class="pure-form pure-form-stacked">
+        <input type="hidden" name="ID" value="{{.ID}}">
+
+        <label for="team-no">Team No.</label>
+        <input type="text" id="team-no" name="teamNo" value="{{.TeamNo}}" required="required">
+        <label for="teamName">Team Name</label>
+        <input type="text" id="team-name" name="teamName" required="required" value="{{.TeamName}}">
+
+        <label for="curling">Curling</label>
+        <input type="text" id="curling" name="curling" value="{{.Curling}}">
+        <label for="figure-skating">Figure Skating</label>
+        <input type="text" id="curling" name="figureSkating" value="{{.FigureSkating}}">
+        <label for="luge">Luge</label>
+        <input type="text" id="luge" name="luge" value="{{.Luge}}">
+        <label for="ski-jumping">Ski Jumping</label>
+        <input type="text" id="ski-jumping" name="skiJumping" value="{{.SkiJumping}}">
+        <label for="ice-hockey">Ice Hockey</label>
+        <input type="text" id="ice-hockey" name="iceHockey" value="{{.IceHockey}}">
+        <label for="biathlon">Biathlon</label>
+        <input type="text" id="biathlon" name="biathlon" value="{{.Biathlon}}">
+        <input type="submit" class="button" value="점수입력">
+        {{end}}
+    </form>
+</main>
+{{ end }}

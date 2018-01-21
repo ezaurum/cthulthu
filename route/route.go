@@ -15,6 +15,10 @@ func (routes Routes) POST(relativePath string, handlerFunc gin.HandlerFunc) Rout
 	return routes.Add("POST", relativePath, handlerFunc)
 }
 
+func (routes Routes) GET(relativePath string, handlerFunc gin.HandlerFunc) Routes {
+	return routes.Add("GET", relativePath, handlerFunc)
+}
+
 func (routes Routes) Add(method string, relativePath string, handlerFunc gin.HandlerFunc) Routes {
 	slice := routes[method]
 	slice = append(slice, Holder{Handler: handlerFunc, RelativePath: relativePath})

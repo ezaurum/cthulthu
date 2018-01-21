@@ -3,13 +3,13 @@ package identity
 import "github.com/ezaurum/cthulthu/database"
 
 const (
-	staticDir   = "admin/static"
-	templateDir = "admin/templates"
+	staticDir   = "identity/static"
+	templateDir = "identity/templates"
 )
 
 var (
-	defaultConfig = []interface{}{"admin/model.conf", "admin/policy.csv"}
-	AutoMigrates  = []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}, &OAuthIDToken{}}
+	DefaultConfig       = []interface{}{"identity/model.conf", "identity/policy.csv"}
+	DefaultAutoMigrates = []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}, &OAuthIDToken{}, &Score{}}
 )
 
 type Config struct {

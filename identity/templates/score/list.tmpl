@@ -1,0 +1,54 @@
+{{define "contents"}}
+<main id="event-likepc">
+    {{if .Error}}
+        <p> {{ .Error }}</p>
+    {{end}}
+
+        <table>
+            <thead>
+            <tr>
+            <th>Rank</th>
+            <th>Team No.</th>
+            <th>Team Name</th>
+            <th>Total Score</th>
+            <th>Curling</th>
+            <th>Figure Skating</th>
+            <th>Luge</th>
+            <th>Ski Jumping</th>
+            <th>Ice Hockey</th>
+            <th>Biathlon</th>
+            {{if .Actions}}
+            <th>수정</th>
+            {{end}}
+            </tr>
+            </thead>
+            <tbody>
+        {{ range  .DataList }}
+            <tr>
+                <td>{{.Rank}}</td>
+                <td>{{.TeamNo}}</td>
+                <td>{{.TeamName}}</td>
+                <td>{{.TotalScore}}</td>
+                <td>{{.Curling}}</td>
+                <td>{{.FigureSkating}}</td>
+                <td>{{.Luge}}</td>
+                <td>{{.SkiJumping}}</td>
+                <td>{{.IceHockey}}</td>
+                <td>{{.Biathlon}}</td>
+            {{if $.Actions}}
+                <td><a class="button" href="/scores/{{.ID}}">수정</a></td>
+            {{end}}
+
+            </tr>
+        {{ end }}
+            </tbody>
+        </table>
+
+    {{if .Actions}}
+        <section class="actions">
+            <a class="button" href="/scores/new">점수추가</a>
+        </section>
+    {{end}}
+</main>
+{{ end }}
+{{define "header" }} {{end}}

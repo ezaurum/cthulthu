@@ -3,6 +3,10 @@
 /**
  공통 레이아웃, 속성
  */
+
+body {
+    margin:0;
+}
 header {
     background-color: #f33737;
     display: block;
@@ -14,9 +18,97 @@ main {
     width:80%;
     max-width: 80rem;
     display:block;
+    font-family: 'Nanum Gothic Coding', serif;
 }
 
 main > form {
     margin:auto;
     //TODO 센터
 }
+
+#event-likepc {
+    width:100%;
+}
+
+#event-likepc table {
+    background-color: #2287c5;
+    width:100%;
+    margin:0;
+    border-collapse: collapse;
+}
+
+#event-likepc th, td {
+    padding: 0.5em;
+    border:1px solid #ffffff;
+    color:#ffffff;
+    min-width:8%;
+    max-width:8%;
+    width:8%;
+}
+
+#event-likepc th {
+    padding-top:80px;
+    background: url("/images/ico-rank.png") center 10px no-repeat;
+    text-indent: -1000px;
+    overflow: hidden;
+}
+
+#event-likepc th:nth-child(2) {
+    background-image: url("/images/ico-team-no.png");
+}
+
+#event-likepc th:nth-child(3) {
+    background-image: url("/images/ico-team-name.png");
+    max-width:20%;
+    width:20%;
+}
+
+#event-likepc th:nth-child(4) {
+    background-image: url("/images/ico-total-score.png")
+}
+
+#event-likepc th:nth-child(5) {
+    background-image: url("/images/ico-curling.png")
+}
+
+#event-likepc th:nth-child(6) {
+    background-image: url("/images/ico-figure-skating.png")
+}
+
+#event-likepc th:nth-child(7) {
+    background-image: url("/images/ico-luge.png")
+}
+
+#event-likepc th:nth-child(8) {
+    background-image: url("/images/ico-ski-jumping.png")
+}
+
+#event-likepc th:nth-child(9) {
+    background-image: url("/images/ico-ice-hockey.png")
+}
+
+#event-likepc th:nth-child(10) {
+    background-image: url("/images/ico-biathlon.png")
+}
+
+#event-likepc th:nth-child(11) {
+    background-image: none
+}
+
+#event-likepc .button {
+    background-color: #2287c5;
+    padding:5px;
+    text-decoration: none;
+    color:white;
+}
+
+#event-likepc .actions {
+    position:absolute;
+    right:0;
+    margin-top:1em;
+}
+
+#event-likepc form {
+    margin: auto;
+}
+
