@@ -13,6 +13,7 @@ type Store interface {
 type Session interface {
 	ID() string
 	Get(key string) (interface{}, bool)
+	MustGet(key string) (interface{})
 	Set(key string, o interface{})
 	Save()
 	IsExpired() bool
@@ -73,4 +74,12 @@ func (s *DefaultSession) ExpiresAt(nano int64) {
 
 func (s *DefaultSession) Store() Store {
 	return s.store
+}
+
+func (s DefaultSession) MustGet(k string) interface{} {
+	o, b := s.M[k]
+	if b {
+		return o
+	}
+	return nil
 }
