@@ -52,7 +52,7 @@ func (dbm *Manager) AutoMigrate(values ...interface{}) {
 
 	switch dbm.dialect {
 	case "mysql":
-		dbm.db.Set("gorm:table_options", "ENGINE=InnoDB;CHARACTER SET=UTF-8").AutoMigrate(values...)
+		dbm.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;").AutoMigrate(values...)
 		break
 	default:
 		dbm.db.AutoMigrate(values...)
