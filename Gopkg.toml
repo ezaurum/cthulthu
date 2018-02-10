@@ -1,51 +1,22 @@
-
-# Gopkg.toml example
-#
-# Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
-# for detailed Gopkg.toml documentation.
-#
-# required = ["github.com/user/thing/cmd/thing"]
 # ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
-#
-# [[constraint]]
-#   name = "github.com/user/project"
-#   version = "1.0.0"
-#
-# [[constraint]]
-#   name = "github.com/user/project2"
-#   branch = "dev"
-#   source = "github.com/myfork/project2"
-#
-# [[override]]
-#  name = "github.com/x/y"
-#  version = "2.4.0"
+
+required = [
 
 # 제네레이터 사용 - db, session 에서 사용
-[[constraint]]
-  branch = "master"
-  name = "github.com/bwmarrin/snowflake"
+"github.com/bwmarrin/snowflake",
 
 # 세션 메모리 스토어가 사용
-[[constraint]]
-  name = "github.com/patrickmn/go-cache"
-  version = "2.1.0"
+"github.com/patrickmn/go-cache",
+#test
+"github.com/PuerkitoBio/goquery",
+
+#auth
+"github.com/casbin/casbin",
+#DB
+"github.com/jinzhu/gorm"
+]
 
 # gin
 [[constraint]]
   name = "github.com/gin-gonic/gin"
-  branch = "master"
-
-# DB
-[[constraint]]
-  name = "github.com/jinzhu/gorm"
-  branch = "master"
-
-# authorizer
-[[constraint]]
-  name = "github.com/casbin/casbin"
-  branch = "master"
-
-# 테스트
-[[constraint]]
-  name = "github.com/PuerkitoBio/goquery"
   branch = "master"
