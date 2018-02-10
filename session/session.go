@@ -17,6 +17,7 @@ type Session interface {
 	Save()
 	IsExpired() bool
 	ExpiresAt(nano int64)
+	Store() Store
 }
 
 type SessionMap map[string]Session
@@ -68,4 +69,8 @@ func (s DefaultSession) IsExpired() bool {
 
 func (s *DefaultSession) ExpiresAt(nano int64) {
 	s.expires = nano
+}
+
+func (s *DefaultSession) Store() Store {
+	return s.store
 }
