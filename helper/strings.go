@@ -12,5 +12,5 @@ func Contains(target []string, substr string) bool {
 }
 
 func IsEmpty(target string) bool {
-	return len(target) > 0
+	return len(target) <1
 }
