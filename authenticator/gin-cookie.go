@@ -7,6 +7,7 @@ import (
 	"github.com/ezaurum/cthulthu/session/stores/memstore"
 	"github.com/gin-gonic/gin"
 	"time"
+	"log"
 )
 
 const (
@@ -105,7 +106,9 @@ func (ca cookieAuthenticator) Authenticate(c *gin.Context, session session.Sessi
 	identity, b := ca.LoadIdentity(idToken)
 
 	if !b {
-		panic("Not exist identity")
+		//TODO panic("Not exist identity")
+		log.Println("Not exist identity")
+		return
 	}
 
 	SetIdentity(session, identity)
