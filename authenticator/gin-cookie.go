@@ -108,6 +108,8 @@ func (ca cookieAuthenticator) Authenticate(c *gin.Context, session session.Sessi
 	if !b {
 		//TODO panic("Not exist identity")
 		log.Println("Not exist identity")
+		//일단 제거
+		ca.ClearSessionIDCookie(c)
 		return
 	}
 
