@@ -16,19 +16,19 @@ import (
 
 // gorm 래퍼가 되지
 type Manager struct {
-	connectionString string
-	dialect          string
-	nodes            map[string]generators.IDGenerator
+	ConnectionString string
+	Dialect          string
+	Nodes            map[string]generators.IDGenerator
 	NodeNumber       int64
 	db               *gorm.DB
 }
 
 func Default() *Manager {
-	// mysql connect
+	// mysql Connect
 	return &Manager{
-		connectionString: "root:example@tcp(127.0.0.1:3306)/dev?charset=utf8&parseTime=True&loc=Local",
-		dialect:          "mysql",
-		nodes:            make(map[string]generators.IDGenerator),
+		ConnectionString: "root:example@tcp(127.0.0.1:3306)/dev?charset=utf8&parseTime=True&loc=Local",
+		Dialect:          "mysql",
+		Nodes:            make(map[string]generators.IDGenerator),
 	}
 }
 
@@ -36,21 +36,21 @@ func (dbm *Manager) DB() *gorm.DB {
 	return dbm.db
 }
 func (dbm *Manager) Generate(typeName string) int64 {
-	return dbm.nodes[typeName].GenerateInt64()
+	return dbm.Nodes[typeName].GenerateInt64()
 }
 
 func (dbm *Manager) GenerateByType(v interface{}) int64 {
-	return dbm.nodes[reflect.TypeOf(v).Name()].GenerateInt64()
+	return dbm.Nodes[reflect.TypeOf(v).Name()].GenerateInt64()
 }
 
 func (dbm *Manager) AutoMigrate(values ...interface{}) {
 
 	for _, v := range values {
 		n := snowflake.New(dbm.NodeNumber)
-		dbm.nodes[reflect.TypeOf(v).Name()] = n
+		dbm.Nodes[reflect.TypeOf(v).Name()] = n
 	}
 
-	switch dbm.dialect {
+	switch dbm.Dialect {
 	case "mysql":
 		dbm.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;").AutoMigrate(values...)
 		break
@@ -59,23 +59,23 @@ func (dbm *Manager) AutoMigrate(values ...interface{}) {
 		break
 	}
 	node := snowflake.New(0)
-	dbm.nodes["Spin"] = node
+	dbm.Nodes["Spin"] = node
 }
 
-func (dbm *Manager) SetDialect(dialect string) {
-	dbm.dialect = dialect
+func (dbm *Manager) SetDialect(Dialect string) {
+	dbm.Dialect = Dialect
 }
 
-func (dbm *Manager) SetConnection(connectString string) {
-	dbm.connectionString = connectString
+func (dbm *Manager) SetConnection(ConnectString string) {
+	dbm.ConnectionString = ConnectString
 }
 
 func (dbm *Manager) Connect() *gorm.DB {
-	if len(dbm.connectionString) < 1 {
-		panic("connect string is empty")
+	if len(dbm.ConnectionString) < 1 {
+		panic("Connect string is empty")
 	}
 
-	db, err := gorm.Open(dbm.dialect, dbm.connectionString)
+	db, err := gorm.Open(dbm.Dialect, dbm.ConnectionString)
 	if err != nil {
 		panic(err)
 	}
@@ -171,19 +171,19 @@ func TestNew() *Manager {
 
 	file := fmt.Sprintf("test%v.db", time.Now().UnixNano())
 
-	// mysql connect
+	// mysql Connect
 	return &Manager{
-		connectionString: file,
-		dialect:          "sqlite3",
-		nodes:            make(map[string]generators.IDGenerator),
+		ConnectionString: file,
+		Dialect:          "sqlite3",
+		Nodes:            make(map[string]generators.IDGenerator),
 	}
 }
 
 func Test() *Manager {
-	// mysql connect
+	// mysql Connect
 	return &Manager{
-		connectionString: "test.db",
-		dialect:          "sqlite3",
-		nodes:            make(map[string]generators.IDGenerator),
+		ConnectionString: "test.db",
+		Dialect:          "sqlite3",
+		Nodes:            make(map[string]generators.IDGenerator),
 	}
 }
