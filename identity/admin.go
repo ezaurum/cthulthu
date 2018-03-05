@@ -55,8 +55,8 @@ func Initialize(config *Config) *gin.Engine {
 	manager.AutoMigrate(config.AutoMigrates...)
 
 	CreateIdentityByForm(FormIDToken{
-		AccountName:"likepc",
-		AccountPassword:"like#pc$0218",
+		AccountName:     "likepc",
+		AccountPassword: "like#pc$0218",
 	}, manager)
 	//gin
 	r := gin.Default()

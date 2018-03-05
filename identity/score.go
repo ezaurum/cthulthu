@@ -6,14 +6,14 @@ import (
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strconv"
 	"sort"
+	"strconv"
 )
 
 type Score struct {
 	database.Model
 	Rank          int
-	TeamNo        int `form:"teamNo" binding:"required"`
+	TeamNo        int    `form:"teamNo" binding:"required"`
 	TeamName      string `form:"teamName" binding:"required"`
 	TotalScore    int
 	Curling       int `form:"curling"`
@@ -28,6 +28,7 @@ func (s *Score) calculateTotal() *Score {
 	s.TotalScore = s.Curling + s.FigureSkating + s.SkiJumping + s.IceHockey + s.Biathlon + s.Luge
 	return s
 }
+
 // ByAge implements sort.Interface for []Person based on
 // the Age field.
 type ByScore []Score
@@ -58,7 +59,7 @@ func ScoreRoute() route.Routes {
 			list[i].Rank = rank
 		}
 
-		c.HTML(http.StatusOK,	"score/list", gin.H{"DataList": list, "Actions": true})
+		c.HTML(http.StatusOK, "score/list", gin.H{"DataList": list, "Actions": true})
 	}).
 		GET("/scores/:id", func(c *gin.Context) {
 			id := c.Param("id")
@@ -85,7 +86,7 @@ func ScoreRoute() route.Routes {
 			if nil != err {
 				panic(err)
 			}
-			idString  := c.PostForm("ID")
+			idString := c.PostForm("ID")
 			if c.Writer.Written() {
 				panic("WTFfdsffffffffffff 01?")
 			}
@@ -114,7 +115,6 @@ func ScoreRoute() route.Routes {
 					panic("WTFfdsfffffffff 04 fff?")
 				}
 			}
-
 
 			return http.StatusFound, "/scores"
 		}))

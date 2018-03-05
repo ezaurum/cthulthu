@@ -1,6 +1,7 @@
 # ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
 
 required = [
+"github.com/fsnotify/fsnotify",
 
 # 제네레이터 사용 - db, session 에서 사용
 "github.com/bwmarrin/snowflake",

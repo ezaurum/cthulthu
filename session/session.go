@@ -13,7 +13,7 @@ type Store interface {
 type Session interface {
 	ID() string
 	Get(key string) (interface{}, bool)
-	MustGet(key string) (interface{})
+	MustGet(key string) interface{}
 	Set(key string, o interface{})
 	Save()
 	IsExpired() bool
