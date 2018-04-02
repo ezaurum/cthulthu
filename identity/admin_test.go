@@ -40,11 +40,12 @@ func Initialize(config *config.Config,
 		GetLoadIdentity(manager),
 		GetPersistToken(manager))
 	r.Use(cthulthu.GinMiddleware(ca).Handler())
+	var au	authorizer.AuthorizeMiddleware
 	if len(config.AuthorizerConfig) > 0 {
-		authorizer.Init(r, config.AuthorizerConfig...)
+		au = authorizer.GetAuthorizer(config.AuthorizerConfig...)
 	}
 
-	r.Use(manager.Handler())
+	r.Use(ca.Handler(), au.Handler(), manager.Handler())
 	//TODO login redirect page 지정 필요
 	// renderer
 	if !helper.IsEmpty(config.TemplateDir) {

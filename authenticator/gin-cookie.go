@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"time"
+	"fmt"
 )
 
 const (
@@ -32,6 +33,11 @@ func (ca *cookieAuthenticator) SetActions(loadIDToken IDTokenLoader, loadIdentit
 }
 
 func (ca *cookieAuthenticator) Handler() gin.HandlerFunc {
+
+	fmt.Println("caca")
+	fmt.Println("caca")
+	fmt.Println("caca")
+	fmt.Println("caca")
 
 	if nil == ca.LoadIDToken {
 		panic("LoadIdToken is nil")

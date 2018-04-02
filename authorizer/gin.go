@@ -5,6 +5,7 @@ import (
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"fmt"
 )
 
 type AuthorizeMiddleware struct {
@@ -37,6 +38,9 @@ func GetAuthorizer(config ...interface{}) AuthorizeMiddleware {
 
 func (a *AuthorizeMiddleware) Handler() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		fmt.Println("authorize ")
+		fmt.Println("authorize ")
+		fmt.Println("authorize ")
 		if a.CheckPermission(c, session.GetSession(c)) {
 			return
 		}

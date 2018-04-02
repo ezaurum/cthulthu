@@ -14,7 +14,7 @@ type FullContextHandlerFunc func(c *gin.Context, session session.Session, manage
 
 func GetProcess(page string, f FullContextHandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		dbm := database.GetDatatbase(c)
+		dbm := database.GetDatabase(c)
 		s := session.GetSession(c)
 		if c.Writer.Written() {
 			panic("WTF? fdsfsd")
