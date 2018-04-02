@@ -6,8 +6,8 @@ import (
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/session/stores/memstore"
 	"github.com/gin-gonic/gin"
-	"time"
 	"log"
+	"time"
 )
 
 const (

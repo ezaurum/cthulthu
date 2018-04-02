@@ -7,19 +7,19 @@ import (
 )
 
 type Config struct {
-	DBManager               *database.Manager
-	ConnectionString 		string
-	Dialect			 		string
-	AutoMigrates            []interface{}
+	DBManager        *database.Manager
+	ConnectionString string
+	Dialect          string
+	AutoMigrates     []interface{}
 
-	TemplateDir             string
-	StaticDir               string
+	TemplateDir string
+	StaticDir   string
 
 	NodeNumber              int64
 	SessionExpiresInSeconds int
 	AuthorizerConfig        []interface{}
 
-	Routes					[]func() route.Routes
+	Routes []func() route.Routes
 
-	Initialize				func(engine *gin.Engine)
+	Initialize func(engine *gin.Engine)
 }
