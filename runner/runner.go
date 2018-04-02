@@ -6,10 +6,10 @@ import (
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/helper"
 	"github.com/ezaurum/cthulthu/render"
-	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/identity"
 	"github.com/ezaurum/cthulthu/authorizer"
+	"github.com/ezaurum/cthulthu/route"
 )
 
 const (
@@ -37,6 +37,7 @@ func Run(config *config.Config, addr...string) {
 	r := gin.Default()
 
 	config.Initialize(r)
+	route.InitRoute(r, config.Routes...)
 
 	// authenticator 를 초기화한다
 	ca := authenticator.NewMem(config.NodeNumber, config.SessionExpiresInSeconds)
@@ -44,13 +45,13 @@ func Run(config *config.Config, addr...string) {
 		identity.GetLoadIdentity(manager),
 		identity.GetPersistToken(manager))
 	if len(config.AuthorizerConfig) > 0 {
-		authorizer.Init(r, config.AuthorizerConfig...)
+		au := authorizer.Init(config.AuthorizerConfig...)
+		r.Use(manager.Handler(), ca.Handler(), au.Handler())
+	} else {
+		r.Use(manager.Handler(), ca.Handler())
 	}
 
-	route.InitRoute(r, config.Routes...)
 
-	// DB 핸들러 설정
-	r.Use(ca.Handler(), manager.Handler())
 
 	// 템틀릿 렌더러 설정
 	if !helper.IsEmpty(config.TemplateDir) {

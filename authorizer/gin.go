@@ -13,19 +13,15 @@ type AuthorizeMiddleware struct {
 
 func InitWithAuthenticator(r *gin.Engine, config ...interface{}) (authenticator.Authenticator, *AuthorizeMiddleware) {
 	ac := authenticator.Init(r)
-	auth := Init(r, config...)
+	auth := Init(config...)
 	return ac, auth
 }
 
-func Init(r *gin.Engine, config ...interface{}) *AuthorizeMiddleware {
-
+func Init(config ...interface{}) *AuthorizeMiddleware {
 	auth := GetAuthorizer(config...)
-
-	r.Use(auth.Handler())
-
 	return &auth
-
 }
+
 func GetAuthorizer(config ...interface{}) AuthorizeMiddleware {
 	var authorizer *Authorizer
 	if len(config) < 1 {
