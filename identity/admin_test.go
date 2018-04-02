@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/url"
 	"testing"
+	"github.com/ezaurum/cthulthu/route"
 )
 
 func Initialize(config *config.Config,
@@ -45,7 +46,7 @@ func Initialize(config *config.Config,
 		au = authorizer.GetAuthorizer(config.AuthorizerConfig...)
 	}
 
-	r.Use(ca.Handler(), au.Handler(), manager.Handler())
+	r.Use(ca.Handler(), manager.Handler(), au.Handler())
 	//TODO login redirect page 지정 필요
 	// renderer
 	if !helper.IsEmpty(config.TemplateDir) {
@@ -79,6 +80,7 @@ func initializeTest(manager *database.Manager, expires int) (*gin.Engine, *confi
 		AutoMigrates:            testConfig.AutoMigrates,
 		StaticDir:               testConfig.StaticDir,
 		NodeNumber:              testConfig.NodeNumber,
+		Routes: []func() route.Routes{ Login, Register},
 	}
 	engine := gin.Default()
 	Initialize(&tc, engine)
