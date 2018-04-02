@@ -2,11 +2,11 @@ package identity
 
 import (
 	"github.com/ezaurum/cthulthu/database"
+	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"github.com/ezaurum/cthulthu/route"
 )
 
 func TestRegister(t *testing.T) {

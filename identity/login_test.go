@@ -4,12 +4,12 @@ import (
 	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/helper"
+	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
-	"github.com/ezaurum/cthulthu/route"
 )
 
 func TestLogin(t *testing.T) {
@@ -19,7 +19,7 @@ func TestLogin(t *testing.T) {
 	defer db.Close()
 	r, _ := initializeTest(testDB, session.DefaultSessionExpires)
 
-	route.InitRoute(r, )
+	route.InitRoute(r)
 
 	form := getRegisterFormPostData()
 

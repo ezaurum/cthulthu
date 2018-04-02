@@ -1,19 +1,19 @@
 package identity
 
 import (
+	"github.com/ezaurum/cthulthu"
+	"github.com/ezaurum/cthulthu/authenticator"
+	"github.com/ezaurum/cthulthu/authorizer"
+	"github.com/ezaurum/cthulthu/config"
 	"github.com/ezaurum/cthulthu/database"
+	"github.com/ezaurum/cthulthu/helper"
+	"github.com/ezaurum/cthulthu/render"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"net/url"
 	"testing"
-	"github.com/ezaurum/cthulthu/config"
-	"github.com/ezaurum/cthulthu/authenticator"
-	"github.com/ezaurum/cthulthu"
-	"github.com/ezaurum/cthulthu/authorizer"
-	"github.com/ezaurum/cthulthu/helper"
-	"github.com/ezaurum/cthulthu/render"
 )
 
 func Initialize(config *config.Config,
@@ -29,8 +29,8 @@ func Initialize(config *config.Config,
 	manager.AutoMigrate(config.AutoMigrates...)
 
 	CreateIdentityByForm(FormIDToken{
-		AccountName:"likepc",
-		AccountPassword:"like#pc$0218",
+		AccountName:     "likepc",
+		AccountPassword: "like#pc$0218",
 	}, manager)
 
 	// 기본값으로 만들고
@@ -61,8 +61,8 @@ func getRegisterFormPostData() url.Values {
 
 var testConfig = &config.Config{
 	//DBManager:               manager,
-	TemplateDir:  "test/static",
-	StaticDir:   "test/templates" ,
+	TemplateDir: "test/static",
+	StaticDir:   "test/templates",
 	NodeNumber:  0,
 	//SessionExpiresInSeconds: expires,
 	AutoMigrates:     []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}},
