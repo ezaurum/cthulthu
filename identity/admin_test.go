@@ -8,7 +8,49 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/url"
 	"testing"
+	"github.com/ezaurum/cthulthu/config"
+	"github.com/ezaurum/cthulthu/authenticator"
+	"github.com/ezaurum/cthulthu"
+	"github.com/ezaurum/cthulthu/authorizer"
+	"github.com/ezaurum/cthulthu/helper"
+	"github.com/ezaurum/cthulthu/render"
 )
+
+func Initialize(config *config.Config,
+	r *gin.Engine) {
+
+	if nil == config.DBManager {
+		panic("DB manager cannot be nil")
+	}
+
+	manager := config.DBManager
+
+	//TODO related
+	manager.AutoMigrate(config.AutoMigrates...)
+
+	CreateIdentityByForm(FormIDToken{
+		AccountName:"likepc",
+		AccountPassword:"like#pc$0218",
+	}, manager)
+
+	// 기본값으로 만들고
+	// authenticator 를 초기화한다
+	ca := authenticator.NewMem(config.NodeNumber, config.SessionExpiresInSeconds)
+	ca.SetActions(GetLoadCookieIDToken(manager),
+		GetLoadIdentity(manager),
+		GetPersistToken(manager))
+	r.Use(cthulthu.GinMiddleware(ca).Handler())
+	if len(config.AuthorizerConfig) > 0 {
+		authorizer.Init(r, config.AuthorizerConfig...)
+	}
+
+	r.Use(manager.Handler())
+	//TODO login redirect page 지정 필요
+	// renderer
+	if !helper.IsEmpty(config.TemplateDir) {
+		r.HTMLRender = render.New(config.TemplateDir)
+	}
+}
 
 func getRegisterFormPostData() url.Values {
 	form := make(url.Values)
@@ -17,18 +59,18 @@ func getRegisterFormPostData() url.Values {
 	return form
 }
 
-var testConfig = &Config{
+var testConfig = &config.Config{
 	//DBManager:               manager,
-	TemplateDir: testTemplateDir,
-	StaticDir:   testStaticDir,
+	TemplateDir:  "test/static",
+	StaticDir:   "test/templates" ,
 	NodeNumber:  0,
 	//SessionExpiresInSeconds: expires,
 	AutoMigrates:     []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}},
-	AuthorizerConfig: testAuthorizerConfig,
+	AuthorizerConfig: []interface{}{"test/model.conf", "test/policy.csv"},
 }
 
-func initializeTest(manager *database.Manager, expires int) *gin.Engine {
-	tc := Config{
+func initializeTest(manager *database.Manager, expires int) (*gin.Engine, *config.Config) {
+	tc := config.Config{
 		SessionExpiresInSeconds: expires,
 		DBManager:               manager,
 		TemplateDir:             testConfig.TemplateDir,
@@ -37,7 +79,9 @@ func initializeTest(manager *database.Manager, expires int) *gin.Engine {
 		StaticDir:               testConfig.StaticDir,
 		NodeNumber:              testConfig.NodeNumber,
 	}
-	return Initialize(&tc)
+	engine := gin.Default()
+	Initialize(&tc, engine)
+	return engine, &tc
 }
 
 func TestRoleAccess(t *testing.T) {
@@ -45,7 +89,7 @@ func TestRoleAccess(t *testing.T) {
 	testDB := database.Test()
 	db := testDB.Connect()
 	defer db.Close()
-	r := initializeTest(testDB, session.DefaultSessionExpires)
+	r, _ := initializeTest(testDB, session.DefaultSessionExpires)
 
 	client := test.HttpClient{}
 	w0 := client.GetRequest(r, "/")

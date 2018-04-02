@@ -63,3 +63,9 @@ func each(routeFunc routeFunc, holders []Holder) {
 		routeFunc(v.RelativePath, v.Handler)
 	}
 }
+
+func InitRoute(r *gin.Engine, routes ...func() Routes) {
+	for _, v := range routes {
+		AddAll(r, v())
+	}
+}

@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+	"github.com/ezaurum/cthulthu/route"
 )
 
 func TestLogin(t *testing.T) {
@@ -16,9 +17,9 @@ func TestLogin(t *testing.T) {
 	testDB := database.TestNew()
 	db := testDB.Connect()
 	defer db.Close()
-	r := initializeTest(testDB, session.DefaultSessionExpires)
+	r, _ := initializeTest(testDB, session.DefaultSessionExpires)
 
-	initRoute(r, nil)
+	route.InitRoute(r, )
 
 	form := getRegisterFormPostData()
 
@@ -35,8 +36,8 @@ func TestCookiePersistLogin(t *testing.T) {
 	testDB := database.TestNew()
 	db := testDB.Connect()
 	defer db.Close()
-	r := initializeTest(testDB, 1)
-	initRoute(r, nil)
+	r, conf := initializeTest(testDB, 1)
+	route.InitRoute(r, conf.Routes...)
 
 	form := getRegisterFormPostData()
 
