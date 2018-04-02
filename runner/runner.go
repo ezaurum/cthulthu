@@ -46,9 +46,9 @@ func Run(config *config.Config, addr...string) {
 		identity.GetPersistToken(manager))
 	if len(config.AuthorizerConfig) > 0 {
 		au := authorizer.Init(config.AuthorizerConfig...)
-		r.Use(manager.Handler(), ca.Handler(), au.Handler())
+		r.Use(au.Handler(), ca.Handler(), manager.Handler())
 	} else {
-		r.Use(manager.Handler(), ca.Handler())
+		r.Use(ca.Handler(), manager.Handler())
 	}
 
 
