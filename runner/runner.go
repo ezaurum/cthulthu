@@ -9,7 +9,6 @@ import (
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/identity"
-	"github.com/ezaurum/cthulthu"
 	"github.com/ezaurum/cthulthu/authorizer"
 )
 
@@ -44,7 +43,6 @@ func Run(config *config.Config, addr...string) {
 	ca.SetActions(identity.GetLoadCookieIDToken(manager),
 		identity.GetLoadIdentity(manager),
 		identity.GetPersistToken(manager))
-	r.Use(cthulthu.GinMiddleware(ca).Handler())
 	if len(config.AuthorizerConfig) > 0 {
 		authorizer.Init(r, config.AuthorizerConfig...)
 	}
@@ -52,7 +50,7 @@ func Run(config *config.Config, addr...string) {
 	route.InitRoute(r, config.Routes...)
 
 	// DB 핸들러 설정
-	r.Use(manager.Handler())
+	r.Use(ca.Handler(), manager.Handler())
 
 	// 템틀릿 렌더러 설정
 	if !helper.IsEmpty(config.TemplateDir) {
