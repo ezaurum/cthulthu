@@ -1,7 +1,6 @@
 package identity
 
 import (
-	"github.com/ezaurum/cthulthu"
 	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/authorizer"
 	"github.com/ezaurum/cthulthu/config"
@@ -40,8 +39,7 @@ func Initialize(config *config.Config,
 	ca.SetActions(GetLoadCookieIDToken(manager),
 		GetLoadIdentity(manager),
 		GetPersistToken(manager))
-	r.Use(cthulthu.GinMiddleware(ca).Handler())
-	var au	authorizer.AuthorizeMiddleware
+	var au authorizer.AuthorizeMiddleware
 	if len(config.AuthorizerConfig) > 0 {
 		au = authorizer.GetAuthorizer(config.AuthorizerConfig...)
 	}

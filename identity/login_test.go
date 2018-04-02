@@ -17,9 +17,9 @@ func TestLogin(t *testing.T) {
 	testDB := database.TestNew()
 	db := testDB.Connect()
 	defer db.Close()
-	r, _ := initializeTest(testDB, session.DefaultSessionExpires)
+	r, conf := initializeTest(testDB, session.DefaultSessionExpires)
 
-	route.InitRoute(r, )
+	route.InitRoute(r, conf.Routes...)
 
 	form := getRegisterFormPostData()
 

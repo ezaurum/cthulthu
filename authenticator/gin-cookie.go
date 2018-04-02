@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"time"
-	"fmt"
 )
 
 const (
@@ -48,11 +47,6 @@ func (ca *cookieAuthenticator) Handler() gin.HandlerFunc {
 	}
 
 	return func(c *gin.Context) {
-
-		fmt.Println("caca")
-		fmt.Println("caca")
-		fmt.Println("caca")
-		fmt.Println("caca")
 
 		SetAuthenticator(c, ca)
 
