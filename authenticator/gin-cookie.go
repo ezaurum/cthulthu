@@ -34,10 +34,6 @@ func (ca *cookieAuthenticator) SetActions(loadIDToken IDTokenLoader, loadIdentit
 
 func (ca *cookieAuthenticator) Handler() gin.HandlerFunc {
 
-	fmt.Println("caca")
-	fmt.Println("caca")
-	fmt.Println("caca")
-	fmt.Println("caca")
 
 	if nil == ca.LoadIDToken {
 		panic("LoadIdToken is nil")
@@ -52,6 +48,11 @@ func (ca *cookieAuthenticator) Handler() gin.HandlerFunc {
 	}
 
 	return func(c *gin.Context) {
+
+		fmt.Println("caca")
+		fmt.Println("caca")
+		fmt.Println("caca")
+		fmt.Println("caca")
 
 		SetAuthenticator(c, ca)
 

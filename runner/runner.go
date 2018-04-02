@@ -37,7 +37,6 @@ func Run(config *config.Config, addr...string) {
 	r := gin.Default()
 
 	config.Initialize(r)
-	route.InitRoute(r, config.Routes...)
 
 	// authenticator 를 초기화한다
 	ca := authenticator.NewMem(config.NodeNumber, config.SessionExpiresInSeconds)
@@ -51,7 +50,7 @@ func Run(config *config.Config, addr...string) {
 		r.Use(ca.Handler(), manager.Handler())
 	}
 
-
+	route.InitRoute(r, config.Routes...)
 
 	// 템틀릿 렌더러 설정
 	if !helper.IsEmpty(config.TemplateDir) {
