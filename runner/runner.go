@@ -15,7 +15,7 @@ import (
 func Run(config *config.Config) {
 
 	//Init DB
-	manager := database.New(config.ConnectionString, config.Dialect, config.NodeNumber)
+	manager := database.New(config.Db.Connection, config.Db.Dialect, config.NodeNumber)
 
 	db := manager.Connect()
 	defer db.Close()
@@ -59,8 +59,13 @@ func Run(config *config.Config) {
 	route.InitRoute(r, config.Routes...)
 
 	// 템틀릿 렌더러 설정
-	if !helper.IsEmpty(config.TemplateDir) {
-		r.HTMLRender = render.New(config.TemplateDir)
+	if !helper.IsEmpty(config.Dir.Template) {
+		r.HTMLRender = render.New(config.Dir.Template)
+	}
+
+	// 스태틱 파일 설정
+	if !helper.IsEmpty(config.Dir.Static) {
+		route.InitStaticFiles(r, config.Dir.Static)
 	}
 
 	r.Run(config.Address)
