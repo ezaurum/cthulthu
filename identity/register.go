@@ -93,3 +93,19 @@ func GetNewIdentity(m *database.Manager) Identity {
 	}
 	return id
 }
+
+func CreateUsersIfNotExist(manager *database.Manager, defaultUsers []FormIDToken) {
+	for _, userForm := range defaultUsers {
+		CreateUserIfNotExist(manager, userForm)
+	}
+}
+
+func CreateUserIfNotExist(manager *database.Manager, token FormIDToken) bool {
+	ft := FormIDToken{}
+	if manager.IsExist(&ft, token) {
+		return false
+	}
+
+	CreateIdentityByForm(token, manager)
+	return true
+}
