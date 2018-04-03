@@ -7,21 +7,12 @@ import (
 	"github.com/ezaurum/cthulthu/helper"
 	"github.com/ezaurum/cthulthu/render"
 	"github.com/ezaurum/cthulthu/authenticator"
-	"github.com/ezaurum/cthulthu/identity"
 	"github.com/ezaurum/cthulthu/authorizer"
 	"github.com/ezaurum/cthulthu/route"
+	"github.com/ezaurum/cthulthu/identity"
 )
 
-const (
-	defaultAddress = ":9999"
-)
-
-func DefaultRun(config *config.Config) {
-	//TODO 어드레스를 실행시나 콘피그에서 가져올 수 있도록
-	Run(config, defaultAddress)
-}
-
-func Run(config *config.Config, addr...string) {
+func Run(config *config.Config) {
 
 	//Init DB
 	manager := database.New(config.ConnectionString, config.Dialect, config.NodeNumber)
@@ -29,27 +20,42 @@ func Run(config *config.Config, addr...string) {
 	db := manager.Connect()
 	defer db.Close()
 
-	// DB 초기화
 	manager.AutoMigrate(config.AutoMigrates...)
 
 	config.DBManager = manager
 
-	r := gin.Default()
-
-	config.Initialize(r)
-
-	// authenticator 를 초기화한다
-	ca := authenticator.NewMem(config.NodeNumber, config.SessionExpiresInSeconds)
-	ca.SetActions(identity.GetLoadCookieIDToken(manager),
-		identity.GetLoadIdentity(manager),
-		identity.GetPersistToken(manager))
-	if len(config.AuthorizerConfig) > 0 {
-		au := authorizer.Init(config.AuthorizerConfig...)
-		r.Use(ca.Handler(), manager.Handler(), au.Handler())
-	} else {
-		r.Use(ca.Handler(), manager.Handler())
+	//웹 전에 초기화 해야 하는 것들
+	if nil != config.OnInitializeDB {
+		config.OnInitializeDB()
 	}
 
+	// 웹 초기화
+
+	r := gin.Default()
+
+	// 엔진 넘겨주고 시작
+	if nil != config.Initialize {
+		config.Initialize(r)
+	}
+
+	// 미들웨어 사용 초기화
+	if nil != config.InitializeMiddleware {
+		config.InitializeMiddleware(r)
+	} else {
+		// authenticator 를 초기화한다
+		ca := authenticator.NewMem(config.NodeNumber, config.SessionExpiresInSeconds)
+		ca.SetActions(identity.GetLoadCookieIDToken(manager),
+			identity.GetLoadIdentity(manager),
+			identity.GetPersistToken(manager))
+		if len(config.AuthorizerConfig) > 0 {
+			au := authorizer.Init(config.AuthorizerConfig...)
+			r.Use(ca.Handler(), manager.Handler(), au.Handler())
+		} else {
+			r.Use(ca.Handler(), manager.Handler())
+		}
+	}
+
+	// 라우터는 핸들러가 추가되고 나서
 	route.InitRoute(r, config.Routes...)
 
 	// 템틀릿 렌더러 설정
@@ -57,5 +63,5 @@ func Run(config *config.Config, addr...string) {
 		r.HTMLRender = render.New(config.TemplateDir)
 	}
 
-	r.Run(addr...)
+	r.Run(config.Address)
 }

@@ -21,5 +21,9 @@ type Config struct {
 
 	Routes []func() route.Routes
 
-	Initialize func(engine *gin.Engine)
+	OnInitializeDB       func()
+	Initialize           func(engine *gin.Engine)
+	InitializeMiddleware func(engine *gin.Engine)
+
+	Address string
 }
