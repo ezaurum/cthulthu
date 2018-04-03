@@ -47,6 +47,10 @@ func IsAuthenticated(session session.Session) bool {
 	return b
 }
 
+func GetRole(session session.Session) string {
+	return GetIdentity(session).Role()
+}
+
 func GetIdentity(session session.Session) Identity {
 	i, _ := session.Get(IdentitySessionKey)
 	return i.(Identity)

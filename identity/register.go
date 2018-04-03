@@ -12,13 +12,6 @@ import (
 	"time"
 )
 
-const (
-	USER_ROLE = "User"
-	SUPER_ADMIN_ROLE = "SuperAdmin"
-	ADMIN_ROLE = "Admin"
-	ORGANIZER_ROLE = "Organizer"
-)
-
 func Register() route.Routes {
 	rt := make(route.Routes)
 	rt.AddPage("/register", "common/register").
