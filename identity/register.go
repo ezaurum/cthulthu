@@ -19,13 +19,16 @@ func Register() route.Routes {
 	return rt
 }
 
-func CreateFormIdentityWithRole(m *database.Manager, account string, password string, role string) {
+func CreateFormIdentityWithRole(m *database.Manager,
+	account string, password string, role string) Identity {
 
 	ft := FormIDToken{}
 	if m.IsExist(&ft, FormIDToken{
 		AccountName:account,
 	}) {
-		return
+		var i Identity
+		m.Find(&i, ft.IdentityID)
+		return i
 	}
 
 	identity := GetNewIdentity(m)
@@ -43,6 +46,8 @@ func CreateFormIdentityWithRole(m *database.Manager, account string, password st
 	}
 
 	m.CreateAll(&identity, &form)
+
+	return identity
 }
 
 
