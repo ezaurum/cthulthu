@@ -79,10 +79,10 @@ func (ca cookieAuthenticator) createSession(c *gin.Context) session.Session {
 }
 
 func (ca cookieAuthenticator) PersistIDToken(c *gin.Context, session session.Session, idToken IDToken) {
-	ca.PersistToken(idToken)
-	c.SetCookie(ca.persistedIDTokenCookieName, idToken.TokenString(),
+	cookieToken := ca.PersistToken(idToken)
+	c.SetCookie(ca.persistedIDTokenCookieName, cookieToken.TokenString(),
 		//tODO max age from token
-		365*24*60*60*10, "", "", false, true)
+		365*24*60*60*99, "", "", false, true)
 }
 
 func (ca cookieAuthenticator) findIDToken(c *gin.Context, session session.Session) (IDToken, bool) {
