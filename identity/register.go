@@ -12,12 +12,38 @@ import (
 	"time"
 )
 
+const (
+	USER_ROLE = "User"
+	SUPER_ADMIN_ROLE = "SuperAdmin"
+	ADMIN_ROLE = "Admin"
+	ORGANIZER_ROLE = "Organizer"
+)
+
 func Register() route.Routes {
 	rt := make(route.Routes)
 	rt.AddPage("/register", "common/register").
 		POST("/register", route.GetProcess("/", CreateIdentity))
 	return rt
 }
+
+func CreateFormIdentityWithRole(m *database.Manager, account string, password string, role string) {
+	identity := GetNewIdentity(m)
+	identity.IdentityRole = role
+
+	form := FormIDToken{
+		AccountName:     account,
+		AccountPassword: password,
+		Model:           identity.Model,
+		IdentityID:      identity.ID,
+		//TODO 토큰 암호화
+		Token: strconv.FormatInt(identity.ID, 10),
+		//TODO 설정 필요
+		expires: time.Now().Add(time.Hour * 24 * 365),
+	}
+
+	m.CreateAll(&identity, &form)
+}
+
 
 func CreateIdentity(c *gin.Context, s session.Session, m *database.Manager) (int, interface{}) {
 
@@ -88,7 +114,6 @@ func GetNewIdentity(m *database.Manager) Identity {
 	}
 	id := Identity{
 		Model: i,
-		//TODO default 유저 롤
 		IdentityRole: "User",
 	}
 	return id
