@@ -6,8 +6,6 @@ import (
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/helper"
 	"github.com/ezaurum/cthulthu/render"
-	"github.com/ezaurum/cthulthu/authenticator"
-	"github.com/ezaurum/cthulthu/authorizer"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/identity"
 )
@@ -42,7 +40,9 @@ func Run(config *config.Config) {
 	if nil != config.InitializeMiddleware {
 		config.InitializeMiddleware(r)
 	} else {
-		identity.DefaultMiddleware(config, manager, r)
+		identity.DefaultMiddleware(config.NodeNumber, manager, r,
+			config.SessionExpiresInSeconds,
+			config.AuthorizerConfig...)
 	}
 
 	// 라우터는 핸들러가 추가되고 나서
