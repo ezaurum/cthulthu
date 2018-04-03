@@ -1,0 +1,13 @@
+address = ":9999"
+
+[dir]
+static = "static"
+template = "templates"
+
+[db]
+dialect =    "sqlite3"
+connection = "test.db"
+
+[[account]]
+accountname = "congkong"
+accountpassword = "Cong#Kong$123"

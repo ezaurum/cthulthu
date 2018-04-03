@@ -42,7 +42,7 @@ func Run(config *config.Config) {
 	if nil != config.InitializeMiddleware {
 		config.InitializeMiddleware(r)
 	} else {
-		defaultMiddleware(config, manager, r)
+		identity.DefaultMiddleware(config, manager, r)
 	}
 
 	// 라우터는 핸들러가 추가되고 나서
@@ -61,16 +61,4 @@ func Run(config *config.Config) {
 	r.Run(config.Address)
 }
 
-func defaultMiddleware(config *config.Config, manager *database.Manager, r *gin.Engine) {
-	// authenticator 를 초기화한다
-	ca := authenticator.NewMem(config.NodeNumber, config.SessionExpiresInSeconds)
-	ca.SetActions(identity.GetLoadCookieIDToken(manager),
-		identity.GetLoadIdentityByCookie(manager),
-		identity.GetPersistToken(manager))
-	if len(config.AuthorizerConfig) > 0 {
-		au := authorizer.Init(config.AuthorizerConfig...)
-		r.Use(manager.Handler(), ca.Handler(), au.Handler())
-	} else {
-		r.Use(manager.Handler(), ca.Handler())
-	}
-}
+

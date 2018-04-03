@@ -118,8 +118,8 @@ func TestPersistedTokenLoad(t *testing.T) {
 		return token, true
 	}, func(token IDToken) (Identity, bool) {
 		return identity, true
-	}, func(token IDToken) {
-
+	}, func(token IDToken) IDToken {
+		return nil
 	})
 
 	r.Use(cthulthu.GinMiddleware(middleware).Handler())
@@ -263,8 +263,8 @@ func setNilFunctions(authenticator Authenticator) {
 		return nil, false
 	}, func(token IDToken) (Identity, bool) {
 		return nil, false
-	}, func(token IDToken) {
-
+	}, func(token IDToken) IDToken{
+		return nil
 	})
 }
 

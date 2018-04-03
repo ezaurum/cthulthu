@@ -43,12 +43,12 @@ func Login() route.Routes {
 							Expires:    time.Now().Add(time.Hour * 24 * 365),
 						})
 					}
-					return http.StatusFound, "/scores"
+					return http.StatusFound, "/"
 				default:
 					panic(findErr)
 				}
 
-				return http.StatusFound, "/scores"
+				return http.StatusFound, "/"
 			}))
 	return rt
 }

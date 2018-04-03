@@ -7,6 +7,9 @@ import (
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"net/url"
+	"time"
+	"fmt"
 )
 
 func TestRegister(t *testing.T) {
@@ -21,7 +24,9 @@ func TestRegister(t *testing.T) {
 	//assert.Equal(t, 1, loginForm.Find("form").Length())
 	//assert.Equal(t, 1, loginForm.Find("form").Find("input[name='userID']").Length())
 
-	form := getRegisterFormPostData()
+	form := make(url.Values)
+	form.Set("accountName", "test"+fmt.Sprintf("%v",time.Now()))
+	form.Set("accountPassword", "test")
 
 	client := test.HttpClient{}
 	w0 := client.PostFormRequest(r, "/register", form)
@@ -47,6 +52,7 @@ func TestAfterRegisterAuthenticated(t *testing.T) {
 	route.InitRoute(r, conf.Routes...)
 
 	form := getRegisterFormPostData()
+	form.Set("accountName", "test"+fmt.Sprintf("%v",time.Now()))
 
 	client := test.HttpClient{}
 	client.PostFormRequest(r, "/register", form)

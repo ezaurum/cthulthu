@@ -4,7 +4,6 @@ import (
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/gin-gonic/gin"
-	"github.com/ezaurum/cthulthu/identity"
 	"github.com/pelletier/go-toml"
 )
 
@@ -26,7 +25,6 @@ type Config struct {
 
 	Db  DBConfig
 	Dir DirConfig
-	Account []identity.FormIDToken
 }
 
 type DBConfig struct {

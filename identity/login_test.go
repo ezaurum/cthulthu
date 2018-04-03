@@ -24,7 +24,6 @@ func TestLogin(t *testing.T) {
 	form := getRegisterFormPostData()
 
 	client := test.HttpClient{}
-	client.PostFormRequest(r, "/register", form)
 	w0 := client.PostFormRequest(r, "/login", form)
 
 	assert.True(t, test.IsRedirect(w0))

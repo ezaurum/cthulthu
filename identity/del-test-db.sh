@@ -1,3 +1,3 @@
-#! sh
+#! /bin/sh
 
 rm *.db
