@@ -18,17 +18,10 @@ func GetLoadCookieIDToken(dbm *database.Manager) authenticator.IDTokenLoader {
 	}
 }
 
-func GetLoadIdentity(dbm *database.Manager) authenticator.IDLoader {
+func GetLoadIdentityByCookie(dbm *database.Manager) authenticator.IDLoader {
 	return func(cookie authenticator.IDToken) (authenticator.Identity, bool) {
 		identity := Identity{}
-
-		persistedCookie := CookieIDToken{}
-
-		if !dbm.IsExist(&persistedCookie, cookie.IdentityKey()) {
-			return nil, false
-		}
-
-		if dbm.IsExist(&identity, persistedCookie.IdentityKey()) {
+		if dbm.IsExist(&identity, cookie.IdentityKey()) {
 			return identity, true
 		}
 

@@ -37,7 +37,7 @@ func Initialize(config *config.Config,
 	// authenticator 를 초기화한다
 	ca := authenticator.NewMem(config.NodeNumber, config.SessionExpiresInSeconds)
 	ca.SetActions(GetLoadCookieIDToken(manager),
-		GetLoadIdentity(manager),
+		GetLoadIdentityByCookie(manager),
 		GetPersistToken(manager))
 	var au authorizer.AuthorizeMiddleware
 	if len(config.AuthorizerConfig) > 0 {
