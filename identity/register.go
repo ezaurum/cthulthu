@@ -27,6 +27,14 @@ func Register() route.Routes {
 }
 
 func CreateFormIdentityWithRole(m *database.Manager, account string, password string, role string) {
+
+	ft := FormIDToken{}
+	if m.IsExist(&ft, FormIDToken{
+		AccountName:account,
+	}) {
+		return
+	}
+
 	identity := GetNewIdentity(m)
 	identity.IdentityRole = role
 
