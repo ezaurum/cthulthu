@@ -12,7 +12,7 @@ const (
 
 type IDTokenLoader func(string) (IDToken, bool)
 type IDLoader func(IDToken) (Identity, bool)
-type TokenSaver func(IDToken)
+type TokenSaver func(IDToken) (IDToken)
 
 type Identity interface {
 	Role() string

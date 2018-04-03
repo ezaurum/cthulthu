@@ -30,11 +30,11 @@ func GetLoadIdentity(dbm *database.Manager) authenticator.IDLoader {
 }
 
 func GetPersistToken(dbm *database.Manager) authenticator.TokenSaver {
-	return func(token authenticator.IDToken) {
-		dbm.Create(&CookieIDToken{
+	return func(token authenticator.IDToken) authenticator.IDToken {
+		return dbm.Create(&CookieIDToken{
 			IdentityID: token.IdentityKey(),
 			Token:      token.TokenString(),
 			Expires:    time.Now().Add(time.Hour * 24 * 365),
-		})
+		}).(authenticator.IDToken)
 	}
 }
