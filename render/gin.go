@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin/render"
 	"html/template"
 	"log"
+	"fmt"
 )
 
 //check implementation
@@ -33,6 +34,9 @@ func New(templateDir string) Render {
 				case ev := <-watcher.Events:
 					if ev.Op != 0 {
 						i.templateContainer = boongeoppang.Load(templateDir)
+						fmt.Println("reload remplate")
+						fmt.Println("reload remplate")
+						fmt.Println("reload remplate")
 					}
 				case err := <-watcher.Errors:
 					log.Fatal("error:", err)
