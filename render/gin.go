@@ -2,9 +2,11 @@ package render
 
 import (
 	"github.com/ezaurum/cthulthu/render/boongeoppang"
+	"github.com/fsnotify/fsnotify"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
 	"html/template"
+	"log"
 )
 
 //check implementation
@@ -18,15 +20,28 @@ func Default() Render {
 func New(templateDir string) Render {
 
 	var b *boongeoppang.TemplateContainer
-	if gin.IsDebugging() {
-		b = boongeoppang.LoadDebug(templateDir)
-	} else {
-		b = boongeoppang.Load(templateDir)
-	}
-
-	return Render{
+	b = boongeoppang.Load(templateDir)
+	i := Render{
 		templateContainer: b,
 	}
+
+	if gin.IsDebugging() {
+
+		boongeoppang.WatchDir(templateDir, func(watcher *fsnotify.Watcher) {
+			for {
+				select {
+				case ev := <-watcher.Events:
+					if ev.Op != 0 {
+						i.templateContainer = boongeoppang.Load(templateDir)
+					}
+				case err := <-watcher.Errors:
+					log.Fatal("error:", err)
+				}
+			}
+		})
+	}
+
+	return i
 }
 
 type Render struct {

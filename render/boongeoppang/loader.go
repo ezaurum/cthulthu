@@ -8,6 +8,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"github.com/fsnotify/fsnotify"
 )
 
 const (
@@ -73,15 +74,22 @@ func LoadDebug(rootDir string) *TemplateContainer {
 	d := Default()
 	d.debug = true
 
-	/*watcher, err := fsnotify.NewWatcher()
+	load := d.Load(rootDir)
 
-	if nil != err {
-		panic(err)
-	}
+	WatchDir(rootDir, func(watcher *fsnotify.Watcher) {
+		for {
+			select {
+			case ev := <-watcher.Events:
+				if ev.Op != 0 {
+					load = d.Load(rootDir)
+				}
+			case err := <-watcher.Errors:
+				log.Fatal("error:", err)
+			}
+		}
+	})
 
-	watcher.Add() */
-
-	return d.Load(rootDir)
+	return load
 }
 
 func DefaultLoad() *TemplateContainer {
@@ -93,6 +101,8 @@ func Load(rootDir string) *TemplateContainer {
 }
 
 func (t *TemplateContainer) Load(rootDir string) *TemplateContainer {
+	Defaults := t.Defaults
+	holders := t.M
 
 	filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
 		if nil != err {
@@ -119,11 +129,12 @@ func (t *TemplateContainer) Load(rootDir string) *TemplateContainer {
 			t.Partials[layoutName] = path
 			break
 		case defaultDir:
-			t.Defaults[layoutName] = path
+			Defaults[layoutName] = path
 			templateKey = layoutName
+
 			fallthrough
 		default:
-			t.M[templateKey] = &LayoutHolder{
+			holders[templateKey] = &LayoutHolder{
 				Name: layoutName,
 				Path: path,
 			}
