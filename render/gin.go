@@ -28,6 +28,7 @@ func New(templateDir string) Render {
 
 	if gin.IsDebugging() {
 
+		fmt.Println("watch "+templateDir)
 		boongeoppang.WatchDir(templateDir, func(watcher *fsnotify.Watcher) {
 			for {
 				select {
