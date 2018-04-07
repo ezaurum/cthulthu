@@ -14,7 +14,6 @@ func WatchDir(targetDir string, run func(watcher *fsnotify.Watcher)) *fsnotify.W
 		log.Fatal(err)
 	}
 
-
 	filepath.Walk(targetDir, func(path string, fi os.FileInfo, err error) error {
 		if fi.IsDir() {
 			fmt.Printf("add watch path %v\n", path)
