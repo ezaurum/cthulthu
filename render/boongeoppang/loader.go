@@ -82,8 +82,10 @@ func LoadDebug(rootDir string) *TemplateContainer {
 			select {
 			case ev := <-watcher.Events:
 				if ev.Op & fsnotify.Create == fsnotify.Create {
-					fmt.Println("reload remplate")
-					load = d.Load(rootDir)
+					if "tmpl" == filepath.Ext(ev.Name) {
+						fmt.Println("reload remplate")
+						load = d.Load(rootDir)
+					}
 				}
 			case err := <-watcher.Errors:
 				log.Fatal("error:", err)
