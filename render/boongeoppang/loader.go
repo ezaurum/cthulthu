@@ -84,8 +84,6 @@ func LoadDebug(rootDir string) *TemplateContainer {
 				fmt.Printf("event %v\n", ev)
 				if ev.Op != 0 {
 					fmt.Println("reload remplate")
-					fmt.Println("reload remplate")
-					fmt.Println("reload remplate")
 					load = d.Load(rootDir)
 				}
 			case err := <-watcher.Errors:
@@ -120,7 +118,14 @@ func (t *TemplateContainer) Load(rootDir string) *TemplateContainer {
 		}
 
 		filename := info.Name()
-		layoutName := strings.TrimSuffix(filename, filepath.Ext(filename))
+		ext := filepath.Ext(filename)
+
+		// 템플릿이 아니면 패스
+		if ext != "tmpl" {
+			return nil
+		}
+
+		layoutName := strings.TrimSuffix(filename, ext)
 		if layoutName == "" {
 			return fmt.Errorf("file name is empty %v, %v", path, info)
 		}
@@ -200,7 +205,12 @@ func (t *TemplateContainer) initiateTemplates() {
 }
 
 func populateHtmlTemplate(files ...string) interface{} {
-	return template.Must(template.ParseFiles(files...))
+	t, err := template.ParseFiles(files...)
+	if nil != err {
+		log.Printf("file error %v\n", err)
+		return nil
+	}
+	return t
 }
 func (t *TemplateContainer) IsDebug() bool {
 	return t.debug
