@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"log"
 	"fmt"
+	"path/filepath"
 )
 
 //check implementation
@@ -34,10 +35,9 @@ func New(templateDir string) Render {
 				select {
 				case ev := <-watcher.Events:
 					fmt.Printf("event remplate %v\n", ev)
-					if ev.Op != 0 {
+					if ev.Op & fsnotify.Create == fsnotify.Create &&
+					".tmpl" == filepath.Ext(ev.Name) {
 						i.templateContainer = boongeoppang.Load(templateDir)
-						fmt.Println("reload remplate")
-						fmt.Println("reload remplate")
 						fmt.Println("reload remplate")
 					}
 				case err := <-watcher.Errors:

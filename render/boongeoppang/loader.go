@@ -8,7 +8,6 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"github.com/fsnotify/fsnotify"
 )
 
 const (
@@ -70,7 +69,7 @@ func Default() *TemplateContainer {
 	}
 }
 
-func LoadDebug(rootDir string) *TemplateContainer {
+/*func LoadDebug(rootDir string) *TemplateContainer {
 	d := Default()
 	d.debug = true
 
@@ -81,8 +80,6 @@ func LoadDebug(rootDir string) *TemplateContainer {
 		for {
 			select {
 			case ev := <-watcher.Events:
-				if ev.Op & fsnotify.Create == fsnotify.Create {
-					if "tmpl" == filepath.Ext(ev.Name) {
 						fmt.Println("reload remplate")
 						load = d.Load(rootDir)
 					}
@@ -94,7 +91,7 @@ func LoadDebug(rootDir string) *TemplateContainer {
 	})
 
 	return load
-}
+}*/
 
 func DefaultLoad() *TemplateContainer {
 	return Default().Load(DefaultTemplateDir)
@@ -123,7 +120,7 @@ func (t *TemplateContainer) Load(rootDir string) *TemplateContainer {
 		fmt.Printf("%v\n", ext)
 
 		// 템플릿이 아니면 패스
-		if ext != "tmpl" {
+		if ext != ".tmpl" {
 			return nil
 		}
 
