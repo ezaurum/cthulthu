@@ -119,6 +119,9 @@ func (t *TemplateContainer) Load(rootDir string) *TemplateContainer {
 		filename := info.Name()
 		ext := filepath.Ext(filename)
 
+		fmt.Printf("%v\n", filename)
+		fmt.Printf("%v\n", ext)
+
 		// 템플릿이 아니면 패스
 		if ext != "tmpl" {
 			return nil
