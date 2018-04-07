@@ -51,7 +51,6 @@ func TestTemplateDebug(t *testing.T) {
 
 func getDefault() *gin.Engine {
 	r := gin.New()
-	render := Default()
-	r.HTMLRender = render
+	MakeRender(r)
 	return r
 }

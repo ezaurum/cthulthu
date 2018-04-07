@@ -14,12 +14,17 @@ import (
 //check implementation
 var _ render.HTMLRender = Render{}
 
-func Default() Render {
-	return New(boongeoppang.DefaultTemplateDir)
+func Default(engine *gin.Engine) Render {
+	return New(boongeoppang.DefaultTemplateDir, engine)
+}
+
+func MakeRender(engine *gin.Engine) {
+	render := Default(engine)
+	engine.HTMLRender = render
 }
 
 // New instance
-func New(templateDir string) Render {
+func New(templateDir string, engine *gin.Engine) Render {
 
 	var b *boongeoppang.TemplateContainer
 	b = boongeoppang.Load(templateDir)
@@ -39,6 +44,7 @@ func New(templateDir string) Render {
 					".tmpl" == filepath.Ext(ev.Name) {
 						i.templateContainer = boongeoppang.Load(templateDir)
 						fmt.Println("reload remplate")
+						engine.HTMLRender = i
 					}
 				case err := <-watcher.Errors:
 					log.Fatal("error:", err)
@@ -46,6 +52,7 @@ func New(templateDir string) Render {
 			}
 		})
 	}
+
 
 	return i
 }
