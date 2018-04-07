@@ -33,6 +33,7 @@ func New(templateDir string) Render {
 			for {
 				select {
 				case ev := <-watcher.Events:
+					fmt.Printf("event remplate %v\n", ev)
 					if ev.Op != 0 {
 						i.templateContainer = boongeoppang.Load(templateDir)
 						fmt.Println("reload remplate")
