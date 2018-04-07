@@ -50,7 +50,7 @@ func Run(config *config.Config) {
 
 	// 템틀릿 렌더러 설정
 	if !helper.IsEmpty(config.Dir.Template) {
-		r.HTMLRender = render.New(config.Dir.Template)
+		r.HTMLRender = render.New(config.Dir.Template, r)
 	}
 
 	// 스태틱 파일 설정
