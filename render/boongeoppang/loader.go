@@ -158,6 +158,8 @@ func (t *TemplateContainer) Load(rootDir string) *TemplateContainer {
 
 		return err
 	})
+	t.Defaults = Defaults
+	t.M = holders
 
 	t.initiateTemplates()
 
