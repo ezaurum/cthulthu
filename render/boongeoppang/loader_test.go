@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestBaseLayoutLoad(t *testing.T) {
@@ -90,4 +91,7 @@ func TestChanged(t *testing.T) {
 	container := LoadDebug("tests/full")
 
 	assert.True(t, container.IsDebug())
+
+	time.Sleep(60 * time.Second)
+
 }

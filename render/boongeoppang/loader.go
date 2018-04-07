@@ -77,9 +77,11 @@ func LoadDebug(rootDir string) *TemplateContainer {
 	load := d.Load(rootDir)
 
 	WatchDir(rootDir, func(watcher *fsnotify.Watcher) {
+		fmt.Printf("watch dirs\n")
 		for {
 			select {
 			case ev := <-watcher.Events:
+				fmt.Printf("event %v\n", ev)
 				if ev.Op != 0 {
 					fmt.Println("reload remplate")
 					fmt.Println("reload remplate")
