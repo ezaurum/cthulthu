@@ -105,8 +105,6 @@ func Load(rootDir string) *TemplateContainer {
 }
 
 func (t *TemplateContainer) Load(rootDir string) *TemplateContainer {
-	Defaults := t.Defaults
-	holders := t.M
 
 	filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
 		if nil != err {
@@ -140,12 +138,12 @@ func (t *TemplateContainer) Load(rootDir string) *TemplateContainer {
 			t.Partials[layoutName] = path
 			break
 		case defaultDir:
-			Defaults[layoutName] = path
+			t.Defaults[layoutName] = path
 			templateKey = layoutName
 
 			fallthrough
 		default:
-			holders[templateKey] = &LayoutHolder{
+			t.M[templateKey] = &LayoutHolder{
 				Name: layoutName,
 				Path: path,
 			}
@@ -158,8 +156,6 @@ func (t *TemplateContainer) Load(rootDir string) *TemplateContainer {
 
 		return err
 	})
-	t.Defaults = Defaults
-	t.M = holders
 
 	t.initiateTemplates()
 
