@@ -141,7 +141,7 @@ func (t *TemplateContainer) Load(rootDir string) *TemplateContainer {
 
 func formatAsDate(t time.Time) string {
 	year, month, day := t.Date()
-	return fmt.Sprintf("%d-%d-%d", year, month, day)
+	return fmt.Sprintf("%04d-%02d-%02d", year, month, day)
 }
 
 // initiate html/template
@@ -182,11 +182,11 @@ func (t *TemplateContainer) initiateTemplates() {
 			files = append(files[:1], partialsFileNames...)
 		}
 
+		// baseof.tmpl이 실행되어야 한다.
+		// parse를 하면 각 파일 이름별로 하나씩 내부에 템플릿이 만들어진다
 		value.Layout =
-		//template.Must(template.New("").Funcs(t.FuncMap).ParseFiles(files...))
-		//template.Must(template.ParseFiles(files...))
 			template.Must(template.
-				New(path.Base(files[len(files)-1])).
+				New(path.Base(files[0])).
 				Funcs(t.FuncMap).ParseFiles(files...))
 	}
 }

@@ -7,12 +7,16 @@ import (
 	"testing"
 	"html/template"
 	"os"
+	"github.com/gin-gonic/gin"
+	"bytes"
+	"time"
 )
+
+const testTemplateDir = "tests"
 
 func TestBaseLayoutLoad(t *testing.T) {
 
-	rootDir := "tests/full"
-	container := Load(rootDir)
+	container := Load(testTemplateDir)
 
 	notExist := []string{"test", "head", "foot"}
 	for _, el := range notExist {
@@ -35,7 +39,7 @@ func TestBaseLayoutLoad(t *testing.T) {
 		assert.NotEmpty(t, path)
 		assert.True(t, strings.Index(path, el) > -1)
 		assert.True(t, strings.Index(path, ".tmpl") > -1)
-		assert.True(t, strings.Index(path, "tests") > -1)
+		assert.True(t, strings.Index(path, testTemplateDir) > -1)
 	}
 
 	partialsExpected := []string{"head", "body"}
@@ -44,13 +48,13 @@ func TestBaseLayoutLoad(t *testing.T) {
 		assert.NotEmpty(t, path)
 		assert.True(t, strings.Index(path, el) > -1)
 		assert.True(t, strings.Index(path, ".tmpl") > -1)
-		assert.True(t, strings.Index(path, "tests") > -1)
+		assert.True(t, strings.Index(path, testTemplateDir) > -1)
 	}
 }
 
 func TestContentSpecifiedLayoutLoad(t *testing.T) {
 
-	container := Load("tests/full")
+	container := Load(testTemplateDir)
 
 	defaultsExpected := []string{"product/index", "product/single", "product/list", "product/form"}
 	for _, el := range defaultsExpected {
@@ -64,7 +68,7 @@ func TestContentSpecifiedLayoutLoad(t *testing.T) {
 		assert.NotEmpty(t, path)
 		assert.True(t, strings.Index(path, filepath.Base(el)) > -1)
 		assert.True(t, strings.Index(path, ".tmpl") > -1)
-		assert.True(t, strings.Index(path, "tests") > -1)
+		assert.True(t, strings.Index(path, testTemplateDir) > -1)
 
 		layout.Layout.Execute(os.Stdout, nil)
 	}
@@ -72,7 +76,7 @@ func TestContentSpecifiedLayoutLoad(t *testing.T) {
 
 func TestLayoutSetGet(t *testing.T) {
 
-	container := Load("tests/full")
+	container := Load(testTemplateDir)
 	expected := template.New("Test")
 	container.Set("index", expected)
 
@@ -82,20 +86,40 @@ func TestLayoutSetGet(t *testing.T) {
 	assert.Equal(t, expected, layout.Layout)
 }
 
-/*
-func TestLoadDebug(t *testing.T) {
+func TestExecute(t *testing.T) {
 
-	container := LoadDebug("tests/full")
+	container := Load(testTemplateDir)
+	expected := "common/login"
+	holder, b := container.Get(expected)
+	if !b {
+		t.Fail()
+	}
 
-	assert.True(t, container.IsDebug())
+	buf := bytes.NewBufferString("")
+	template := holder.Layout
+	err := template.Execute(buf, gin.H{})
+
+	assert.Nil(t, err, err)
+	assert.True(t, len(buf.String()) > 0)
 }
 
-func TestChanged(t *testing.T) {
+func TestExecuteFuncMap(t *testing.T) {
 
-	/container := LoadDebug("tests/full")
+	container := Load(testTemplateDir)
+	expected := "index"
+	holder, b := container.Get(expected)
+	if !b {
+		t.Fail()
+	}
+	targetTime, _ := time.Parse("2006-01-02", "2017-01-31")
+	buf := bytes.NewBufferString("")
+	template := holder.Layout
+	err := template.Execute(buf, gin.H{
+		"TestDate": targetTime,
+	})
 
-	assert.True(t, container.IsDebug())
-
-	time.Sleep(60 * time.Second)
-
-}*/
+	assert.Nil(t, err, err)
+	s := buf.String()
+	assert.True(t, len(s) > 0)
+	assert.True(t, strings.Contains(s,targetTime.Format("2006-01-02")))
+}

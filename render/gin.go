@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
 	"log"
-	"fmt"
 	"path/filepath"
 )
 
@@ -15,11 +14,6 @@ var _ render.HTMLRender = Render{}
 
 func Default(engine *gin.Engine) Render {
 	return New(boongeoppang.DefaultTemplateDir, engine)
-}
-
-func MakeRender(engine *gin.Engine) {
-	render := Default(engine)
-	engine.HTMLRender = render
 }
 
 // New instance
@@ -33,16 +27,14 @@ func New(templateDir string, engine *gin.Engine) Render {
 
 	if gin.IsDebugging() {
 
-		fmt.Println("watch " + templateDir)
 		boongeoppang.WatchDir(templateDir, func(watcher *fsnotify.Watcher) {
 			for {
 				select {
 				case ev := <-watcher.Events:
-					fmt.Printf("event remplate %v\n", ev)
 					if ev.Op&fsnotify.Create == fsnotify.Create &&
 						".tmpl" == filepath.Ext(ev.Name) {
 						i.templateContainer = boongeoppang.Load(templateDir)
-						fmt.Println("reload remplate")
+						//TODO 나중에 처널로 어떻게...
 						engine.HTMLRender = i
 					}
 				case err := <-watcher.Errors:

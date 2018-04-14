@@ -23,7 +23,7 @@ func TestIndex(t *testing.T) {
 
 	doc := test.GetStatusOKDoc(r, givenUrl, t)
 
-	fmt.Println(doc)
+	fmt.Println(doc.Nodes)
 
 	assert.Equal(t, testString, doc.Find("p").First().Text())
 	assert.Equal(t, "Dashboard", doc.Find("h1").First().Text())
@@ -44,16 +44,10 @@ func TestLogin(t *testing.T) {
 	//assert.Equal(t, "로그인", w.Find("title").First().Text())
 }
 
-func TestTemplateDebug(t *testing.T) {
-	r := getDefault()
-	render := Default(r)
-	r.HTMLRender = render
-}
-
 // test utils
 
 func getDefault() *gin.Engine {
 	r := gin.New()
-	MakeRender(r)
+	r.HTMLRender = New("boongeoppang/tests", r)
 	return r
 }
