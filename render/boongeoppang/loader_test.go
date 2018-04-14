@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"html/template"
+	"os"
 )
 
 func TestBaseLayoutLoad(t *testing.T) {
@@ -63,13 +65,15 @@ func TestContentSpecifiedLayoutLoad(t *testing.T) {
 		assert.True(t, strings.Index(path, filepath.Base(el)) > -1)
 		assert.True(t, strings.Index(path, ".tmpl") > -1)
 		assert.True(t, strings.Index(path, "tests") > -1)
+
+		layout.Layout.Execute(os.Stdout, nil)
 	}
 }
 
 func TestLayoutSetGet(t *testing.T) {
 
 	container := Load("tests/full")
-	expected := "IndexLayout"
+	expected := template.New("Test")
 	container.Set("index", expected)
 
 	layout, b := container.Get("index")
@@ -77,6 +81,7 @@ func TestLayoutSetGet(t *testing.T) {
 	assert.True(t, b)
 	assert.Equal(t, expected, layout.Layout)
 }
+
 /*
 func TestLoadDebug(t *testing.T) {
 

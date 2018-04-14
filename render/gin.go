@@ -5,7 +5,6 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
-	"html/template"
 	"log"
 	"fmt"
 	"path/filepath"
@@ -34,14 +33,14 @@ func New(templateDir string, engine *gin.Engine) Render {
 
 	if gin.IsDebugging() {
 
-		fmt.Println("watch "+templateDir)
+		fmt.Println("watch " + templateDir)
 		boongeoppang.WatchDir(templateDir, func(watcher *fsnotify.Watcher) {
 			for {
 				select {
 				case ev := <-watcher.Events:
 					fmt.Printf("event remplate %v\n", ev)
-					if ev.Op & fsnotify.Create == fsnotify.Create &&
-					".tmpl" == filepath.Ext(ev.Name) {
+					if ev.Op&fsnotify.Create == fsnotify.Create &&
+						".tmpl" == filepath.Ext(ev.Name) {
 						i.templateContainer = boongeoppang.Load(templateDir)
 						fmt.Println("reload remplate")
 						engine.HTMLRender = i
@@ -52,7 +51,6 @@ func New(templateDir string, engine *gin.Engine) Render {
 			}
 		})
 	}
-
 
 	return i
 }
@@ -68,7 +66,7 @@ func (r Render) Instance(name string, data interface{}) render.Render {
 		panic("not exist template " + name)
 	}
 	return render.HTML{
-		Template: layout.Layout.(*template.Template),
+		Template: layout.Layout,
 		Data:     data,
 	}
 }

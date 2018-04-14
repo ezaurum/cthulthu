@@ -24,7 +24,7 @@ var (
 
 type LayoutHolder struct {
 	Path   string
-	Layout interface{}
+	Layout *template.Template
 	Name   string
 }
 
@@ -36,7 +36,7 @@ type TemplateContainer struct {
 	debug    bool
 }
 
-func (t TemplateContainer) Set(name string, layout interface{}) {
+func (t TemplateContainer) Set(name string, layout *template.Template) {
 	get, _ := t.Get(name)
 	get.Layout = layout
 }
@@ -50,8 +50,9 @@ func (t TemplateContainer) Get(name string) (*LayoutHolder, bool) {
 
 	if mm, b := t.Defaults[baseName]; b && baseName != baseOf {
 		t.M[name] = &LayoutHolder{
-			Name: name,
-			Path: mm,
+			Name:   name,
+			Path:   mm,
+			Layout: t.M[baseName].Layout,
 		}
 		return t.M[name], true
 	}
@@ -66,32 +67,11 @@ func Default() *TemplateContainer {
 		Partials: partials,
 		Defaults: defaults,
 		M:        make(map[string]*LayoutHolder),
+		FuncMap: template.FuncMap{
+			"formatAsDate": formatAsDate,
+		},
 	}
 }
-
-/*func LoadDebug(rootDir string) *TemplateContainer {
-	d := Default()
-	d.debug = true
-
-	load := d.Load(rootDir)
-
-	WatchDir(rootDir, func(watcher *fsnotify.Watcher) {
-		fmt.Printf("watch dirs\n")
-		for {
-			select {
-			case ev := <-watcher.Events:
-						fmt.Println("reload remplate")
-						load = d.Load(rootDir)
-					}
-				}
-			case err := <-watcher.Errors:
-				log.Fatal("error:", err)
-			}
-		}
-	})
-
-	return load
-}*/
 
 func LoadDefault() *TemplateContainer {
 	return Default().Load(DefaultTemplateDir)
@@ -167,10 +147,6 @@ func formatAsDate(t time.Time) string {
 // initiate html/template
 func (t *TemplateContainer) initiateTemplates() {
 
-	t.FuncMap = template.FuncMap{
-		"formatAsDate": formatAsDate,
-	}
-
 	var partialsFileNames []string
 	for _, v := range t.Partials {
 		partialsFileNames = append(partialsFileNames, v)
@@ -206,18 +182,11 @@ func (t *TemplateContainer) initiateTemplates() {
 			files = append(files[:1], partialsFileNames...)
 		}
 
-		value.Layout = t.populateHtmlTemplate(layoutName, files...)
+		value.Layout =
+		//template.Must(template.New("").Funcs(t.FuncMap).ParseFiles(files...))
+		//template.Must(template.ParseFiles(files...))
+			template.Must(template.
+				New(path.Base(files[len(files)-1])).
+				Funcs(t.FuncMap).ParseFiles(files...))
 	}
-}
-
-func (t *TemplateContainer) populateHtmlTemplate(layoutName string, files ...string) *template.Template {
-	tmpl, err := template.New(layoutName).Funcs(t.FuncMap).ParseFiles(files...)
-	if nil != err {
-		log.Printf("file error %v\n", err)
-		return nil
-	}
-	return tmpl
-}
-func (t *TemplateContainer) IsDebug() bool {
-	return t.debug
 }
