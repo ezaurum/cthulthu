@@ -8,6 +8,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 const (
@@ -31,7 +32,7 @@ type TemplateContainer struct {
 	M        map[string]*LayoutHolder
 	Partials map[string]string
 	Defaults map[string]string
-	Populate func(files ...string) interface{}
+	FuncMap  template.FuncMap
 	debug    bool
 }
 
@@ -65,7 +66,6 @@ func Default() *TemplateContainer {
 		Partials: partials,
 		Defaults: defaults,
 		M:        make(map[string]*LayoutHolder),
-		Populate: populateHtmlTemplate,
 	}
 }
 
@@ -93,7 +93,7 @@ func Default() *TemplateContainer {
 	return load
 }*/
 
-func DefaultLoad() *TemplateContainer {
+func LoadDefault() *TemplateContainer {
 	return Default().Load(DefaultTemplateDir)
 }
 
@@ -115,9 +115,6 @@ func (t *TemplateContainer) Load(rootDir string) *TemplateContainer {
 
 		filename := info.Name()
 		ext := filepath.Ext(filename)
-
-		fmt.Printf("%v\n", filename)
-		fmt.Printf("%v\n", ext)
 
 		// 템플릿이 아니면 패스
 		if ext != ".tmpl" {
@@ -162,8 +159,18 @@ func (t *TemplateContainer) Load(rootDir string) *TemplateContainer {
 	return t
 }
 
+func formatAsDate(t time.Time) string {
+	year, month, day := t.Date()
+	return fmt.Sprintf("%d-%d-%d", year, month, day)
+}
+
 // initiate html/template
 func (t *TemplateContainer) initiateTemplates() {
+
+	t.FuncMap = template.FuncMap{
+		"formatAsDate": formatAsDate,
+	}
+
 	var partialsFileNames []string
 	for _, v := range t.Partials {
 		partialsFileNames = append(partialsFileNames, v)
@@ -199,17 +206,17 @@ func (t *TemplateContainer) initiateTemplates() {
 			files = append(files[:1], partialsFileNames...)
 		}
 
-		value.Layout = t.Populate(files...)
+		value.Layout = t.populateHtmlTemplate(layoutName, files...)
 	}
 }
 
-func populateHtmlTemplate(files ...string) interface{} {
-	t, err := template.ParseFiles(files...)
+func (t *TemplateContainer) populateHtmlTemplate(layoutName string, files ...string) *template.Template {
+	tmpl, err := template.New(layoutName).Funcs(t.FuncMap).ParseFiles(files...)
 	if nil != err {
 		log.Printf("file error %v\n", err)
 		return nil
 	}
-	return t
+	return tmpl
 }
 func (t *TemplateContainer) IsDebug() bool {
 	return t.debug
