@@ -8,7 +8,6 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 const (
@@ -68,7 +67,11 @@ func Default() *TemplateContainer {
 		Defaults: defaults,
 		M:        make(map[string]*LayoutHolder),
 		FuncMap: template.FuncMap{
-			"formatAsDate": formatAsDate,
+			"asDate": asDate,
+			"asDate12HMinute": asDate12HMinute,
+			"asDate24HMinute": asDate24HMinute,
+			"asTime12H": asTime12H,
+			"asTime24H": asTime24H,
 		},
 	}
 }
@@ -139,10 +142,6 @@ func (t *TemplateContainer) Load(rootDir string) *TemplateContainer {
 	return t
 }
 
-func formatAsDate(t time.Time) string {
-	year, month, day := t.Date()
-	return fmt.Sprintf("%04d-%02d-%02d", year, month, day)
-}
 
 // initiate html/template
 func (t *TemplateContainer) initiateTemplates() {
