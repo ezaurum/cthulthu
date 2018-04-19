@@ -2,18 +2,23 @@ package database
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
-func (dbm *Manager) Handler() gin.HandlerFunc {
+const (
+	contextKey = "cthulthu-DBM"
+)
+
+func Handler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		SetDatabase(c, dbm)
+		SetDatabase(c, db)
 	}
 }
 
-func SetDatabase(c *gin.Context, db *Manager) {
-	c.Set("DBM", db)
+func SetDatabase(c *gin.Context, db *gorm.DB) {
+	c.Set(contextKey, db)
 }
 
 func GetDatabase(c *gin.Context) *Manager {
-	return c.MustGet("DBM").(*Manager)
+	return c.MustGet(contextKey).(*Manager)
 }
