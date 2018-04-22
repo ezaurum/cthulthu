@@ -21,12 +21,6 @@ type Manager struct {
 	db               *gorm.DB
 }
 
-func Default() *Manager {
-	// mysql Connect
-	return New("root:example@tcp(127.0.0.1:3306)/dev?charset=utf8&parseTime=True&loc=Local",
-		"mysql", 0)
-}
-
 func New(connectionString string, dialect string, nodeNumber int64) *Manager {
 	return &Manager{
 		connectionString: connectionString,
@@ -107,36 +101,9 @@ func (dbm *Manager) CreateAll(targets ...interface{}) {
 	CreateAll(dbm.db, targets...)
 }
 
-func CreateAll(db *gorm.DB, targets ...interface{}) {
-	action := func(tx *gorm.DB, v interface{}) {
-		d := tx.Create(v)
-		checkError(d, tx)
-	}
-	transaction(db, action, targets...)
-}
-
-func checkError(d *gorm.DB, tx *gorm.DB) {
-	if d.Error == nil {
-		return
-	}
-
-	tx.Rollback()
-	panic(d.Error)
-}
-
 func (dbm *Manager) transaction(action TransactionHandlerFunc, targets ...interface{}) {
 	transaction(dbm.db, action, targets...)
 }
-
-func transaction(db *gorm.DB, action TransactionHandlerFunc, targets ...interface{}) {
-	tx := db.Begin()
-	for _, v := range targets {
-		action(tx, v)
-	}
-	tx.Commit()
-}
-
-type TransactionHandlerFunc func(*gorm.DB, interface{})
 
 func (dbm *Manager) assignIDWhenNotAssigned(target interface{}) int64 {
 	stype := reflect.ValueOf(target).Elem()
@@ -161,18 +128,6 @@ func (dbm *Manager) Find(token interface{}, where ...interface{}) interface{} {
 		return db.Error
 	}
 	return nil
-}
-
-func IsExist(db *gorm.DB, t interface{}, where ...interface{}) bool {
-	dbR := db.Find(t, where...)
-	switch dbR.Error {
-	case nil:
-		return true
-	case gorm.ErrRecordNotFound:
-		return false
-	default:
-		panic(db.Error)
-	}
 }
 
 func (dbm *Manager) IsExist(t interface{}, where ...interface{}) bool {

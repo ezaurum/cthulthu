@@ -4,13 +4,14 @@ import (
 	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/database"
 	"time"
+	"github.com/jinzhu/gorm"
 )
 
 // 쿠키의 id 토큰 처리
-func GetLoadCookieIDToken(dbm *database.Manager) authenticator.IDTokenLoader {
+func GetLoadCookieIDToken(dbm *gorm.DB) authenticator.IDTokenLoader {
 	return func(tokenString string) (authenticator.IDToken, bool) {
 		var token CookieIDToken
-		if dbm.IsExist(&token, &CookieIDToken{Token: tokenString}) {
+		if database.IsExist(dbm, &token, &CookieIDToken{Token: tokenString}) {
 			return token, true
 		} else {
 			return nil, false
@@ -18,10 +19,10 @@ func GetLoadCookieIDToken(dbm *database.Manager) authenticator.IDTokenLoader {
 	}
 }
 
-func GetLoadIdentityByCookie(dbm *database.Manager) authenticator.IDLoader {
+func GetLoadIdentityByCookie(dbm *gorm.DB) authenticator.IDLoader {
 	return func(cookie authenticator.IDToken) (authenticator.Identity, bool) {
 		identity := Identity{}
-		if dbm.IsExist(&identity, cookie.IdentityKey()) {
+		if database.IsExist(dbm, &identity, cookie.IdentityKey()) {
 			return identity, true
 		}
 
@@ -29,9 +30,9 @@ func GetLoadIdentityByCookie(dbm *database.Manager) authenticator.IDLoader {
 	}
 }
 
-func GetPersistToken(dbm *database.Manager) authenticator.TokenSaver {
+func GetPersistToken(dbm *gorm.DB) authenticator.TokenSaver {
 	return func(token authenticator.IDToken) authenticator.IDToken {
-		return dbm.Create(&CookieIDToken{
+		return database.Create(dbm, &CookieIDToken{
 			IdentityID: token.IdentityKey(),
 			Token:      token.TokenString(),
 			Expires:    time.Now().Add(time.Hour * 24 * 365),
