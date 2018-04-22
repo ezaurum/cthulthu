@@ -5,9 +5,9 @@ import (
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/helper"
 	"github.com/ezaurum/cthulthu/identity"
-	"github.com/ezaurum/cthulthu/render"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/gin-gonic/gin"
+	"github.com/ezaurum/boongeoppang/gin"
 )
 
 func Run(config *config.Config) {
@@ -50,7 +50,11 @@ func Run(config *config.Config) {
 
 	// 템틀릿 렌더러 설정
 	if !helper.IsEmpty(config.Dir.Template) {
-		r.HTMLRender = render.New(config.Dir.Template, r)
+		if gin.IsDebugging() {
+			render.NewDebug(config.Dir.Template, r)
+		} else {
+			r.HTMLRender = render.New(config.Dir.Template)
+		}
 	}
 
 	// 스태틱 파일 설정
