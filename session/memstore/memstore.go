@@ -20,7 +20,8 @@ func Default() session.Store {
 	return New(k, DefaultDuration, DefaultCleanupInterval)
 }
 
-func New(k generators.IDGenerator, duration time.Duration, cleanupInterval time.Duration) session.Store {
+func New(k generators.IDGenerator, duration time.Duration,
+	cleanupInterval time.Duration) session.Store {
 	return memorySessionStore{
 		duration:        duration,
 		cleanupInterval: cleanupInterval,

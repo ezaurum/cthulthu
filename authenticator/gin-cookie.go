@@ -3,7 +3,7 @@ package authenticator
 import (
 	"github.com/ezaurum/cthulthu/generators/snowflake"
 	"github.com/ezaurum/cthulthu/session"
-	"github.com/ezaurum/cthulthu/session/stores/memstore"
+	"github.com/ezaurum/cthulthu/session/memstore"
 	"github.com/gin-gonic/gin"
 	"log"
 	"time"
@@ -12,6 +12,8 @@ import (
 const (
 	SessionIDCookieName        = "session-id-CTHULTHU"
 	PersistedIDTokenCookieName = "persisted-id-token-CTHULTHU"
+	DefaultSessionContextKey   = "session context key tekeli-li tekeli-li"
+	DefaultSessionExpires      = 60 * 15
 )
 
 type cookieAuthenticator struct {
@@ -121,7 +123,7 @@ func (ca cookieAuthenticator) Authenticate(c *gin.Context, session session.Sessi
 func (ca *cookieAuthenticator) activateSession(c *gin.Context, s session.Session) {
 
 	//refresh session expires
-	session.SetSession(c, s)
+	SetSession(c, s)
 	ca.SetSessionIDCookie(c, s)
 }
 
@@ -159,7 +161,7 @@ func (ca cookieAuthenticator) SetSessionIDCookie(c *gin.Context, session session
 }
 
 func Default() *cookieAuthenticator {
-	return NewMem(0, session.DefaultSessionExpires)
+	return NewMem(0, DefaultSessionExpires)
 }
 
 func NewMem(node int64, expiresInSeconds int) *cookieAuthenticator {
@@ -174,10 +176,18 @@ func NewMem(node int64, expiresInSeconds int) *cookieAuthenticator {
 func newMiddleware(store session.Store) *cookieAuthenticator {
 	return &cookieAuthenticator{
 		store:  store,
-		MaxAge: session.DefaultSessionExpires,
+		MaxAge: DefaultSessionExpires,
 		persistedIDTokenCookieName: PersistedIDTokenCookieName,
 		sessionIDCookieName:        SessionIDCookieName,
 	}
 }
 
 var _ Authenticator = &cookieAuthenticator{}
+
+func GetSession(c *gin.Context) session.Session {
+	return c.MustGet(DefaultSessionContextKey).(session.Session)
+}
+
+func SetSession(c *gin.Context, s session.Session) {
+	c.Set(DefaultSessionContextKey, s)
+}
