@@ -1,7 +1,6 @@
 package authenticator
 
 import (
-	ct "github.com/ezaurum/cthulthu"
 	"github.com/ezaurum/cthulthu/generators/snowflake"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/session/stores/memstore"
@@ -159,7 +158,7 @@ func (ca cookieAuthenticator) SetSessionIDCookie(c *gin.Context, session session
 		false, true)
 }
 
-func Default() Authenticator {
+func Default() *cookieAuthenticator {
 	return NewMem(0, session.DefaultSessionExpires)
 }
 
@@ -181,5 +180,4 @@ func newMiddleware(store session.Store) *cookieAuthenticator {
 	}
 }
 
-var _ ct.GinMiddleware = &cookieAuthenticator{}
 var _ Authenticator = &cookieAuthenticator{}

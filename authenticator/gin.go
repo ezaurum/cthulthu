@@ -1,7 +1,6 @@
 package authenticator
 
 import (
-	ct "github.com/ezaurum/cthulthu"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
 )
@@ -22,6 +21,6 @@ type Authenticator interface {
 
 func Init(r *gin.Engine) Authenticator {
 	ca := Default()
-	r.Use(ca.(ct.GinMiddleware).Handler())
+	r.Use(ca.Handler())
 	return ca
 }

@@ -2,7 +2,6 @@ package authenticator
 
 import (
 	"fmt"
-	"github.com/ezaurum/cthulthu"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/gin-gonic/gin"
@@ -17,7 +16,7 @@ func TestCookie(t *testing.T) {
 
 	r := gin.New()
 	authenticator := getDefault()
-	r.Use(authenticator.(cthulthu.GinMiddleware).Handler())
+	r.Use(authenticator.Handler())
 
 	r.GET("/", func(c *gin.Context) {
 		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
@@ -122,7 +121,7 @@ func TestPersistedTokenLoad(t *testing.T) {
 		return nil
 	})
 
-	r.Use(cthulthu.GinMiddleware(middleware).Handler())
+	r.Use(middleware.Handler())
 
 	r.GET("/", func(c *gin.Context) {
 		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
@@ -177,7 +176,7 @@ func TestIdentityRole(t *testing.T) {
 		return nil, false
 	}
 
-	r.Use((cthulthu.GinMiddleware(middleware)).Handler())
+	r.Use(middleware.Handler())
 
 	r.GET("/", func(c *gin.Context) {
 		ac := GetAuthenticator(c)
@@ -253,7 +252,7 @@ func (i TestIdentity) Role() string {
 	return i.IdentityRole
 }
 
-func getDefault() interface{} {
+func getDefault() *cookieAuthenticator {
 	authenticator := Default()
 	setNilFunctions(authenticator)
 	return authenticator
