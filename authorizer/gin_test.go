@@ -2,7 +2,6 @@ package authorizer
 
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
-	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -53,7 +52,7 @@ func TestRoleAccess(t *testing.T) {
 	// 강제 로그인
 	r.GET("/login", func(c *gin.Context) {
 		ac := authenticator.GetAuthenticator(c)
-		ac.Authenticate(c, session.GetSession(c), token)
+		ac.Authenticate(c, authenticator.GetSession(c), token)
 	})
 
 	client := test.HttpClient{}

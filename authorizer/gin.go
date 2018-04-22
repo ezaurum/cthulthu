@@ -37,7 +37,7 @@ func GetAuthorizer(config ...interface{}) AuthorizeMiddleware {
 
 func (a *AuthorizeMiddleware) Handler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if a.CheckPermission(c, session.GetSession(c)) {
+		if a.CheckPermission(c, authenticator.GetSession(c)) {
 			return
 		}
 		writeRequirePermission(c)
