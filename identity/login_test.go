@@ -4,7 +4,6 @@ import (
 	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/helper"
 	"github.com/ezaurum/cthulthu/route"
-	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -16,7 +15,7 @@ func TestLogin(t *testing.T) {
 	testDB := testDB()
 	db := testDB.Connect()
 	defer db.Close()
-	r, conf := initializeTest(testDB, session.DefaultSessionExpires)
+	r, conf := initializeTest(testDB, authenticator.DefaultSessionExpires)
 
 	route.InitRoute(r, conf.Routes...)
 

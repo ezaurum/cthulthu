@@ -13,11 +13,14 @@ import (
 	"time"
 )
 
-func Register(generator generators.IDGenerator) route.Routes {
-	rt := make(route.Routes)
-	rt.AddPage("/register", "common/register").
-		POST("/register", route.GetProcess("/", CreateIdentity(generator)))
-	return rt
+func MakeRegister(idGenerator generators.IDGenerator) func() route.Routes {
+	return func() route.Routes {
+		rt := make(route.Routes)
+		rt.AddPage("/register", "common/register").
+			POST("/register", route.GetProcess("/",
+			CreateIdentity(idGenerator)))
+		return rt
+	}
 }
 
 func CreateFormIdentityWithRole(m *gorm.DB,

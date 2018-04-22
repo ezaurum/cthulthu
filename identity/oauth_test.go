@@ -3,6 +3,9 @@ package identity
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"github.com/ezaurum/cthulthu/generators"
+	"github.com/ezaurum/cthulthu/generators/snowflake"
+	"reflect"
 )
 
 func TestOauthRegister(t *testing.T) {
@@ -18,7 +21,13 @@ func TestOauthRegister(t *testing.T) {
 		Token:    "test token",
 	}
 
-	CreateIdentityByOAuth(form, testDB)
+	gens := generators.New(func() generators.IDGenerator {
+		return snowflake.New(0)
+	}, &Identity{})
+	name := reflect.TypeOf(&Identity{}).Name()
+	idGenerator := gens[name]
+
+	CreateIdentityByOAuth(form, db, idGenerator)
 
 	var r OAuthIDToken
 	b := testDB.IsExist(&r, &form)

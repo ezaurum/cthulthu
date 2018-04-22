@@ -5,15 +5,18 @@ import (
 	"github.com/ezaurum/cthulthu/config"
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/helper"
-	"github.com/ezaurum/cthulthu/render"
 	"github.com/ezaurum/cthulthu/route"
-	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"net/url"
 	"testing"
 	"time"
+	"github.com/ezaurum/boongeoppang/gin"
+	"github.com/ezaurum/cthulthu/authenticator"
+	"github.com/ezaurum/cthulthu/generators"
+	"github.com/ezaurum/cthulthu/generators/snowflake"
+	"reflect"
 )
 
 func getRegisterFormPostData() url.Values {
@@ -36,6 +39,13 @@ var testConfig = &config.Config{
 }
 
 func initializeTest(manager *database.Manager, expires int) (*gin.Engine, *config.Config) {
+
+	gens := generators.New(func() generators.IDGenerator {
+		return snowflake.New(0)
+	},  &Identity{})
+	name := reflect.TypeOf(&Identity{}).Name()
+	idGenerator := gens[name]
+
 	tc := config.Config{
 		SessionExpiresInSeconds: expires,
 		DBManager:               manager,
@@ -46,7 +56,7 @@ func initializeTest(manager *database.Manager, expires int) (*gin.Engine, *confi
 		AuthorizerConfig: testConfig.AuthorizerConfig,
 		AutoMigrates:     testConfig.AutoMigrates,
 		NodeNumber:       testConfig.NodeNumber,
-		Routes:           []func() route.Routes{Login, Register},
+		Routes:           []func() route.Routes{Login, MakeRegister(idGenerator)},
 	}
 	engine := gin.Default()
 
@@ -55,7 +65,7 @@ func initializeTest(manager *database.Manager, expires int) (*gin.Engine, *confi
 	CreateIdentityByForm(FormIDToken{
 		AccountName:     "test",
 		AccountPassword: "test",
-	}, manager)
+	}, manager.DB(), idGenerator)
 
 	// 기본값으로 만들고
 
@@ -75,7 +85,7 @@ func TestRoleAccess(t *testing.T) {
 	testDB := testDB()
 	db := testDB.Connect()
 	defer db.Close()
-	r, _ := initializeTest(testDB, session.DefaultSessionExpires)
+	r, _ := initializeTest(testDB, authenticator.DefaultSessionExpires)
 
 	client := test.HttpClient{}
 	w0 := client.GetRequest(r, "/")

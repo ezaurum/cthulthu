@@ -3,12 +3,12 @@ package identity
 import (
 	"fmt"
 	"github.com/ezaurum/cthulthu/route"
-	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/stretchr/testify/assert"
 	"net/url"
 	"testing"
 	"time"
+	"github.com/ezaurum/cthulthu/authenticator"
 )
 
 func TestRegister(t *testing.T) {
@@ -16,7 +16,7 @@ func TestRegister(t *testing.T) {
 	testDB := testDB()
 	db := testDB.Connect()
 	defer db.Close()
-	r, conf := initializeTest(testDB, session.DefaultSessionExpires)
+	r, conf := initializeTest(testDB, authenticator.DefaultSessionExpires)
 	route.InitRoute(r, conf.Routes...)
 
 	//loginForm := webtest.GetStatusOKDoc(r, redirectLocation, t)
@@ -47,7 +47,7 @@ func TestAfterRegisterAuthenticated(t *testing.T) {
 	testDB := testDB()
 	db := testDB.Connect()
 	defer db.Close()
-	r, conf := initializeTest(testDB, session.DefaultSessionExpires)
+	r, conf := initializeTest(testDB, authenticator.DefaultSessionExpires)
 	route.InitRoute(r, conf.Routes...)
 
 	form := getRegisterFormPostData()
