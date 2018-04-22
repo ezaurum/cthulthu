@@ -1,20 +1,19 @@
 package identity
 
 import (
-	"github.com/ezaurum/cthulthu/database"
+	"fmt"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/stretchr/testify/assert"
-	"testing"
 	"net/url"
+	"testing"
 	"time"
-	"fmt"
 )
 
 func TestRegister(t *testing.T) {
 
-	testDB := database.TestNew()
+	testDB := testDB()
 	db := testDB.Connect()
 	defer db.Close()
 	r, conf := initializeTest(testDB, session.DefaultSessionExpires)
@@ -25,7 +24,7 @@ func TestRegister(t *testing.T) {
 	//assert.Equal(t, 1, loginForm.Find("form").Find("input[name='userID']").Length())
 
 	form := make(url.Values)
-	form.Set("accountName", "test"+fmt.Sprintf("%v",time.Now()))
+	form.Set("accountName", "test"+fmt.Sprintf("%v", time.Now()))
 	form.Set("accountPassword", "test")
 
 	client := test.HttpClient{}
@@ -45,14 +44,14 @@ func TestRegister(t *testing.T) {
 
 func TestAfterRegisterAuthenticated(t *testing.T) {
 
-	testDB := database.TestNew()
+	testDB := testDB()
 	db := testDB.Connect()
 	defer db.Close()
 	r, conf := initializeTest(testDB, session.DefaultSessionExpires)
 	route.InitRoute(r, conf.Routes...)
 
 	form := getRegisterFormPostData()
-	form.Set("accountName", "test"+fmt.Sprintf("%v",time.Now()))
+	form.Set("accountName", "test"+fmt.Sprintf("%v", time.Now()))
 
 	client := test.HttpClient{}
 	client.PostFormRequest(r, "/register", form)

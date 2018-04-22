@@ -2,7 +2,6 @@ package generators
 
 import (
 	"reflect"
-	"github.com/ezaurum/cthulthu/generators/snowflake"
 )
 
 type IDGenerator interface {
@@ -10,36 +9,34 @@ type IDGenerator interface {
 	GenerateInt64() int64
 }
 
-type idGenerators struct {
-	idGenerators map[string]IDGenerator
-	nodeNumber   int64
+type IDGenerators struct {
+	IDGenerators map[string]IDGenerator
 }
 
-func (gen *idGenerators) GenerateInt64(typeName string) int64 {
-	return gen.idGenerators[typeName].GenerateInt64()
+func (gen *IDGenerators) GenerateInt64(typeName string) int64 {
+	return gen.IDGenerators[typeName].GenerateInt64()
 }
 
-func (gen *idGenerators) Generate(typeName string) string {
-	return gen.idGenerators[typeName].Generate()
+func (gen *IDGenerators) Generate(typeName string) string {
+	return gen.IDGenerators[typeName].Generate()
 }
 
-func (gen *idGenerators) GenerateByType(v interface{}) string {
-	return gen.idGenerators[reflect.TypeOf(v).Name()].Generate()
+func (gen *IDGenerators) GenerateByType(v interface{}) string {
+	return gen.IDGenerators[reflect.TypeOf(v).Name()].Generate()
 }
 
-func (gen *idGenerators) GenerateInt64ByType(v interface{}) string {
-	return gen.idGenerators[reflect.TypeOf(v).Name()].Generate()
+func (gen *IDGenerators) GenerateInt64ByType(v interface{}) string {
+	return gen.IDGenerators[reflect.TypeOf(v).Name()].Generate()
 }
 
-func New(nodeNumber int64, values ...interface{}) *idGenerators {
+func New(generator IDGenerator, values ...interface{}) *IDGenerators {
 
 	gens := make(map[string]IDGenerator)
 	for _, v := range values {
-		n := snowflake.New(nodeNumber)
+		n := generator
 		gens[reflect.TypeOf(v).Name()] = n
 	}
-	return &idGenerators{
-		nodeNumber:   nodeNumber,
-		idGenerators: gens,
+	return &IDGenerators{
+		IDGenerators: gens,
 	}
 }

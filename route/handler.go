@@ -5,12 +5,13 @@ import (
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"net/http"
 )
 
 type SessionHandlerFunc func(session session.Session) (int, interface{})
 type SessionContextHandlerFunc func(c *gin.Context, session session.Session) (int, interface{})
-type FullContextHandlerFunc func(c *gin.Context, session session.Session, manager *database.Manager) (int, interface{})
+type FullContextHandlerFunc func(c *gin.Context, session session.Session, db *gorm.DB) (int, interface{})
 
 func GetProcess(page string, f FullContextHandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {

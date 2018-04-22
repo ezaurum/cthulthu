@@ -263,7 +263,7 @@ func setNilFunctions(authenticator Authenticator) {
 		return nil, false
 	}, func(token IDToken) (Identity, bool) {
 		return nil, false
-	}, func(token IDToken) IDToken{
+	}, func(token IDToken) IDToken {
 		return nil
 	})
 }

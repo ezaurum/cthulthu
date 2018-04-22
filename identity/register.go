@@ -3,6 +3,7 @@ package identity
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/database"
+	"github.com/ezaurum/cthulthu/generators"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
@@ -12,26 +13,27 @@ import (
 	"time"
 )
 
-func Register() route.Routes {
+func Register(generator generators.IDGenerator) route.Routes {
 	rt := make(route.Routes)
 	rt.AddPage("/register", "common/register").
-		POST("/register", route.GetProcess("/", CreateIdentity))
+		POST("/register", route.GetProcess("/", CreateIdentity(generator)))
 	return rt
 }
 
-func CreateFormIdentityWithRole(m *database.Manager,
+func CreateFormIdentityWithRole(m *gorm.DB,
+	generator generators.IDGenerator,
 	account string, password string, role string) Identity {
 
 	ft := FormIDToken{}
-	if m.IsExist(&ft, FormIDToken{
-		AccountName:account,
+	if database.IsExist(m, &ft, FormIDToken{
+		AccountName: account,
 	}) {
 		var i Identity
 		m.Find(&i, ft.IdentityID)
 		return i
 	}
 
-	identity := GetNewIdentity(m)
+	identity := GetNewIdentity(generator)
 	identity.IdentityRole = role
 
 	form := FormIDToken{
@@ -45,44 +47,44 @@ func CreateFormIdentityWithRole(m *database.Manager,
 		expires: time.Now().Add(time.Hour * 24 * 365),
 	}
 
-	m.CreateAll(&identity, &form)
+	database.CreateAll(m, &identity, &form)
 
 	return identity
 }
 
+func CreateIdentity(generator generators.IDGenerator) func(c *gin.Context, s session.Session, m *gorm.DB) (int, interface{}) {
+	return func(c *gin.Context, s session.Session, m *gorm.DB) (int, interface{}) {
+		//TODO 흠? 에러가 나면 걍 무시를 때려야 하나?
+		var loginForm FormIDToken
+		err := c.Bind(&loginForm)
+		if nil != err {
+			panic(err)
+		}
 
-func CreateIdentity(c *gin.Context, s session.Session, m *database.Manager) (int, interface{}) {
+		var token FormIDToken
+		findErr := m.Find(&token, &FormIDToken{AccountName: loginForm.AccountName})
+		//TODO 에러를 감싸든가...
+		switch findErr.Error {
+		case gorm.ErrRecordNotFound:
+			tk := CreateIdentityByForm(loginForm, m, generator)
+			ac := authenticator.GetAuthenticator(c)
+			ac.Authenticate(c, s, tk)
+			return http.StatusFound, "/"
+			break
+		case nil:
+			// return
+			return http.StatusFound, "/register?err=duplicate"
+		default:
+			panic(findErr)
+		}
 
-	//TODO 흠? 에러가 나면 걍 무시를 때려야 하나?
-	var loginForm FormIDToken
-	err := c.Bind(&loginForm)
-	if nil != err {
-		panic(err)
-	}
-
-	var token FormIDToken
-	findErr := m.Find(&token, &FormIDToken{AccountName: loginForm.AccountName})
-	//TODO 에러를 감싸든가...
-	switch findErr {
-	case gorm.ErrRecordNotFound:
-		tk := CreateIdentityByForm(loginForm, m)
-		ac := authenticator.GetAuthenticator(c)
-		ac.Authenticate(c, s, tk)
 		return http.StatusFound, "/"
-		break
-	case nil:
-		// return
-		return http.StatusFound, "/register?err=duplicate"
-	default:
-		panic(findErr)
 	}
-
-	return http.StatusFound, "/"
 }
 
-func CreateIdentityByForm(registerForm FormIDToken, m *database.Manager) FormIDToken {
+func CreateIdentityByForm(registerForm FormIDToken, m *gorm.DB, generator generators.IDGenerator) FormIDToken {
 
-	id := GetNewIdentity(m)
+	id := GetNewIdentity(generator)
 
 	form := FormIDToken{
 		AccountName:     registerForm.AccountName,
@@ -94,13 +96,13 @@ func CreateIdentityByForm(registerForm FormIDToken, m *database.Manager) FormIDT
 		expires:         time.Now().Add(time.Hour * 24 * 365),
 	}
 
-	m.CreateAll(&id, &form)
+	database.CreateAll(m, &id, &form)
 	return form
 }
 
-func CreateIdentityByOAuth(form OAuthIDToken, m *database.Manager) OAuthIDToken {
+func CreateIdentityByOAuth(form OAuthIDToken, m *gorm.DB, generator generators.IDGenerator) OAuthIDToken {
 
-	id := GetNewIdentity(m)
+	id := GetNewIdentity(generator)
 
 	f := OAuthIDToken{
 		IdentityID: id.ID,
@@ -110,33 +112,33 @@ func CreateIdentityByOAuth(form OAuthIDToken, m *database.Manager) OAuthIDToken 
 		expires:    time.Now().Add(time.Hour * 24 * 365),
 	}
 
-	m.CreateAll(&id, &f)
+	database.CreateAll(m, &id, &f)
 	return f
 }
 
-func GetNewIdentity(m *database.Manager) Identity {
+func GetNewIdentity(generator generators.IDGenerator) Identity {
 	i := database.Model{
-		ID: m.GenerateByType(&Identity{}),
+		ID: generator.GenerateInt64(),
 	}
 	id := Identity{
-		Model: i,
+		Model:        i,
 		IdentityRole: "User",
 	}
 	return id
 }
 
-func CreateUsersIfNotExist(manager *database.Manager, defaultUsers []FormIDToken) {
+func CreateUsersIfNotExist(db *gorm.DB, generator generators.IDGenerator, defaultUsers []FormIDToken) {
 	for _, userForm := range defaultUsers {
-		CreateUserIfNotExist(manager, userForm)
+		CreateUserIfNotExist(db, userForm, generator)
 	}
 }
 
-func CreateUserIfNotExist(manager *database.Manager, token FormIDToken) bool {
+func CreateUserIfNotExist(db *gorm.DB, token FormIDToken, generator generators.IDGenerator) bool {
 	ft := FormIDToken{}
-	if manager.IsExist(&ft, token) {
+	if database.IsExist(db, &ft, token) {
 		return false
 	}
 
-	CreateIdentityByForm(token, manager)
+	CreateIdentityByForm(token, db, generator)
 	return true
 }

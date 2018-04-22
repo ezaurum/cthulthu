@@ -13,7 +13,10 @@ required = [
 #auth
 "github.com/casbin/casbin",
 #DB
-"github.com/jinzhu/gorm"
+"github.com/jinzhu/gorm",
+
+#render
+"github.com/ezaurum/boongeoppang",
 ]
 
 # gin

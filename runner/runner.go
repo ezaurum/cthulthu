@@ -2,12 +2,12 @@ package runner
 
 import (
 	"github.com/ezaurum/cthulthu/config"
-	"github.com/gin-gonic/gin"
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/helper"
+	"github.com/ezaurum/cthulthu/identity"
 	"github.com/ezaurum/cthulthu/render"
 	"github.com/ezaurum/cthulthu/route"
-	"github.com/ezaurum/cthulthu/identity"
+	"github.com/gin-gonic/gin"
 )
 
 func Run(config *config.Config) {
@@ -60,5 +60,3 @@ func Run(config *config.Config) {
 
 	r.Run(config.Address)
 }
-
-

@@ -1,13 +1,12 @@
 package identity
 
 import (
-	"github.com/ezaurum/cthulthu/database"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestOauthRegister(t *testing.T) {
-	testDB := database.TestNew()
+	testDB := testDB()
 	db := testDB.Connect()
 	defer db.Close()
 

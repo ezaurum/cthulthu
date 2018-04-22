@@ -19,6 +19,6 @@ func SetDatabase(c *gin.Context, db *gorm.DB) {
 	c.Set(contextKey, db)
 }
 
-func GetDatabase(c *gin.Context) *Manager {
-	return c.MustGet(contextKey).(*Manager)
+func GetDatabase(c *gin.Context) *gorm.DB {
+	return c.MustGet(contextKey).(*gorm.DB)
 }

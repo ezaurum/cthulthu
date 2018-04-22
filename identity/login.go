@@ -2,7 +2,6 @@ package identity
 
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
-	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
@@ -17,7 +16,7 @@ func Login() route.Routes {
 		//TODO
 		gin.H{"GoogleClientID": "test client id"}).
 		POST("/login", route.GetProcess("/scores",
-			func(c *gin.Context, s session.Session, m *database.Manager) (int, interface{}) {
+			func(c *gin.Context, s session.Session, m *gorm.DB) (int, interface{}) {
 
 				//TODO 흠? 에러가 나면 걍 무시를 때려야 하나?
 				var loginForm FormIDToken
@@ -29,7 +28,7 @@ func Login() route.Routes {
 				var token FormIDToken
 				findErr := m.Find(&token, &FormIDToken{AccountName: loginForm.AccountName})
 				//TODO 에러를 감싸든가...
-				switch findErr {
+				switch findErr.Error {
 				case gorm.ErrRecordNotFound:
 					return http.StatusFound, "/login?err=not"
 					break

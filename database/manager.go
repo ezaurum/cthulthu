@@ -6,12 +6,10 @@ import (
 
 	"github.com/ezaurum/cthulthu/generators"
 
-	//TODO 임포트 자체를 바꿔야 하나?
-	"fmt"
 	"github.com/ezaurum/cthulthu/generators/snowflake"
+	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"time"
 )
 
 // gorm 래퍼가 되지
@@ -34,7 +32,7 @@ func New(connectionString string, dialect string, nodeNumber int64) *Manager {
 		connectionString: connectionString,
 		dialect:          dialect,
 		idGenerators:     make(map[string]generators.IDGenerator),
-		nodeNumber:nodeNumber,
+		nodeNumber:       nodeNumber,
 	}
 }
 
@@ -106,11 +104,15 @@ func (dbm *Manager) SaveAll(targets ...interface{}) {
 }
 
 func (dbm *Manager) CreateAll(targets ...interface{}) {
+	CreateAll(dbm.db, targets...)
+}
+
+func CreateAll(db *gorm.DB, targets ...interface{}) {
 	action := func(tx *gorm.DB, v interface{}) {
 		d := tx.Create(v)
 		checkError(d, tx)
 	}
-	dbm.transaction(action, targets...)
+	transaction(db, action, targets...)
 }
 
 func checkError(d *gorm.DB, tx *gorm.DB) {
@@ -123,7 +125,11 @@ func checkError(d *gorm.DB, tx *gorm.DB) {
 }
 
 func (dbm *Manager) transaction(action TransactionHandlerFunc, targets ...interface{}) {
-	tx := dbm.db.Begin()
+	transaction(dbm.db, action, targets...)
+}
+
+func transaction(db *gorm.DB, action TransactionHandlerFunc, targets ...interface{}) {
+	tx := db.Begin()
 	for _, v := range targets {
 		action(tx, v)
 	}
@@ -157,23 +163,25 @@ func (dbm *Manager) Find(token interface{}, where ...interface{}) interface{} {
 	return nil
 }
 
-func (dbm *Manager) IsExist(t interface{}, where ...interface{}) bool {
-	error := dbm.Find(t, where...)
-	switch error {
+func IsExist(db *gorm.DB, t interface{}, where ...interface{}) bool {
+	dbR := db.Find(t, where...)
+	switch dbR.Error {
 	case nil:
 		return true
 	case gorm.ErrRecordNotFound:
 		return false
 	default:
-		panic(error)
+		panic(db.Error)
 	}
 }
 
-func TestNew() *Manager {
-	file := fmt.Sprintf("test%v.db", time.Now().UnixNano())
-	return New(file, "sqlite3", 0)
+func (dbm *Manager) IsExist(t interface{}, where ...interface{}) bool {
+	return IsExist(dbm.db, t, where...)
 }
 
-func Test() *Manager {
-	return New("test.db", "sqlite3", 0)
+func (dbm *Manager) Handler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		db := dbm.DB()
+		SetDatabase(c, db)
+	}
 }

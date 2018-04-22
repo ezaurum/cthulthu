@@ -2,7 +2,6 @@ package identity
 
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
-	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/helper"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/session"
@@ -14,7 +13,7 @@ import (
 
 func TestLogin(t *testing.T) {
 
-	testDB := database.TestNew()
+	testDB := testDB()
 	db := testDB.Connect()
 	defer db.Close()
 	r, conf := initializeTest(testDB, session.DefaultSessionExpires)
@@ -32,7 +31,7 @@ func TestLogin(t *testing.T) {
 
 func TestCookiePersistLogin(t *testing.T) {
 
-	testDB := database.TestNew()
+	testDB := testDB()
 	db := testDB.Connect()
 	defer db.Close()
 	r, conf := initializeTest(testDB, 1)

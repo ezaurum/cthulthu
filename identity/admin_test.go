@@ -1,17 +1,19 @@
 package identity
 
 import (
+	"fmt"
+	"github.com/ezaurum/cthulthu/config"
 	"github.com/ezaurum/cthulthu/database"
+	"github.com/ezaurum/cthulthu/helper"
+	"github.com/ezaurum/cthulthu/render"
+	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"net/url"
 	"testing"
-	"github.com/ezaurum/cthulthu/route"
-	"github.com/ezaurum/cthulthu/config"
-	"github.com/ezaurum/cthulthu/helper"
-	"github.com/ezaurum/cthulthu/render"
+	"time"
 )
 
 func getRegisterFormPostData() url.Values {
@@ -24,10 +26,10 @@ func getRegisterFormPostData() url.Values {
 var testConfig = &config.Config{
 	//DBManager:               manager,
 	Dir: config.DirConfig{
-		Static:"test/static",
-		Template:   "test/templates",
+		Static:   "test/static",
+		Template: "test/templates",
 	},
-	NodeNumber:  0,
+	NodeNumber: 0,
 	//SessionExpiresInSeconds: expires,
 	AutoMigrates:     []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}},
 	AuthorizerConfig: []interface{}{"test/model.conf", "test/policy.csv"},
@@ -38,13 +40,13 @@ func initializeTest(manager *database.Manager, expires int) (*gin.Engine, *confi
 		SessionExpiresInSeconds: expires,
 		DBManager:               manager,
 		Dir: config.DirConfig{
-			Static:"test/static",
-			Template:   "test/templates",
+			Static:   "test/static",
+			Template: "test/templates",
 		},
-		AuthorizerConfig:        testConfig.AuthorizerConfig,
-		AutoMigrates:            testConfig.AutoMigrates,
-		NodeNumber:              testConfig.NodeNumber,
-		Routes: []func() route.Routes{ Login, Register},
+		AuthorizerConfig: testConfig.AuthorizerConfig,
+		AutoMigrates:     testConfig.AutoMigrates,
+		NodeNumber:       testConfig.NodeNumber,
+		Routes:           []func() route.Routes{Login, Register},
 	}
 	engine := gin.Default()
 
@@ -70,7 +72,7 @@ func initializeTest(manager *database.Manager, expires int) (*gin.Engine, *confi
 
 func TestRoleAccess(t *testing.T) {
 
-	testDB := database.Test()
+	testDB := testDB()
 	db := testDB.Connect()
 	defer db.Close()
 	r, _ := initializeTest(testDB, session.DefaultSessionExpires)
@@ -79,4 +81,13 @@ func TestRoleAccess(t *testing.T) {
 	w0 := client.GetRequest(r, "/")
 	assert.True(t, test.IsRedirect(w0))
 	assert.Equal(t, "/login", test.GetRedirect(w0))
+}
+
+func testDBNew() *database.Manager {
+	file := fmt.Sprintf("test%v.db", time.Now().UnixNano())
+	return database.New(file, "sqlite3", 0)
+}
+
+func testDB() *database.Manager {
+	return database.New("test.db", "sqlite3", 0)
 }
