@@ -4,7 +4,9 @@ import (
 	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/authorizer"
 	"github.com/ezaurum/cthulthu/database"
+	dbg "github.com/ezaurum/cthulthu/database/gin"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
 type Identity struct {
@@ -17,17 +19,17 @@ func (i Identity) Role() string {
 }
 
 func DefaultMiddleware(
-	nodeNumber int64, manager *database.Manager, r *gin.Engine,
+	nodeNumber int64, manager *gorm.DB, r *gin.Engine,
 	sessionExpiresInSeconds int, authorizerConfig ...interface{}) {
 	// authenticator 를 초기화한다
 	ca := authenticator.NewMem(nodeNumber, sessionExpiresInSeconds)
-	ca.SetActions(GetLoadCookieIDToken(manager.DB()),
-		GetLoadIdentityByCookie(manager.DB()),
-		GetPersistToken(manager.DB()))
+	ca.SetActions(GetLoadCookieIDToken(manager),
+		GetLoadIdentityByCookie(manager),
+		GetPersistToken(manager))
 	if len(authorizerConfig) > 0 {
 		au := authorizer.Init(authorizerConfig...)
-		r.Use(database.Handler(manager.DB()), ca.Handler(), au.Handler())
+		r.Use(dbg.Handler(manager), ca.Handler(), au.Handler())
 	} else {
-		r.Use(manager.Handler(), ca.Handler())
+		r.Use(dbg.Handler(manager), ca.Handler())
 	}
 }

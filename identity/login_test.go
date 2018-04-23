@@ -5,17 +5,20 @@ import (
 	"github.com/ezaurum/cthulthu/helper"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/test"
+	itest "github.com/ezaurum/cthulthu/identity/test"
+
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
 
 func TestLogin(t *testing.T) {
+	targets := []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}}
+	gens := getGenerators(targets...)
 
-	testDB := testDB()
-	db := testDB.Connect()
-	defer db.Close()
-	r, conf := initializeTest(testDB, authenticator.DefaultSessionExpires)
+	testDB := itest.DB(gens)
+	defer testDB.Close()
+	r, conf := initializeTest(gens, testDB, authenticator.DefaultSessionExpires)
 
 	route.InitRoute(r, conf.Routes...)
 
@@ -30,10 +33,12 @@ func TestLogin(t *testing.T) {
 
 func TestCookiePersistLogin(t *testing.T) {
 
-	testDB := testDB()
-	db := testDB.Connect()
-	defer db.Close()
-	r, conf := initializeTest(testDB, 1)
+	targets := []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}}
+	gens := getGenerators(targets...)
+
+	testDB := itest.DB(gens)
+	defer testDB.Close()
+	r, conf := initializeTest(gens, testDB, 1)
 	route.InitRoute(r, conf.Routes...)
 
 	form := getRegisterFormPostData()

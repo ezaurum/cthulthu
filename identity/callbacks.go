@@ -2,9 +2,9 @@ package identity
 
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
-	"github.com/ezaurum/cthulthu/database"
 	"time"
 	"github.com/jinzhu/gorm"
+	"github.com/ezaurum/cthulthu/database"
 )
 
 // 쿠키의 id 토큰 처리
@@ -32,10 +32,10 @@ func GetLoadIdentityByCookie(dbm *gorm.DB) authenticator.IDLoader {
 
 func GetPersistToken(dbm *gorm.DB) authenticator.TokenSaver {
 	return func(token authenticator.IDToken) authenticator.IDToken {
-		return database.Create(dbm, &CookieIDToken{
+		return dbm.Save(&CookieIDToken{
 			IdentityID: token.IdentityKey(),
 			Token:      token.TokenString(),
 			Expires:    time.Now().Add(time.Hour * 24 * 365),
-		}).(authenticator.IDToken)
+		}).Value.(authenticator.IDToken)
 	}
 }

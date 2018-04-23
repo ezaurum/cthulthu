@@ -31,7 +31,7 @@ func New(maker func() IDGenerator, values ...interface{}) IDGenerators {
 	gens := make(map[string]IDGenerator)
 	for _, v := range values {
 		n := maker()
-		gens[reflect.TypeOf(v).Name()] = n
+		gens[reflect.TypeOf(v).String()] = n
 	}
 	return gens
 }

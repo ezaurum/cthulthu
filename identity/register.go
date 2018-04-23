@@ -50,7 +50,7 @@ func CreateFormIdentityWithRole(m *gorm.DB,
 		expires: time.Now().Add(time.Hour * 24 * 365),
 	}
 
-	database.CreateAll(m, &identity, &form)
+	database.SaveAll(m, &identity, &form)
 
 	return identity
 }
@@ -99,11 +99,12 @@ func CreateIdentityByForm(registerForm FormIDToken, m *gorm.DB, generator genera
 		expires:         time.Now().Add(time.Hour * 24 * 365),
 	}
 
-	database.CreateAll(m, &id, &form)
+	database.SaveAll(m, &id, &form)
 	return form
 }
 
-func CreateIdentityByOAuth(form OAuthIDToken, m *gorm.DB, generator generators.IDGenerator) OAuthIDToken {
+func CreateIdentityByOAuth(form OAuthIDToken, m *gorm.DB,
+	generator generators.IDGenerator) OAuthIDToken {
 
 	id := GetNewIdentity(generator)
 
@@ -115,7 +116,7 @@ func CreateIdentityByOAuth(form OAuthIDToken, m *gorm.DB, generator generators.I
 		expires:    time.Now().Add(time.Hour * 24 * 365),
 	}
 
-	database.CreateAll(m, &id, &f)
+	database.SaveAll(m, &id, &f)
 	return f
 }
 

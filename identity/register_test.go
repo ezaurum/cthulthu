@@ -2,21 +2,24 @@ package identity
 
 import (
 	"fmt"
+	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/test"
+	itest "github.com/ezaurum/cthulthu/identity/test"
 	"github.com/stretchr/testify/assert"
 	"net/url"
 	"testing"
 	"time"
-	"github.com/ezaurum/cthulthu/authenticator"
+	"github.com/ezaurum/cthulthu/database"
 )
 
 func TestRegister(t *testing.T) {
 
-	testDB := testDB()
-	db := testDB.Connect()
-	defer db.Close()
-	r, conf := initializeTest(testDB, authenticator.DefaultSessionExpires)
+	targets := []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}}
+	gens := getGenerators(targets...)
+	testDB := itest.DB(gens)
+	defer testDB.Close()
+	r, conf := initializeTest(gens, testDB, authenticator.DefaultSessionExpires)
 	route.InitRoute(r, conf.Routes...)
 
 	//loginForm := webtest.GetStatusOKDoc(r, redirectLocation, t)
@@ -34,9 +37,9 @@ func TestRegister(t *testing.T) {
 	assert.Equal(t, "/", test.GetRedirect(w0))
 
 	var result FormIDToken
-	b := testDB.IsExist(&result, &FormIDToken{AccountPassword: "test", AccountName: "test"})
+	b := database.IsExist(testDB, &result, &FormIDToken{AccountPassword: "test", AccountName: "test"})
 	var identity Identity
-	b0 := testDB.IsExist(&identity, result.IdentityKey())
+	b0 := database.IsExist(testDB, &identity, result.IdentityKey())
 
 	assert.True(t, b)
 	assert.True(t, b0)
@@ -44,10 +47,11 @@ func TestRegister(t *testing.T) {
 
 func TestAfterRegisterAuthenticated(t *testing.T) {
 
-	testDB := testDB()
-	db := testDB.Connect()
-	defer db.Close()
-	r, conf := initializeTest(testDB, authenticator.DefaultSessionExpires)
+	targets := []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}}
+	gens := getGenerators(targets...)
+	testDB := itest.DB(gens)
+	defer testDB.Close()
+	r, conf := initializeTest(gens, testDB, authenticator.DefaultSessionExpires)
 	route.InitRoute(r, conf.Routes...)
 
 	form := getRegisterFormPostData()

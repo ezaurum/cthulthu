@@ -1,22 +1,21 @@
 package identity
 
 import (
-	"fmt"
+	"github.com/ezaurum/boongeoppang/gin"
+	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/config"
-	"github.com/ezaurum/cthulthu/database"
+	"github.com/ezaurum/cthulthu/generators"
+	"github.com/ezaurum/cthulthu/generators/snowflake"
 	"github.com/ezaurum/cthulthu/helper"
+	itest "github.com/ezaurum/cthulthu/identity/test"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"net/url"
-	"testing"
-	"time"
-	"github.com/ezaurum/boongeoppang/gin"
-	"github.com/ezaurum/cthulthu/authenticator"
-	"github.com/ezaurum/cthulthu/generators"
-	"github.com/ezaurum/cthulthu/generators/snowflake"
 	"reflect"
+	"testing"
+	"github.com/jinzhu/gorm"
 )
 
 func getRegisterFormPostData() url.Values {
@@ -38,17 +37,21 @@ var testConfig = &config.Config{
 	AuthorizerConfig: []interface{}{"test/model.conf", "test/policy.csv"},
 }
 
-func initializeTest(manager *database.Manager, expires int) (*gin.Engine, *config.Config) {
-
+func getGenerators(targets ...interface{}) generators.IDGenerators {
 	gens := generators.New(func() generators.IDGenerator {
 		return snowflake.New(0)
-	},  &Identity{})
-	name := reflect.TypeOf(&Identity{}).Name()
+	}, targets...)
+	return gens
+}
+
+func initializeTest(gens generators.IDGenerators, manager *gorm.DB, expires int) (*gin.Engine, *config.Config) {
+
+	name := reflect.TypeOf(&Identity{}).String()
 	idGenerator := gens[name]
 
 	tc := config.Config{
 		SessionExpiresInSeconds: expires,
-		DBManager:               manager,
+		DB:                      manager,
 		Dir: config.DirConfig{
 			Static:   "test/static",
 			Template: "test/templates",
@@ -65,7 +68,7 @@ func initializeTest(manager *database.Manager, expires int) (*gin.Engine, *confi
 	CreateIdentityByForm(FormIDToken{
 		AccountName:     "test",
 		AccountPassword: "test",
-	}, manager.DB(), idGenerator)
+	}, manager, idGenerator)
 
 	// 기본값으로 만들고
 
@@ -82,22 +85,15 @@ func initializeTest(manager *database.Manager, expires int) (*gin.Engine, *confi
 
 func TestRoleAccess(t *testing.T) {
 
-	testDB := testDB()
-	db := testDB.Connect()
-	defer db.Close()
-	r, _ := initializeTest(testDB, authenticator.DefaultSessionExpires)
+	targets := []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}}
+	gens := getGenerators(targets...)
+
+	testDB := itest.DB(gens)
+	defer testDB.Close()
+	r, _ := initializeTest(gens, testDB, authenticator.DefaultSessionExpires)
 
 	client := test.HttpClient{}
 	w0 := client.GetRequest(r, "/")
 	assert.True(t, test.IsRedirect(w0))
 	assert.Equal(t, "/login", test.GetRedirect(w0))
-}
-
-func testDBNew() *database.Manager {
-	file := fmt.Sprintf("test%v.db", time.Now().UnixNano())
-	return database.New(file, "sqlite3", 0)
-}
-
-func testDB() *database.Manager {
-	return database.New("test.db", "sqlite3", 0)
 }

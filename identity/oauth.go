@@ -3,18 +3,19 @@ package identity
 import (
 	"github.com/ezaurum/cthulthu/database"
 	"time"
+	"github.com/jinzhu/gorm"
 )
 
-func FindOAuthToken(r OAuthIDToken, dbm *database.Manager) (OAuthIDToken, bool) {
+func FindOAuthToken(r OAuthIDToken, dbm *gorm.DB) (OAuthIDToken, bool) {
 	var i OAuthIDToken
-	exist := dbm.IsExist(&i, OAuthIDToken{
+	exist := database.IsExist(dbm, &i, OAuthIDToken{
 		TokenID:  r.TokenID,
 		Provider: r.Provider,
 	})
 	return i, exist
 }
 
-func UpdateOAuthToken(token OAuthIDToken, tokenString string, expires time.Time, dbm *database.Manager) {
+func UpdateOAuthToken(token OAuthIDToken, tokenString string, expires time.Time, dbm *gorm.DB) {
 
 	//TODO expires
 	token.Token = tokenString

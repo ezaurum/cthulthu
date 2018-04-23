@@ -1,14 +1,14 @@
 package config
 
 import (
-	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/gin-gonic/gin"
 	"github.com/pelletier/go-toml"
+	"github.com/jinzhu/gorm"
 )
 
 type Config struct {
-	DB           *database.DB
+	DB           *gorm.DB
 	AutoMigrates []interface{}
 
 	NodeNumber              int64

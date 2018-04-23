@@ -18,3 +18,4 @@
 vendor/
 *.stackdump
 *.db
+*.db-journal

@@ -2,11 +2,11 @@ package route
 
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
-	"github.com/ezaurum/cthulthu/database"
+	dbg "github.com/ezaurum/cthulthu/database/gin"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"net/http"
+	"github.com/jinzhu/gorm"
 )
 
 type SessionHandlerFunc func(session session.Session) (int, interface{})
@@ -15,7 +15,7 @@ type FullContextHandlerFunc func(c *gin.Context, session session.Session, db *go
 
 func GetProcess(page string, f FullContextHandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		dbm := database.GetDatabase(c)
+		dbm := dbg.GetDatabase(c)
 		s := authenticator.GetSession(c)
 		if c.Writer.Written() {
 			panic("WTF? fdsfsd")

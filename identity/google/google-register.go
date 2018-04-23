@@ -2,13 +2,13 @@ package google
 
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
-	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/identity"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
+	"github.com/jinzhu/gorm"
 )
 
 const (
@@ -20,7 +20,7 @@ func Register() route.Routes {
 		POST("/google/register", route.GetProcess("/", CreateIdentity))
 }
 
-func CreateIdentity(c *gin.Context, s session.Session, m *database.Manager) (int, interface{}) {
+func CreateIdentity(c *gin.Context, s session.Session, m *gorm.DB) (int, interface{}) {
 
 	var form identity.OAuthIDToken
 	err := c.Bind(&form)
@@ -47,7 +47,7 @@ func CreateIdentity(c *gin.Context, s session.Session, m *database.Manager) (int
 		expires := time.Now().Add(time.Hour * 24 * 365)
 		identity.UpdateOAuthToken(tk, form.TokenString(), expires, m)
 	} else {
-		tk = identity.CreateIdentityByOAuth(form, m)
+		tk = identity.CreateIdentityByOAuth(form, m, nil)
 	}
 
 	//TODO
