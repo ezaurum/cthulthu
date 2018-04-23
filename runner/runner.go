@@ -14,12 +14,13 @@ import (
 
 func Run(config *config.Config) {
 
-	idGenerators := generators.New(func() generators.IDGenerator {
+	config.Generators = generators.New(func() generators.IDGenerator {
 		return snowflake.New(config.NodeNumber)
 	}, config.AutoMigrates...)
 
 	//Init DB
-	db, err := database.Open(idGenerators, config.Db.Dialect, config.Db.Connection)
+	db, err := database.Open(config.Generators,
+		config.Db.Dialect, config.Db.Connection)
 	if err != nil {
 		panic(err)
 	}

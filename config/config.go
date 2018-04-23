@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pelletier/go-toml"
 	"github.com/jinzhu/gorm"
+	"github.com/ezaurum/cthulthu/generators"
 )
 
 type Config struct {
@@ -12,6 +13,7 @@ type Config struct {
 	AutoMigrates []interface{}
 
 	NodeNumber              int64
+	Generators              generators.IDGenerators
 	SessionExpiresInSeconds int
 	AuthorizerConfig        []interface{}
 
