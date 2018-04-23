@@ -26,7 +26,8 @@ type cookieAuthenticator struct {
 	PersistToken               TokenSaver
 }
 
-func (ca *cookieAuthenticator) SetActions(loadIDToken IDTokenLoader, loadIdentity IDLoader, tokenSaver TokenSaver) {
+func (ca *cookieAuthenticator) SetActions(loadIDToken IDTokenLoader,
+	loadIdentity IDLoader, tokenSaver TokenSaver) {
 	ca.LoadIdentity = loadIdentity
 	ca.LoadIDToken = loadIDToken
 	ca.PersistToken = tokenSaver

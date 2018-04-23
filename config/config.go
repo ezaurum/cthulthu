@@ -8,7 +8,7 @@ import (
 )
 
 type Config struct {
-	DBManager    *database.Manager
+	DB           *database.DB
 	AutoMigrates []interface{}
 
 	NodeNumber              int64

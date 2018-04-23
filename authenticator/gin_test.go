@@ -19,7 +19,7 @@ func TestCookie(t *testing.T) {
 	r.Use(authenticator.Handler())
 
 	r.GET("/", func(c *gin.Context) {
-		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
+		s := c.MustGet(DefaultSessionContextKey).(session.Session)
 		c.String(http.StatusOK, s.ID())
 	})
 
@@ -45,7 +45,7 @@ func TestExpire(t *testing.T) {
 	r.Use(n.Handler())
 
 	r.GET("/", func(c *gin.Context) {
-		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
+		s := c.MustGet(DefaultSessionContextKey).(session.Session)
 		c.String(http.StatusOK, s.ID())
 	})
 
@@ -76,7 +76,7 @@ func TestPersistToken(t *testing.T) {
 	}
 
 	r.GET("/", func(c *gin.Context) {
-		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
+		s := c.MustGet(DefaultSessionContextKey).(session.Session)
 		middleware.PersistIDToken(c, s, token)
 		c.String(http.StatusOK, token.TokenString())
 	})
@@ -124,13 +124,13 @@ func TestPersistedTokenLoad(t *testing.T) {
 	r.Use(middleware.Handler())
 
 	r.GET("/", func(c *gin.Context) {
-		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
+		s := c.MustGet(DefaultSessionContextKey).(session.Session)
 		middleware.PersistIDToken(c, s, token)
 		c.String(http.StatusOK, token.TokenString())
 	})
 
 	r.GET("/1", func(c *gin.Context) {
-		s := session.GetSession(c)
+		s := GetSession(c)
 		tk, _ := s.Get(IDTokenSessionKey)
 
 		i, _ := s.Get(IdentitySessionKey)
@@ -180,14 +180,14 @@ func TestIdentityRole(t *testing.T) {
 
 	r.GET("/", func(c *gin.Context) {
 		ac := GetAuthenticator(c)
-		ac.Authenticate(c, session.GetSession(c), token)
+		ac.Authenticate(c, GetSession(c), token)
 
-		fmt.Println(session.GetSession(c))
+		fmt.Println(GetSession(c))
 	})
 
 	r.GET("/1", func(c *gin.Context) {
-		fmt.Println(session.GetSession(c))
-		id := GetIdentity(session.GetSession(c))
+		fmt.Println(GetSession(c))
+		id := GetIdentity(GetSession(c))
 		assert.Equal(t, identity.Role(), id.Role())
 	})
 
