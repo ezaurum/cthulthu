@@ -8,19 +8,27 @@ import (
 	"github.com/ezaurum/cthulthu/identity"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/gin-gonic/gin"
+	"github.com/ezaurum/cthulthu/generators/snowflake"
+	"github.com/ezaurum/cthulthu/generators"
 )
 
 func Run(config *config.Config) {
 
-	//Init DB
-	manager := database.New(config.Db.Connection, config.Db.Dialect, config.NodeNumber)
+	idGenerators := generators.New(func() generators.IDGenerator {
+		return snowflake.New(config.NodeNumber)
+	}, config.AutoMigrates...)
 
-	db := manager.Connect()
+	//Init DB
+	db, err := database.Open(idGenerators, config.Db.Dialect, config.Db.Connection)
+	if err != nil {
+		panic(err)
+	}
+
 	defer db.Close()
 
-	manager.AutoMigrate(config.AutoMigrates...)
+	db.AutoMigrate(config.AutoMigrates...)
 
-	config.DBManager = manager
+	config.DB = db
 
 	//웹 전에 초기화 해야 하는 것들
 	if nil != config.OnInitializeDB {
@@ -40,7 +48,7 @@ func Run(config *config.Config) {
 	if nil != config.InitializeMiddleware {
 		config.InitializeMiddleware(r)
 	} else {
-		identity.DefaultMiddleware(config.NodeNumber, manager, r,
+		identity.DefaultMiddleware(config.NodeNumber, db, r,
 			config.SessionExpiresInSeconds,
 			config.AuthorizerConfig...)
 	}
