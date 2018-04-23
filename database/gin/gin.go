@@ -1,4 +1,4 @@
-package database
+package gin
 
 import (
 	"github.com/gin-gonic/gin"
