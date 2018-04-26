@@ -3,9 +3,9 @@ package identity
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/helper"
+	itest "github.com/ezaurum/cthulthu/identity/test"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/test"
-	itest "github.com/ezaurum/cthulthu/identity/test"
 
 	"github.com/stretchr/testify/assert"
 	"testing"

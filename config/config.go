@@ -1,11 +1,11 @@
 package config
 
 import (
+	"github.com/ezaurum/cthulthu/generators"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/gin-gonic/gin"
-	"github.com/pelletier/go-toml"
 	"github.com/jinzhu/gorm"
-	"github.com/ezaurum/cthulthu/generators"
+	"github.com/pelletier/go-toml"
 )
 
 type Config struct {

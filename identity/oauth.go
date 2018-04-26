@@ -2,8 +2,8 @@ package identity
 
 import (
 	"github.com/ezaurum/cthulthu/database"
-	"time"
 	"github.com/jinzhu/gorm"
+	"time"
 )
 
 func FindOAuthToken(r OAuthIDToken, dbm *gorm.DB) (OAuthIDToken, bool) {

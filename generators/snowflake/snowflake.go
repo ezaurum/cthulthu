@@ -28,3 +28,10 @@ func (g snowflakeGenerator) Generate() string {
 func (g snowflakeGenerator) GenerateInt64() int64 {
 	return g.node.Generate().Int64()
 }
+
+func GetGenerators(nodeNumber int64, targets ...interface{}) generators.IDGenerators {
+	gens := generators.New(func() generators.IDGenerator {
+		return New(nodeNumber)
+	}, targets...)
+	return gens
+}

@@ -18,7 +18,7 @@ func MakeRegister(idGenerator generators.IDGenerator) func() route.Routes {
 		rt := make(route.Routes)
 		rt.AddPage("/register", "common/register").
 			POST("/register", route.GetProcess("/",
-			CreateIdentity(idGenerator)))
+				CreateIdentity(idGenerator)))
 		return rt
 	}
 }

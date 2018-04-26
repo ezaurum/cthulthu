@@ -6,9 +6,9 @@ import (
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"net/http"
 	"time"
-	"github.com/jinzhu/gorm"
 )
 
 const (

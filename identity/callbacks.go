@@ -2,9 +2,9 @@ package identity
 
 import (
 	"github.com/ezaurum/cthulthu/authenticator"
-	"time"
-	"github.com/jinzhu/gorm"
 	"github.com/ezaurum/cthulthu/database"
+	"github.com/jinzhu/gorm"
+	"time"
 )
 
 // 쿠키의 id 토큰 처리

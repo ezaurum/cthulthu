@@ -4,12 +4,12 @@ import (
 	"github.com/ezaurum/boongeoppang/gin"
 	"github.com/ezaurum/cthulthu/config"
 	"github.com/ezaurum/cthulthu/database"
+	"github.com/ezaurum/cthulthu/generators"
+	"github.com/ezaurum/cthulthu/generators/snowflake"
 	"github.com/ezaurum/cthulthu/helper"
 	"github.com/ezaurum/cthulthu/identity"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/gin-gonic/gin"
-	"github.com/ezaurum/cthulthu/generators/snowflake"
-	"github.com/ezaurum/cthulthu/generators"
 )
 
 func Run(config *config.Config) {

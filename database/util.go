@@ -48,33 +48,19 @@ func IsExist(db *gorm.DB, t interface{}, where ...interface{}) bool {
 
 func assignIDWhenNotAssigned(generators generators.IDGenerators) func(scope *gorm.Scope) {
 	return func(scope *gorm.Scope) {
-		if !scope.HasError() {
-			if primaryField := scope.PrimaryField();
-				scope.PrimaryKeyZero() &&
-					primaryField.Field.Type().String() == "int64" {
-				typeName := reflect.TypeOf(scope.Value).String()
-				primaryField.Set(generators.GenerateInt64(typeName))
-			}
+		if scope.HasError() {
+			return
+		}
+
+		primaryField := scope.PrimaryField()
+
+		fieldType := primaryField.Field.Type().String()
+		typeName := reflect.TypeOf(scope.Value).String()
+		switch fieldType {
+		case "int64":
+			primaryField.Set(generators.GenerateInt64(typeName))
+		case "string":
+			primaryField.Set(generators.Generate(typeName))
 		}
 	}
-}
-
-func Open(generators generators.IDGenerators,
-	dialect string, args ...interface{}) (db *gorm.DB, err error) {
-	db, err = gorm.Open(dialect, args...)
-	if err != nil {
-		return
-	}
-
-	switch dialect {
-	case "mysql":
-		db.Set("gorm:table_options",
-			"ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;")
-	default:
-	}
-
-	db.Callback().Create().Before("gorm:create").
-		Register("assign_int64_id", assignIDWhenNotAssigned(generators))
-
-	return
 }

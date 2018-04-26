@@ -5,17 +5,17 @@ import (
 	"github.com/ezaurum/cthulthu/authenticator"
 	"github.com/ezaurum/cthulthu/config"
 	"github.com/ezaurum/cthulthu/generators"
-	"github.com/ezaurum/cthulthu/generators/snowflake"
 	"github.com/ezaurum/cthulthu/helper"
 	itest "github.com/ezaurum/cthulthu/identity/test"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
 	"net/url"
 	"reflect"
 	"testing"
-	"github.com/jinzhu/gorm"
+	"github.com/ezaurum/cthulthu/generators/snowflake"
 )
 
 func getRegisterFormPostData() url.Values {
@@ -37,13 +37,6 @@ var testConfig = &config.Config{
 	AuthorizerConfig: []interface{}{"test/model.conf", "test/policy.csv"},
 }
 
-func getGenerators(targets ...interface{}) generators.IDGenerators {
-	gens := generators.New(func() generators.IDGenerator {
-		return snowflake.New(0)
-	}, targets...)
-	return gens
-}
-
 func initializeTest(gens generators.IDGenerators, manager *gorm.DB, expires int) (*gin.Engine, *config.Config) {
 
 	name := reflect.TypeOf(&Identity{}).String()
@@ -51,7 +44,7 @@ func initializeTest(gens generators.IDGenerators, manager *gorm.DB, expires int)
 
 	tc := config.Config{
 		SessionExpiresInSeconds: expires,
-		DB:                      manager,
+		DB: manager,
 		Dir: config.DirConfig{
 			Static:   "test/static",
 			Template: "test/templates",
@@ -86,7 +79,7 @@ func initializeTest(gens generators.IDGenerators, manager *gorm.DB, expires int)
 func TestRoleAccess(t *testing.T) {
 
 	targets := []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}}
-	gens := getGenerators(targets...)
+	gens := snowflake.GetGenerators(0, targets...)
 
 	testDB := itest.DB(gens)
 	defer testDB.Close()

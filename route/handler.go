@@ -5,8 +5,8 @@ import (
 	dbg "github.com/ezaurum/cthulthu/database/gin"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"github.com/jinzhu/gorm"
+	"net/http"
 )
 
 type SessionHandlerFunc func(session session.Session) (int, interface{})

@@ -3,14 +3,14 @@ package identity
 import (
 	"fmt"
 	"github.com/ezaurum/cthulthu/authenticator"
+	"github.com/ezaurum/cthulthu/database"
+	itest "github.com/ezaurum/cthulthu/identity/test"
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/ezaurum/cthulthu/test"
-	itest "github.com/ezaurum/cthulthu/identity/test"
 	"github.com/stretchr/testify/assert"
 	"net/url"
 	"testing"
 	"time"
-	"github.com/ezaurum/cthulthu/database"
 )
 
 func TestRegister(t *testing.T) {
