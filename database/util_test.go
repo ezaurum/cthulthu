@@ -21,7 +21,7 @@ type Pet struct {
 	Name    string
 }
 
-func TestIsExist(t *testing.T) {
+func TestFind(t *testing.T) {
 	gens := snowflake.GetGenerators(0, &Owner{}, &Pet{})
 
 	db := DB(gens)
@@ -55,6 +55,66 @@ func TestIsExist(t *testing.T) {
 	db.Find(&or1, owner.ID).Related(&or1.Pets, "OwnerID")
 	assert.Equal(t, len(owner.Pets), len(or1.Pets))
 }
+
+func TestUpdate(t *testing.T) {
+	gens := snowflake.GetGenerators(0, &Owner{}, &Pet{})
+
+	db := DB(gens)
+	db.AutoMigrate(&Owner{}, &Pet{})
+
+	owner := Owner{Name: "이름"}
+
+	pets := []Pet{
+		{
+			Name: "멍멍1",
+		},
+		{
+			Name: "멍멍2",
+		},
+	}
+	owner.Pets = pets
+
+	db.Create(&owner)
+
+	owner.Pets[0].Name= "멍멍111"
+	owner.Name = "WTF"
+
+	db.Save(&owner)
+
+	var or1 Owner
+	db.Find(&or1, owner.ID).Related(&or1.Pets, "OwnerID")
+	assert.Equal(t, "멍멍111", or1.Pets[0].Name)
+	assert.Equal(t, owner.Pets[0].Name, or1.Pets[0].Name)
+}
+
+func TestDelete(t *testing.T) {
+	gens := snowflake.GetGenerators(0, &Owner{}, &Pet{})
+
+	db := DB(gens)
+	db.AutoMigrate(&Owner{}, &Pet{})
+
+	owner := Owner{Name: "이름"}
+
+	pets := []Pet{
+		{
+			Name: "멍멍1",
+		},
+		{
+			Name: "멍멍2",
+		},
+	}
+	owner.Pets = pets
+
+	db.Create(&owner)
+
+	db.Delete(&owner.Pets[1])
+	owner.Pets = owner.Pets[:1]
+
+	var or1 Owner
+	db.Find(&or1, owner.ID).Related(&or1.Pets, "OwnerID")
+	assert.Equal(t, len(owner.Pets), len(or1.Pets))
+}
+
 
 func DB(generators generators.IDGenerators) *gorm.DB {
 	//file := fmt.Sprintf("test%v.db", time.Now().UnixNano())
