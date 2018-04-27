@@ -27,6 +27,7 @@ func Run(config *config.Config) {
 
 	defer db.Close()
 
+	db.SingularTable(true)
 	db.AutoMigrate(config.AutoMigrates...)
 
 	config.DB = db
