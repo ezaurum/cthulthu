@@ -70,7 +70,7 @@ func initializeTest(gens generators.IDGenerators, manager *gorm.DB, expires int)
 
 	// renderer
 	if !helper.IsEmpty(tc.Dir.Template) {
-		engine.HTMLRender = render.New(tc.Dir.Template)
+		engine.HTMLRender = render.New(tc.Dir.Template, nil)
 	}
 
 	return engine, &tc

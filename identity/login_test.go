@@ -10,11 +10,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+	"github.com/ezaurum/cthulthu/generators/snowflake"
 )
 
 func TestLogin(t *testing.T) {
 	targets := []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}}
-	gens := getGenerators(targets...)
+	gens := snowflake.GetGenerators(0, targets...)
 
 	testDB := itest.DB(gens)
 	defer testDB.Close()
@@ -34,7 +35,7 @@ func TestLogin(t *testing.T) {
 func TestCookiePersistLogin(t *testing.T) {
 
 	targets := []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}}
-	gens := getGenerators(targets...)
+	gens := snowflake.GetGenerators(0, targets...)
 
 	testDB := itest.DB(gens)
 	defer testDB.Close()

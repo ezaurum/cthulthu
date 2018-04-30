@@ -11,12 +11,13 @@ import (
 	"net/url"
 	"testing"
 	"time"
+	"github.com/ezaurum/cthulthu/generators/snowflake"
 )
 
 func TestRegister(t *testing.T) {
 
 	targets := []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}}
-	gens := getGenerators(targets...)
+	gens := snowflake.GetGenerators(0, targets...)
 	testDB := itest.DB(gens)
 	defer testDB.Close()
 	r, conf := initializeTest(gens, testDB, authenticator.DefaultSessionExpires)
@@ -48,7 +49,7 @@ func TestRegister(t *testing.T) {
 func TestAfterRegisterAuthenticated(t *testing.T) {
 
 	targets := []interface{}{&Identity{}, &CookieIDToken{}, &FormIDToken{}}
-	gens := getGenerators(targets...)
+	gens := snowflake.GetGenerators(0, targets...)
 	testDB := itest.DB(gens)
 	defer testDB.Close()
 	r, conf := initializeTest(gens, testDB, authenticator.DefaultSessionExpires)
