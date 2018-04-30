@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/pelletier/go-toml"
+	"html/template"
 )
 
 type Config struct {
@@ -22,6 +23,8 @@ type Config struct {
 	OnInitializeDB       func()
 	Initialize           func(engine *gin.Engine)
 	InitializeMiddleware func(engine *gin.Engine)
+
+	FuncMap template.FuncMap
 
 	Address string
 

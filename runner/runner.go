@@ -61,9 +61,9 @@ func Run(config *config.Config) {
 	// 템틀릿 렌더러 설정
 	if !helper.IsEmpty(config.Dir.Template) {
 		if gin.IsDebugging() {
-			render.NewDebug(config.Dir.Template, r)
+			render.NewDebug(config.Dir.Template, config.FuncMap, r)
 		} else {
-			r.HTMLRender = render.New(config.Dir.Template)
+			r.HTMLRender = render.New(config.Dir.Template, config.FuncMap)
 		}
 	}
 
