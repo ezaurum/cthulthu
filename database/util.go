@@ -42,7 +42,7 @@ func IsExist(db *gorm.DB, t interface{}, where ...interface{}) bool {
 	case gorm.ErrRecordNotFound:
 		return false
 	default:
-		panic(db.Error)
+		panic(dbR.Error)
 	}
 }
 
