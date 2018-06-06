@@ -17,9 +17,7 @@ required = [
 
 #render
 "github.com/ezaurum/boongeoppang",
-]
 
 # gin
-[[constraint]]
-  name = "github.com/gin-gonic/gin"
-  branch = "master"
+"github.com/labstack/echo"
+]

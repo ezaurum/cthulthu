@@ -3,10 +3,10 @@ package config
 import (
 	"github.com/ezaurum/cthulthu/generators"
 	"github.com/ezaurum/cthulthu/route"
-	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/pelletier/go-toml"
 	"html/template"
+	"github.com/labstack/echo"
 )
 
 type Config struct {
@@ -21,8 +21,8 @@ type Config struct {
 	Routes []func() route.Routes
 
 	OnInitializeDB       func()
-	Initialize           func(engine *gin.Engine)
-	InitializeMiddleware func(engine *gin.Engine)
+	Initialize           func(engine *echo.Echo)
+	InitializeMiddleware func(engine *echo.Echo)
 
 	FuncMap template.FuncMap
 
