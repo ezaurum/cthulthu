@@ -64,3 +64,7 @@ func assignIDWhenNotAssigned(generators generators.IDGenerators) func(scope *gor
 		}
 	}
 }
+
+type UniqueEntity interface {
+	CreateIfNotExist(manager *gorm.DB) (interface{}, bool)
+}
