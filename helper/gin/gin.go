@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 	"strings"
+	"github.com/ezaurum/cthulthu/helper"
 )
 
 func BindID(c *gin.Context, paramName string) (int64, bool) {
@@ -52,7 +53,7 @@ func BindIDString(c *gin.Context, paramName string) (int64, bool, string) {
 }
 
 func ExtractNumber(phone string) string {
-	return strings.Join(OnlyNumberReg.FindAllString(phone, -1), "")
+	return strings.Join(helper.OnlyNumberReg.FindAllString(phone, -1), "")
 }
 
 func BindPhoneQuery(c *gin.Context) string {

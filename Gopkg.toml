@@ -18,6 +18,9 @@ required = [
 #render
 "github.com/ezaurum/boongeoppang",
 
-# gin
-"github.com/labstack/echo"
+# echo
+"github.com/labstack/echo",
+
+#gin
+  "github.com/gin-gonic/gin"
 ]
