@@ -16,7 +16,7 @@ const (
 	DefaultSessionExpires      = 60 * 15
 )
 
-type cookieAuthenticator struct {
+type CookieAuthenticator struct {
 	store                      session.Store
 	MaxAge                     int
 	sessionIDCookieName        string
@@ -26,14 +26,14 @@ type cookieAuthenticator struct {
 	PersistToken               TokenSaver
 }
 
-func (ca *cookieAuthenticator) SetActions(loadIDToken IDTokenLoader,
+func (ca *CookieAuthenticator) SetActions(loadIDToken IDTokenLoader,
 	loadIdentity IDLoader, tokenSaver TokenSaver) {
 	ca.LoadIdentity = loadIdentity
 	ca.LoadIDToken = loadIDToken
 	ca.PersistToken = tokenSaver
 }
 
-func (ca *cookieAuthenticator) Handler() gin.HandlerFunc {
+func (ca *CookieAuthenticator) Handler() gin.HandlerFunc {
 
 	if nil == ca.LoadIDToken {
 		panic("LoadIdToken is nil")
@@ -72,21 +72,21 @@ func (ca *cookieAuthenticator) Handler() gin.HandlerFunc {
 	}
 }
 
-func (ca cookieAuthenticator) createSession(c *gin.Context) session.Session {
+func (ca CookieAuthenticator) createSession(c *gin.Context) session.Session {
 	// created
 	session := ca.store.GetNew()
 
 	return session
 }
 
-func (ca cookieAuthenticator) PersistIDToken(c *gin.Context, session session.Session, idToken IDToken) {
+func (ca CookieAuthenticator) PersistIDToken(c *gin.Context, session session.Session, idToken IDToken) {
 	_ = ca.PersistToken(idToken)
 	c.SetCookie(ca.persistedIDTokenCookieName, idToken.TokenString(),
 		//tODO max age from token
 		365*24*60*60*99, "", "", false, true)
 }
 
-func (ca cookieAuthenticator) findIDToken(c *gin.Context, session session.Session) (IDToken, bool) {
+func (ca CookieAuthenticator) findIDToken(c *gin.Context, session session.Session) (IDToken, bool) {
 
 	loginCookie, e := c.Cookie(ca.persistedIDTokenCookieName)
 	hasCookie := nil == e
@@ -103,7 +103,7 @@ func (ca cookieAuthenticator) findIDToken(c *gin.Context, session session.Sessio
 	return nil, false
 }
 
-func (ca cookieAuthenticator) Authenticate(c *gin.Context, session session.Session, idToken IDToken) {
+func (ca CookieAuthenticator) Authenticate(c *gin.Context, session session.Session, idToken IDToken) {
 
 	identity, b := ca.LoadIdentity(idToken)
 
@@ -121,14 +121,14 @@ func (ca cookieAuthenticator) Authenticate(c *gin.Context, session session.Sessi
 
 }
 
-func (ca *cookieAuthenticator) activateSession(c *gin.Context, s session.Session) {
+func (ca *CookieAuthenticator) activateSession(c *gin.Context, s session.Session) {
 
 	//refresh session expires
 	SetSession(c, s)
 	ca.SetSessionIDCookie(c, s)
 }
 
-func (ca cookieAuthenticator) findSession(c *gin.Context) (session.Session, bool) {
+func (ca CookieAuthenticator) findSession(c *gin.Context) (session.Session, bool) {
 	sessionIDCookie, e := c.Cookie(ca.sessionIDCookieName)
 	isSessionIdCookieExist := nil == e
 	var session session.Session
@@ -150,22 +150,22 @@ func (ca cookieAuthenticator) findSession(c *gin.Context) (session.Session, bool
 	return session, needSession
 }
 
-func (ca cookieAuthenticator) ClearSessionIDCookie(c *gin.Context) {
+func (ca CookieAuthenticator) ClearSessionIDCookie(c *gin.Context) {
 	c.SetCookie(ca.sessionIDCookieName, "", -1, "/", "", false, true)
 }
 
-func (ca cookieAuthenticator) SetSessionIDCookie(c *gin.Context, session session.Session) {
+func (ca CookieAuthenticator) SetSessionIDCookie(c *gin.Context, session session.Session) {
 	c.SetCookie(ca.sessionIDCookieName, session.ID(),
 		ca.MaxAge,
 		"/", "",
 		false, true)
 }
 
-func Default() *cookieAuthenticator {
+func Default() *CookieAuthenticator {
 	return NewMem(0, DefaultSessionExpires)
 }
 
-func NewMem(node int64, expiresInSeconds int) *cookieAuthenticator {
+func NewMem(node int64, expiresInSeconds int) *CookieAuthenticator {
 	duration := time.Duration(expiresInSeconds) * time.Second
 	k := snowflake.New(node)
 	m := memstore.New(k, duration, duration*2)
@@ -174,8 +174,8 @@ func NewMem(node int64, expiresInSeconds int) *cookieAuthenticator {
 	return middleware
 }
 
-func newMiddleware(store session.Store) *cookieAuthenticator {
-	return &cookieAuthenticator{
+func newMiddleware(store session.Store) *CookieAuthenticator {
+	return &CookieAuthenticator{
 		store:  store,
 		MaxAge: DefaultSessionExpires,
 		persistedIDTokenCookieName: PersistedIDTokenCookieName,
@@ -183,7 +183,7 @@ func newMiddleware(store session.Store) *cookieAuthenticator {
 	}
 }
 
-var _ Authenticator = &cookieAuthenticator{}
+var _ Authenticator = &CookieAuthenticator{}
 
 func GetSession(c *gin.Context) session.Session {
 	return c.MustGet(DefaultSessionContextKey).(session.Session)

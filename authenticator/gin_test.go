@@ -198,7 +198,7 @@ func TestIdentityRole(t *testing.T) {
 	client.GetRequest(r, "/1")
 }
 
-func getTestAuthenticator(t *testing.T, token IDToken, identity Identity, expiresInSecond int) *cookieAuthenticator {
+func getTestAuthenticator(t *testing.T, token IDToken, identity Identity, expiresInSecond int) *CookieAuthenticator {
 
 	middleware := NewMem(0, expiresInSecond)
 	setNilFunctions(middleware)
@@ -252,7 +252,7 @@ func (i TestIdentity) Role() string {
 	return i.IdentityRole
 }
 
-func getDefault() *cookieAuthenticator {
+func getDefault() *CookieAuthenticator {
 	authenticator := Default()
 	setNilFunctions(authenticator)
 	return authenticator
