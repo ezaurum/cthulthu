@@ -1,16 +1,15 @@
 package runner
 
 import (
-	"github.com/ezaurum/boongeoppang/gin"
 	"github.com/ezaurum/cthulthu/config"
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/generators"
 	"github.com/ezaurum/cthulthu/generators/snowflake"
 	"github.com/ezaurum/cthulthu/helper"
 	"github.com/ezaurum/cthulthu/route"
-	"github.com/gin-gonic/gin"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	becho "github.com/ezaurum/boongeoppang/echo"
 )
 
 func Run(config *config.Config) {
@@ -57,11 +56,14 @@ func Run(config *config.Config) {
 
 	// 템틀릿 렌더러 설정
 	if !helper.IsEmpty(config.Dir.Template) {
-		if gin.IsDebugging() {
+		becho.NewDebug(config.Dir.Template, config.FuncMap)
+
+		//TODO 디버그 아닌 상태가 필요
+		/*if gin.IsDebugging() {
 			render.NewDebug(config.Dir.Template, config.FuncMap, e)
 		} else {
 			//TODO e.HTMLRender = render.New(config.Dir.Template, config.FuncMap)
-		}
+		}*/
 	}
 
 	// 스태틱 파일 설정
