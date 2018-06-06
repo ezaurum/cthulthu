@@ -10,6 +10,7 @@ import (
 	"github.com/ezaurum/cthulthu/route"
 	"github.com/gin-gonic/gin"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 func Run(config *config.Config) {
@@ -65,7 +66,10 @@ func Run(config *config.Config) {
 
 	// 스태틱 파일 설정
 	if !helper.IsEmpty(config.Dir.Static) {
-		e.Static("/", config.Dir.Static)
+		e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+			Root:   config.Dir.Static,
+			Skipper:middleware.DefaultSkipper,
+		}))
 	}
 
 	e.Start(config.Address)
