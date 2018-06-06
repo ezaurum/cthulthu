@@ -7,7 +7,7 @@ import (
 type Holder struct {
 	RelativePath string
 	Handler      echo.HandlerFunc
-	Middleware  []echo.MiddlewareFunc
+	Middleware   []echo.MiddlewareFunc
 }
 
 type Routes map[string][]Holder
@@ -20,8 +20,20 @@ func (routes Routes) DELETE(relativePath string, handlerFunc echo.HandlerFunc) R
 	return routes.Add("DELETE", relativePath, handlerFunc)
 }
 
+func (routes Routes) PUT(relativePath string, handlerFunc echo.HandlerFunc) Routes {
+	return routes.Add("PUT", relativePath, handlerFunc)
+}
+
 func (routes Routes) GET(relativePath string, handlerFunc echo.HandlerFunc) Routes {
 	return routes.Add("GET", relativePath, handlerFunc)
+}
+
+func (routes Routes) HEAD(relativePath string, handlerFunc echo.HandlerFunc) Routes {
+	return routes.Add("HEAD", relativePath, handlerFunc)
+}
+
+func (routes Routes) OPTIONS(relativePath string, handlerFunc echo.HandlerFunc) Routes {
+	return routes.Add("OPTIONS", relativePath, handlerFunc)
 }
 
 func (routes Routes) Add(method string, relativePath string, handlerFunc echo.HandlerFunc) Routes {
@@ -43,9 +55,9 @@ func AddAll(r *echo.Echo, routes Routes) {
 		case "PUT":
 			each(r.PUT, v)
 		case "OPTIONS":
-			each(r.OPTIONS,v)
+			each(r.OPTIONS, v)
 		case "HEAD":
-			each(r.HEAD,v)
+			each(r.HEAD, v)
 		}
 	}
 }
