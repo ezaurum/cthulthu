@@ -23,15 +23,15 @@ func (gen IDGenerators) GenerateByType(v interface{}) string {
 	return gen[reflect.TypeOf(v).Name()].Generate()
 }
 
-func (gen IDGenerators) GenerateInt64ByType(v interface{}) string {
-	return gen[reflect.TypeOf(v).Name()].Generate()
+func (gen IDGenerators) GenerateInt64ByType(v interface{}) int64 {
+	return gen[reflect.TypeOf(v).Name()].GenerateInt64()
 }
 
-func New(maker func() IDGenerator, values ...interface{}) IDGenerators {
+func New(maker func(typeString string) IDGenerator, values ...interface{}) IDGenerators {
 	gens := make(map[string]IDGenerator)
 	for _, v := range values {
-		n := maker()
-		gens[reflect.TypeOf(v).String()] = n
+		s := reflect.TypeOf(v).String()
+		gens[s] = maker(s)
 	}
 	return gens
 }

@@ -17,38 +17,38 @@ func TestGetNew(t *testing.T) {
 
 func TestGetNewSerial(t *testing.T) {
 	kg := New(0)
+	keyCount := 5000
+	waitGroups := 5000
 
+	keys := make(map[string]bool)
 	var wg sync.WaitGroup
-	wg.Add(3)
+	wg.Add(waitGroups + 1)
 
 	n := func(c chan string) {
 		c <- kg.Generate()
 	}
 
-	c := make(chan string)
-
+	c := make(chan string, keyCount)
 	go func() {
 		defer wg.Done()
-		for i := 0; i < 100000; i++ {
-			go n(c)
+		for i:=0; i< waitGroups * keyCount ; i++ {
+			key := <-c
+			keys[key] = true
 		}
 	}()
 
-	go func() {
-		defer wg.Done()
-		for i := 0; i < 100000; i++ {
-			go n(c)
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-		for j := 0; j < 100000; j++ {
-			s0 := <-c
-			s1 := <-c
-			assert.NotEqual(t, s1, s0)
-		}
-	}()
+	//when
+	for i := 0; i < waitGroups; i++ {
+		go func() {
+			defer wg.Done()
+			for i := 0; i < keyCount; i++ {
+				n(c)
+			}
+		}()
+	}
 
 	wg.Wait()
+
+	//then
+	assert.Equal(t, waitGroups*keyCount, len(keys))
 }

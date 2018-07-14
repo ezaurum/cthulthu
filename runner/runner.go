@@ -14,7 +14,7 @@ import (
 
 func Run(config *config.Config) {
 
-	config.Generators = generators.New(func() generators.IDGenerator {
+	config.Generators = generators.New(func(_ string) generators.IDGenerator {
 		return snowflake.New(config.NodeNumber)
 	}, config.AutoMigrates...)
 
