@@ -52,14 +52,10 @@ func BindIDString(c *gin.Context, paramName string) (int64, bool, string) {
 	return accountID, true, accountIDString
 }
 
-func ExtractNumber(phone string) string {
-	return strings.Join(helper.OnlyNumberReg.FindAllString(phone, -1), "")
-}
-
 func BindPhoneQuery(c *gin.Context) string {
 	phone := c.Query("phone")
 	if len(phone) > 0 {
-		phone = ExtractNumber(phone)
+		phone = helper.ExtractNumber(phone)
 	}
 	return phone
 }

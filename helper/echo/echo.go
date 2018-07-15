@@ -4,7 +4,6 @@ import (
 	"strconv"
 	"fmt"
 	"time"
-	"strings"
 	"github.com/labstack/echo"
 	"github.com/ezaurum/cthulthu/helper"
 )
@@ -52,14 +51,11 @@ func BindIDString(c echo.Context, paramName string) (int64, bool, string) {
 	return accountID, true, accountIDString
 }
 
-func ExtractNumber(phone string) string {
-	return strings.Join(helper.OnlyNumberReg.FindAllString(phone, -1), "")
-}
 
 func BindPhoneQuery(c echo.Context) string {
 	phone := c.QueryParam("phone")
 	if len(phone) > 0 {
-		phone = ExtractNumber(phone)
+		phone = helper.ExtractNumber(phone)
 	}
 	return phone
 }
