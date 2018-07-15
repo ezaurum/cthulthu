@@ -1,4 +1,4 @@
-package runner
+package main
 
 import (
 	"github.com/ezaurum/cthulthu/config"
@@ -12,6 +12,13 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/ezaurum/cthulthu/database"
 )
+
+func main() {
+	configFileName := "test-application.toml"
+	cnf := &config.Config{}
+	cnf.FromFile(configFileName)
+	Run(cnf)
+}
 
 func Run(config *config.Config) {
 
@@ -48,14 +55,11 @@ func Run(config *config.Config) {
 
 	// 템틀릿 렌더러 설정
 	if !helper.IsEmpty(config.Dir.Template) {
-		becho.NewDebug(config.Dir.Template, config.FuncMap)
-
-		//TODO 디버그 아닌 상태가 필요
-		/*if gin.IsDebugging() {
-			render.NewDebug(config.Dir.Template, config.FuncMap, e)
+		if e.Debug {
+			e.Renderer = becho.NewDebug(config.Dir.Template, config.FuncMap)
 		} else {
-			//TODO e.HTMLRender = render.New(config.Dir.Template, config.FuncMap)
-		}*/
+			e.Renderer = becho.New(config.Dir.Template, config.FuncMap)
+		}
 	}
 
 	// 스태틱 파일 설정
