@@ -21,6 +21,33 @@ type Pet struct {
 	Name    string
 }
 
+func TestCreate(t *testing.T) {
+	gens := snowflake.GetGenerators(0, &Owner{}, &Pet{})
+
+	db := DB(gens)
+	db.AutoMigrate(&Owner{}, &Pet{})
+
+	defaultID := int64(1234)
+	owner0 := Owner{
+		Name: "test0",
+		Model: Model{
+			ID: defaultID,
+		},
+	}
+
+	owner1 := Owner{
+		Name: "test1",
+	}
+
+	//when
+	db.Create(&owner0)
+	db.Create(&owner1)
+
+	//then
+	assert.Equal(t, defaultID, owner0.ID)
+	assert.NotZero(t, owner1.ID)
+}
+
 func TestFind(t *testing.T) {
 	gens := snowflake.GetGenerators(0, &Owner{}, &Pet{})
 
@@ -76,7 +103,7 @@ func TestUpdate(t *testing.T) {
 
 	db.Create(&owner)
 
-	owner.Pets[0].Name= "멍멍111"
+	owner.Pets[0].Name = "멍멍111"
 	owner.Name = "WTF"
 
 	db.Save(&owner)
@@ -115,9 +142,12 @@ func TestDelete(t *testing.T) {
 	assert.Equal(t, len(owner.Pets), len(or1.Pets))
 }
 
-
 func DB(generators generators.IDGenerators) *gorm.DB {
-	//file := fmt.Sprintf("test%v.db", time.Now().UnixNano())
-	db, _ := Open(generators, "sqlite3", "test.db")
-	return db
+	db2, err := gorm.Open("sqlite3", "test.db")
+	if err != nil {
+		panic(err)
+	}
+
+	RegisterAutoIDAssign(db2, generators)
+	return db2
 }
