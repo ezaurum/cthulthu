@@ -2,7 +2,6 @@ package runner
 
 import (
 	"github.com/ezaurum/cthulthu/config"
-	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/generators"
 	"github.com/ezaurum/cthulthu/generators/snowflake"
 	"github.com/ezaurum/cthulthu/helper"
@@ -10,6 +9,8 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	becho "github.com/ezaurum/boongeoppang/echo"
+	"github.com/jinzhu/gorm"
+	"github.com/ezaurum/cthulthu/database"
 )
 
 func Run(config *config.Config) {
@@ -18,18 +19,9 @@ func Run(config *config.Config) {
 		return snowflake.New(config.NodeNumber)
 	}, config.AutoMigrates...)
 
-	//Init DB
-	db, err := database.Open(config.Generators,
-		config.Db.Dialect, config.Db.Connection)
-	if err != nil {
-		panic(err)
-	}
+	db := initDB(config)
 
 	defer db.Close()
-
-	db.SingularTable(true)
-	db.AutoMigrate(config.AutoMigrates...)
-
 	config.DB = db
 
 	//웹 전에 초기화 해야 하는 것들
@@ -69,10 +61,22 @@ func Run(config *config.Config) {
 	// 스태틱 파일 설정
 	if !helper.IsEmpty(config.Dir.Static) {
 		e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
-			Root:   config.Dir.Static,
-			Skipper:middleware.DefaultSkipper,
+			Root:    config.Dir.Static,
+			Skipper: middleware.DefaultSkipper,
 		}))
 	}
 
 	e.Start(config.Address)
+}
+
+func initDB(config *config.Config) *gorm.DB {
+	//Init DB
+	db, err := gorm.Open(config.Db.Dialect, config.Db.Connection)
+	if err != nil {
+		panic(err)
+	}
+	database.RegisterAutoIDAssign(db, config.Generators)
+	db.SingularTable(true)
+	db.AutoMigrate(config.AutoMigrates...)
+	return db
 }
