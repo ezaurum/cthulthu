@@ -5,6 +5,7 @@ import (
 	"github.com/boombuler/barcode/code128"
 	"image/draw"
 	cimage "github.com/ezaurum/cthulthu/image"
+	"github.com/skip2/go-qrcode"
 )
 
 func MakeMMSBarCodeFile(codeString string, fileName string, defaultImage image.Image) (error, bool) {
@@ -51,3 +52,12 @@ func MakeBarCodeFile(codeString string, fileName string) (error, bool) {
 
 	return nil, true
 }
+
+func MakeQR(url string, size int) image.Image {
+	qrCode, err := qrcode.New(url, qrcode.Low)
+	if nil == err {
+		return qrCode.Image(size)
+	}
+	return nil
+}
+
