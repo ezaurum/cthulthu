@@ -35,22 +35,28 @@ func MakeMMSBarCodeFile(codeString string, fileName string, defaultImage image.I
 }
 
 func MakeBarCodeFile(codeString string, fileName string) (error, bool) {
-	cs, e := code128.Encode(codeString)
-	if nil != e {
-		return e, false
+	img, err := MakeBarCode(codeString)
+	if nil != err {
+		return err, false
 	}
 
+	paint.CreateJPEG(fileName, img)
+
+	return nil, true
+}
+
+func MakeBarCode(codeString string) (image.Image, error) {
+	cs, e := code128.Encode(codeString)
+	if nil != e {
+		return nil, e
+	}
 	backgroundBounds := image.Rect(0, 0, 220, 12)
 	canvas := image.NewRGBA(backgroundBounds)
-
 	barCode := paint.Resize(cs, 200, 10)
-
 	barCodeBounds := image.Rect(10, 1, 210, 11)
 	draw.Draw(canvas, barCodeBounds, barCode, image.ZP, draw.Src)
 
-	paint.CreateJPEG(fileName, canvas)
-
-	return nil, true
+	return canvas, nil
 }
 
 func MakeQR(url string, size int) image.Image {
