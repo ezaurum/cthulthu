@@ -2,11 +2,10 @@ package config
 
 import (
 	"github.com/ezaurum/cthulthu/generators"
-	"github.com/ezaurum/cthulthu/route"
 	"github.com/jinzhu/gorm"
 	"github.com/pelletier/go-toml"
 	"html/template"
-	"github.com/labstack/echo"
+	"github.com/ezaurum/cthulthu/database"
 )
 
 type Config struct {
@@ -16,13 +15,6 @@ type Config struct {
 	NodeNumber              int64
 	Generators              generators.IDGenerators
 	SessionExpiresInSeconds int
-	AuthorizerConfig        []interface{}
-
-	Routes []func() route.Routes
-
-	OnInitializeDB       func()
-	Initialize           func(engine *echo.Echo)
-	InitializeMiddleware func(engine *echo.Echo)
 
 	FuncMap template.FuncMap
 
@@ -48,4 +40,17 @@ func (cnf *Config) FromFile(configFile string) {
 		panic(err)
 	}
 	toml.Unmarshal(cnf)
+}
+func (cnf *Config) InitDB() *gorm.DB {
+	//Init DB
+	db, err := gorm.Open(cnf.Db.Dialect, cnf.Db.Connection)
+	if err != nil {
+		panic(err)
+	}
+	database.RegisterAutoIDAssign(db, cnf.Generators)
+	db.SingularTable(true)
+	db.AutoMigrate(cnf.AutoMigrates...)
+
+	cnf.DB = db
+	return db
 }
