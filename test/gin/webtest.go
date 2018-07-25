@@ -1,4 +1,4 @@
-package test
+package gin
 
 import (
 	"github.com/PuerkitoBio/goquery"
