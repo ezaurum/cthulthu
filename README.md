@@ -1,2 +1,3 @@
 # cthulthu
-Board
+
+Sample and scaffold project for go web server
