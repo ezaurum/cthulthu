@@ -16,7 +16,7 @@ func assignIDWhenNotAssigned(generators generators.IDGenerators) func(scope *gor
 
 		primaryField := scope.PrimaryField()
 
-		if !primaryField.HasDefaultValue {
+		if !primaryField.IsBlank {
 			return
 		}
 
