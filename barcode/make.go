@@ -25,7 +25,6 @@ func MakeMMSBarCodeFile(codeString string, fileName string, defaultImage image.I
 	if nil != e {
 		return e, false
 	}
-	//paint.CreateJPEG(cs.Content()+".jpg", paint.ResizeA(cs, uint(cs.Bounds().Dx()*2), ImageHeight, resize.NearestNeighbor))
 
 	var backgroundBounds image.Rectangle
 	var canvas draw.Image
@@ -54,24 +53,11 @@ func MakeMMSBarCodeFile(codeString string, fileName string, defaultImage image.I
 	barCodeBounds := image.Rect(minPoint.X+paddingA,
 		maxPoint.Y-ImageHeight, maxPoint.X-paddingB, maxPoint.Y)
 
-	paint.CreateJPEG("t0"+fileName,
-		paint.ResizeA(cs, doubleSize, uint(barCodeBounds.Dy()), resize.Bicubic))
-
-	paint.CreateJPEG("t1"+fileName,
-		paint.ResizeA(cs, doubleSize, uint(barCodeBounds.Dy()), resize.Bilinear))
-
-	paint.CreateJPEG("t2"+fileName,
-		paint.ResizeA(cs, doubleSize, uint(barCodeBounds.Dy()), resize.NearestNeighbor))
-
-	paint.CreateJPEG("t3"+fileName,
-		paint.ResizeA(cs, doubleSize, uint(barCodeBounds.Dy()), resize.Lanczos3))
-
 	if nil != defaultImage {
 		draw.Draw(canvas, backgroundBounds, defaultImage, image.ZP, draw.Src)
 	}
 	draw.Draw(canvas, barCodeBounds, barCode, image.ZP, draw.Src)
 
-	paint.CreateJPEG(cs.Content()+".jpg", canvas)
 	paint.CreateJPEG(fileName, canvas)
 
 	return nil, true
