@@ -26,7 +26,11 @@ func CentimeterToInch(centi float64) float64 {
 }
 
 func Resize(source image.Image, width uint, height uint) image.Image {
-	return resize.Resize(width, height, source, resize.Lanczos3)
+	return resize.Resize(width, height, source, resize.Bilinear)
+}
+
+func ResizeA(source image.Image, width uint, height uint, a resize.InterpolationFunction) image.Image {
+	return resize.Resize(width, height, source, a)
 }
 
 func ResizeWithRatio(source image.Image, maxWidthPx uint, maxHeightPx uint) image.Image {
