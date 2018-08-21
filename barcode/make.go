@@ -2,20 +2,20 @@ package barcode
 
 import (
 	"image"
-	"github.com/boombuler/barcode/code128"
 	"image/draw"
 	"github.com/ezaurum/cthulthu/paint"
 	"github.com/skip2/go-qrcode"
 	"errors"
 	"fmt"
 	"image/color"
-	"github.com/nfnt/resize"
+	"github.com/boombuler/barcode/code128"
+	"github.com/boombuler/barcode"
 )
 
 const (
-	ImageHeight      = 200
-	ImagePadding     = 20
-	DefaultMMSWidth  = 640
+	ImageHeight      = 120
+	ImagePadding     = 10
+	DefaultMMSWidth  = 320
 	DefaultMMSHeight = 1138
 )
 
@@ -42,16 +42,17 @@ func MakeMMSBarCodeFile(codeString string, fileName string, defaultImage image.I
 
 	draw.Draw(canvas, canvas.Bounds(), &image.Uniform{C: color.White}, image.ZP, draw.Src)
 
-	doubleSize := uint(cs.Bounds().Dx() * 4)
-	barCode := paint.ResizeA(cs, doubleSize, ImageHeight, resize.NearestNeighbor)
+	barCode, err := barcode.Scale(cs, DefaultMMSWidth, ImageHeight)
+	if nil != err {
+		return err, false
+	}
 
-	paddingA := (backgroundBounds.Dx() - int(doubleSize)) / 2
-	paddingB := (backgroundBounds.Dx() - int(doubleSize)) - paddingA
+	barcodeWidth := barCode.Bounds().Dx()
+	paddingA := (backgroundBounds.Dx() - int(barcodeWidth)) / 2
 
-	minPoint := backgroundBounds.Min
 	maxPoint := backgroundBounds.Max
-	barCodeBounds := image.Rect(minPoint.X+paddingA,
-		maxPoint.Y-ImageHeight, maxPoint.X-paddingB, maxPoint.Y)
+	barCodeBounds := image.Rect(paddingA,
+		maxPoint.Y-ImageHeight, paddingA+barcodeWidth, maxPoint.Y)
 
 	if nil != defaultImage {
 		draw.Draw(canvas, backgroundBounds, defaultImage, image.ZP, draw.Src)
