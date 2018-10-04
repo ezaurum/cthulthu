@@ -43,11 +43,11 @@
 
 [[constraint]]
   name = "github.com/jinzhu/gorm"
-  version = "1.9.1"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/labstack/echo"
-  version = "3.3.5"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/pelletier/go-toml"
