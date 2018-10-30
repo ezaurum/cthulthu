@@ -18,9 +18,7 @@ import (
 
 const (
 	ImageHeight      = 120
-	ImagePadding     = 10
 	DefaultMMSWidth  = 320
-	DefaultMMSHeight = 1138
 )
 
 var (
@@ -117,7 +115,7 @@ func MakeBarCode(codeString string) (image.Image, error) {
 		return nil, e
 	}
 
-	barCode, err := barcode.Scale(cs, DefaultMMSWidth, ImageHeight)
+	barCode, err := barcode.Scale(cs, DefaultMMSWidth -20, ImageHeight)
 	if nil != err {
 		return nil, err
 	}
@@ -133,8 +131,8 @@ func MakeBarCodeWithString(codeString string) (image.Image, error) {
 		return code, e
 	}
 
-	bounds := code.Bounds()
 	paddingLeft := 10
+	bounds := code.Bounds()
 	clip := image.Rect(bounds.Min.X+paddingLeft, bounds.Max.Y-50, bounds.Max.X-paddingLeft, bounds.Max.Y)
 	canvas := image.NewRGBA(bounds)
 	draw.Draw(canvas, bounds, code, image.ZP, draw.Src)
@@ -166,7 +164,9 @@ func MakeBarCodeWithString(codeString string) (image.Image, error) {
 		c.SetHinting(font.HintingFull)
 	}
 
-	pt := freetype.Pt(paddingLeft*2, clip.Min.Y+int(c.PointToFixed(fontSize)>>6)+paddingLeft)
+	paddingTop := 10
+
+	pt := freetype.Pt(paddingLeft*2, clip.Min.Y+int(c.PointToFixed(fontSize)>>6)+paddingTop)
 	_, err := c.DrawString(codeString, pt)
 	if err != nil {
 		return canvas, err
