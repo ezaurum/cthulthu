@@ -1,22 +1,23 @@
 package barcode
 
 import (
-	"fmt"
-	"testing"
 	"github.com/ezaurum/cthulthu/generators/snowflake"
-	"github.com/stretchr/testify/assert"
 	"github.com/ezaurum/cthulthu/paint"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestMakeBarCode(t *testing.T) {
-	generate := fmt.Sprintf("%X", snowflake.New(0).GenerateInt64())[3:]
+	//generate := fmt.Sprintf("%X", snowflake.New(0).GenerateInt64())[3:]
+	generate := snowflake.New(0).Generate()
 	e, b := MakeMMSBarCodeFile(generate, generate+".jpg", nil, false)
 	assert.True(t, b)
 	assert.Nil(t, e)
 }
 
 func TestMakeBarCode2(t *testing.T) {
-	generate := fmt.Sprintf("%X", snowflake.New(0).GenerateInt64())[3:]
+	//generate := fmt.Sprintf("%X", snowflake.New(0).GenerateInt64())[3:]
+	generate := snowflake.New(0).Generate()
 	jpeg := paint.LoadJPEG("wisdom_default.jpg")
 	e, b := MakeMMSBarCodeFile(generate, generate+".jpg", jpeg, false)
 	assert.True(t, b)
@@ -24,7 +25,8 @@ func TestMakeBarCode2(t *testing.T) {
 }
 
 func TestMakeBarCodeWithString(t *testing.T) {
-	generate := fmt.Sprintf("%X", snowflake.New(0).GenerateInt64())[3:]
+	//generate := fmt.Sprintf("%X", snowflake.New(0).GenerateInt64())[3:]
+	generate := snowflake.New(0).Generate()
 	img, err := MakeBarCodeWithString(generate)
 
 	paint.CreateJPEG(generate+".jpg", img)
@@ -35,14 +37,16 @@ func TestMakeBarCodeWithString(t *testing.T) {
 }
 
 func TestMakeBarCodeWithString2(t *testing.T) {
-	generate := fmt.Sprintf("%X", snowflake.New(0).GenerateInt64())[3:]
+	//generate := fmt.Sprintf("%X", snowflake.New(0).GenerateInt64())[3:]
+	generate := snowflake.New(0).Generate()
 	e, b := MakeMMSBarCodeFile(generate, generate+"TestMakeBarCodeWithString2.jpg", nil, true)
 	assert.True(t, b)
 	assert.Nil(t, e)
 }
 
 func TestMakeBarCodeWithString3(t *testing.T) {
-	generate := fmt.Sprintf("%X", snowflake.New(0).GenerateInt64())[3:]
+	//generate := fmt.Sprintf("%X", snowflake.New(0).GenerateInt64())[3:]
+	generate := snowflake.New(0).Generate()[0:5]
 	jpeg := paint.LoadJPEG("dd.jpg")
 	e, b := MakeMMSBarCodeFile(generate, generate+"TestMakeBarCodeWithString3.jpg", jpeg, true)
 	assert.True(t, b)

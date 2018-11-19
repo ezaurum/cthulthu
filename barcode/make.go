@@ -7,7 +7,7 @@ import (
 	"github.com/skip2/go-qrcode"
 	"errors"
 	"fmt"
-	"github.com/boombuler/barcode/code128"
+	"github.com/boombuler/barcode/twooffive"
 	"github.com/boombuler/barcode"
 	"github.com/golang/freetype"
 	"io/ioutil"
@@ -110,7 +110,7 @@ func MakeBarCodeFile(codeString string, fileName string) (error, bool) {
 }
 
 func MakeBarCode(codeString string) (image.Image, error) {
-	cs, e := code128.Encode(codeString)
+	cs, e := twooffive.Encode(codeString, false)
 	if nil != e {
 		return nil, e
 	}
