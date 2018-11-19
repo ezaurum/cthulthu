@@ -1,24 +1,26 @@
 package barcode
 
 import (
-	"image"
-	"image/draw"
-	"github.com/ezaurum/cthulthu/paint"
-	"github.com/skip2/go-qrcode"
 	"errors"
 	"fmt"
-	"github.com/boombuler/barcode/twooffive"
 	"github.com/boombuler/barcode"
+	"github.com/boombuler/barcode/code39"
+	"github.com/boombuler/barcode/code128"
+	"github.com/boombuler/barcode/twooffive"
+	"github.com/ezaurum/cthulthu/paint"
 	"github.com/golang/freetype"
+	"github.com/golang/freetype/truetype"
+	"github.com/skip2/go-qrcode"
+	"golang.org/x/image/font"
+	"image"
+	"image/draw"
 	"io/ioutil"
 	"log"
-	"github.com/golang/freetype/truetype"
-	"golang.org/x/image/font"
 )
 
 const (
-	ImageHeight      = 120
-	DefaultMMSWidth  = 320
+	ImageHeight     = 120
+	DefaultMMSWidth = 320
 )
 
 var (
@@ -48,14 +50,14 @@ func InitializeFont() {
 //640px by 1138px
 func MakeMMSBarCodeFile(codeString string,
 	fileName string, defaultImage image.Image,
-	withCodeString bool) (error, bool) {
+	withCodeString bool, barcodeType string) (error, bool) {
 
 	var barCode image.Image
 	var err error
 	if withCodeString {
-		barCode, err = MakeBarCodeWithString(codeString)
+		barCode, err = MakeBarCodeWithString(codeString, barcodeType)
 	} else {
-		barCode, err = MakeBarCode(codeString)
+		barCode, err = MakeBarCode(codeString, barcodeType)
 	}
 	if nil != err {
 		return err, false
@@ -98,8 +100,8 @@ func MakeMMSBarCodeFile(codeString string,
 	return nil, true
 }
 
-func MakeBarCodeFile(codeString string, fileName string) (error, bool) {
-	img, err := MakeBarCode(codeString)
+func MakeBarCodeFile(codeString string, fileName string, barcodeType string) (error, bool) {
+	img, err := MakeBarCode(codeString, barcodeType)
 	if nil != err {
 		return err, false
 	}
@@ -109,13 +111,22 @@ func MakeBarCodeFile(codeString string, fileName string) (error, bool) {
 	return nil, true
 }
 
-func MakeBarCode(codeString string) (image.Image, error) {
-	cs, e := twooffive.Encode(codeString, false)
+func MakeBarCode(codeString string, barcodeType string) (image.Image, error) {
+	var cs barcode.Barcode
+	var e error
+	switch barcodeType {
+	case "39":
+		cs, e = code39.Encode(codeString, false, false)
+	case "128":
+		cs, e = code128.Encode(codeString)
+	case "25":
+		cs, e = twooffive.Encode(codeString, false)
+	}
 	if nil != e {
 		return nil, e
 	}
 
-	barCode, err := barcode.Scale(cs, DefaultMMSWidth -20, ImageHeight)
+	barCode, err := barcode.Scale(cs, DefaultMMSWidth-20, ImageHeight)
 	if nil != err {
 		return nil, err
 	}
@@ -123,9 +134,9 @@ func MakeBarCode(codeString string) (image.Image, error) {
 	return barCode, nil
 }
 
-func MakeBarCodeWithString(codeString string) (image.Image, error) {
+func MakeBarCodeWithString(codeString string, barcodeType string) (image.Image, error) {
 
-	code, e := MakeBarCode(codeString)
+	code, e := MakeBarCode(codeString, barcodeType)
 
 	if nil != e {
 		return code, e
