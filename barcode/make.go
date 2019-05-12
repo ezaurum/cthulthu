@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/boombuler/barcode"
-	"github.com/boombuler/barcode/code39"
 	"github.com/boombuler/barcode/code128"
+	"github.com/boombuler/barcode/code39"
 	"github.com/boombuler/barcode/twooffive"
 	"github.com/ezaurum/cthulthu/paint"
 	"github.com/golang/freetype"
@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	ImageHeight     = 120
-	DefaultMMSWidth = 320
+	ImageHeight     = 240
+	DefaultMMSWidth = 640
 )
 
 var (
@@ -29,35 +29,66 @@ var (
 )
 
 // initialize font
-func InitializeFont() {
+func InitializeFont() error {
 
 	// Read the font data.
 	fontBytes, err := ioutil.ReadFile(FontName)
 	if err != nil {
 		log.Println(err)
-		return
+		return err
 	}
 
 	f, err := freetype.ParseFont(fontBytes)
 	if err != nil {
 		log.Println(err)
-		return
+		return err
 	}
 
 	Font = f
+	return nil
 }
 
 //640px by 1138px
 func MakeMMSBarCodeFile(codeString string,
 	fileName string, defaultImage image.Image,
-	withCodeString bool, barcodeType string) (error, bool) {
+	settings map[string]interface{}) (error, bool) {
+
+	// set default value
+	withCodeString := false
+	barCodeType := "128"
+	paddingLeft := 130
+	paddingBottom := 10
+	fontSize := 32.0
+	dpi := 72.0
+
+	// override settings
+	if nil != settings {
+		if i, b := settings["withCodeString"]; b {
+			withCodeString = i.(bool)
+		}
+		if i, b := settings["barcodeType"]; b {
+			barCodeType = i.(string)
+		}
+		if i, b := settings["paddingLeft"]; b {
+			paddingLeft = i.(int)
+		}
+		if i, b := settings["paddingBottom"]; b {
+			paddingBottom = i.(int)
+		}
+		if i, b := settings["fontSize"]; b {
+			fontSize = i.(float64)
+		}
+		if i, b := settings["dpi"]; b {
+			dpi = i.(float64)
+		}
+	}
 
 	var barCode image.Image
 	var err error
 	if withCodeString {
-		barCode, err = MakeBarCodeWithString(codeString, barcodeType)
+		barCode, err = MakeBarCodeWithString(codeString, barCodeType, paddingLeft, paddingBottom, fontSize, dpi)
 	} else {
-		barCode, err = MakeBarCode(codeString, barcodeType)
+		barCode, err = MakeBarCode(codeString, barCodeType)
 	}
 	if nil != err {
 		return err, false
@@ -84,10 +115,10 @@ func MakeMMSBarCodeFile(codeString string,
 	var barCodeBounds image.Rectangle
 	if nil != defaultImage {
 		barCodeBounds = image.Rect(paddingA,
-			maxPoint.Y-ImageHeight, paddingA+barcodeWidth, maxPoint.Y)
+			maxPoint.Y-ImageHeight + 30, paddingA+barcodeWidth, maxPoint.Y)
 	} else {
 		barCodeBounds = image.Rect(paddingA,
-			maxPoint.Y-ImageHeight, paddingA+barcodeWidth, maxPoint.Y)
+			maxPoint.Y-ImageHeight + 30, paddingA+barcodeWidth, maxPoint.Y)
 	}
 
 	if nil != defaultImage {
@@ -126,7 +157,7 @@ func MakeBarCode(codeString string, barcodeType string) (image.Image, error) {
 		return nil, e
 	}
 
-	barCode, err := barcode.Scale(cs, DefaultMMSWidth-20, ImageHeight)
+	barCode, err := barcode.Scale(cs, DefaultMMSWidth-40, ImageHeight-60)
 	if nil != err {
 		return nil, err
 	}
@@ -134,7 +165,7 @@ func MakeBarCode(codeString string, barcodeType string) (image.Image, error) {
 	return barCode, nil
 }
 
-func MakeBarCodeWithString(codeString string, barcodeType string) (image.Image, error) {
+func MakeBarCodeWithString(codeString string, barcodeType string, paddingLeft int, paddingBottom int, fontSize float64, dpi float64) (image.Image, error) {
 
 	code, e := MakeBarCode(codeString, barcodeType)
 
@@ -142,29 +173,28 @@ func MakeBarCodeWithString(codeString string, barcodeType string) (image.Image, 
 		return code, e
 	}
 
-	paddingLeft := 10
+	if nil == Font {
+		fmt.Println("font is nil")
+		e := InitializeFont()
+		if nil != e {
+			fmt.Println("font load error")
+			return nil, e
+		}
+	}
+
 	bounds := code.Bounds()
-	clip := image.Rect(bounds.Min.X+paddingLeft, bounds.Max.Y-50, bounds.Max.X-paddingLeft, bounds.Max.Y)
 	canvas := image.NewRGBA(bounds)
 	draw.Draw(canvas, bounds, code, image.ZP, draw.Src)
-	draw.Draw(canvas, clip, image.White, image.ZP, draw.Src)
 
 	barCodeBounds := image.Rect(bounds.Min.X,
-		bounds.Min.Y, bounds.Max.X, bounds.Max.Y-40)
+		bounds.Min.Y, bounds.Max.X, bounds.Max.Y)
 
 	draw.Draw(canvas, barCodeBounds, code, image.ZP, draw.Src)
 
-	fontSize := 24.0
-	dpi := 72.0
-
 	c := freetype.NewContext()
 	c.SetDPI(dpi)
-	if nil == Font {
-		InitializeFont()
-	}
 	c.SetFont(Font)
 	c.SetFontSize(fontSize)
-	c.SetClip(clip)
 	c.SetDst(canvas)
 	c.SetSrc(image.Black)
 	hinting := "none"
@@ -175,9 +205,13 @@ func MakeBarCodeWithString(codeString string, barcodeType string) (image.Image, 
 		c.SetHinting(font.HintingFull)
 	}
 
-	paddingTop := 10
+	height := int(c.PointToFixed(fontSize) >> 6)
+	clip := image.Rect(bounds.Min.X+paddingLeft, bounds.Max.Y-paddingBottom-height, bounds.Max.X-paddingLeft, bounds.Max.Y)
+	c.SetClip(clip)
 
-	pt := freetype.Pt(paddingLeft*2, clip.Min.Y+int(c.PointToFixed(fontSize)>>6)+paddingTop)
+	draw.Draw(canvas, clip, image.White, image.ZP, draw.Src)
+
+	pt := freetype.Pt(paddingLeft, clip.Max.Y-paddingBottom)
 	_, err := c.DrawString(codeString, pt)
 	if err != nil {
 		return canvas, err
