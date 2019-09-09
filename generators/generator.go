@@ -9,22 +9,33 @@ type IDGenerator interface {
 	GenerateInt64() int64
 }
 
-type IDGenerators map[string]IDGenerator
+type IDGenerators struct {
+	generators       map[string]IDGenerator
+	defaultGenerator IDGenerator
+}
 
 func (gen IDGenerators) GenerateInt64(typeName string) int64 {
-	return gen[typeName].GenerateInt64()
+	if generator, b := gen.generators[typeName]; b {
+		return generator.GenerateInt64()
+	} else {
+		return gen.defaultGenerator.GenerateInt64()
+	}
 }
 
 func (gen IDGenerators) Generate(typeName string) string {
-	return gen[typeName].Generate()
+	if generator, b := gen.generators[typeName]; b {
+		return generator.Generate()
+	} else {
+		return gen.defaultGenerator.Generate()
+	}
 }
 
 func (gen IDGenerators) GenerateByType(v interface{}) string {
-	return gen[reflect.TypeOf(v).Name()].Generate()
+	return gen.Generate(reflect.TypeOf(v).Name())
 }
 
 func (gen IDGenerators) GenerateInt64ByType(v interface{}) int64 {
-	return gen[reflect.TypeOf(v).Name()].GenerateInt64()
+	return gen.GenerateInt64(reflect.TypeOf(v).Name())
 }
 
 func New(maker func(typeString string) IDGenerator, values ...interface{}) IDGenerators {
@@ -33,5 +44,9 @@ func New(maker func(typeString string) IDGenerator, values ...interface{}) IDGen
 		s := reflect.TypeOf(v).String()
 		gens[s] = maker(s)
 	}
-	return gens
+	defaultGen := maker("default")
+	return IDGenerators {
+		generators:       gens,
+		defaultGenerator: defaultGen,
+	}
 }
