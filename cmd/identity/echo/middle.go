@@ -1,10 +1,10 @@
 package echo
 
 import (
+	"github.com/ezaurum/cthulthu/cmd/identity"
+	cookie2 "github.com/ezaurum/cthulthu/cookie"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
-	"github.com/ezaurum/cthulthu/cmd/identitytity"
-	cookie2 "github.com/ezaurum/cthulthu/cookie"
 )
 
 const (

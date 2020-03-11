@@ -1,12 +1,12 @@
 package identity
 
 import (
-	"github.com/ezaurum/cthulthu/database"
-	"time"
-	"github.com/jinzhu/gorm"
 	"crypto/sha256"
 	"encoding/base64"
+	"github.com/ezaurum/cthulthu/database"
+	"github.com/jinzhu/gorm"
 	"github.com/labstack/gommon/random"
+	"time"
 )
 
 // 다른
