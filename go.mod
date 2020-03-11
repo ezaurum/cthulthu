@@ -17,6 +17,7 @@ require (
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/pelletier/go-toml v1.4.0
+	github.com/pkg/errors v0.8.0
 	github.com/skip2/go-qrcode v0.0.0-20190110000554-dc11ecdae0a9
 	github.com/stretchr/testify v1.3.0
 	github.com/tealeg/xlsx v1.0.3
