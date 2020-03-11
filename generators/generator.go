@@ -43,6 +43,12 @@ func (gen *IDGenerators) Add(v interface{}, maker GeneratorMakerFunc) {
 	gen.generators[s] = maker("default")
 }
 
+func (gen *IDGenerators) AddAll(values []interface{}, maker GeneratorMakerFunc) {
+	for _, v := range values {
+		gen.Add(v, maker)
+	}
+}
+
 func New(maker GeneratorMakerFunc, values ...interface{}) IDGenerators {
 	gens := make(map[string]IDGenerator)
 	for _, v := range values {
