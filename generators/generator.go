@@ -38,15 +38,22 @@ func (gen IDGenerators) GenerateInt64ByType(v interface{}) int64 {
 	return gen.GenerateInt64(reflect.TypeOf(v).Name())
 }
 
-func New(maker func(typeString string) IDGenerator, values ...interface{}) IDGenerators {
+func (gen *IDGenerators) Add(v interface{}, maker GeneratorMakerFunc) {
+	s := reflect.TypeOf(v).String()
+	gen.generators[s] = maker("default")
+}
+
+func New(maker GeneratorMakerFunc, values ...interface{}) IDGenerators {
 	gens := make(map[string]IDGenerator)
 	for _, v := range values {
 		s := reflect.TypeOf(v).String()
 		gens[s] = maker(s)
 	}
 	defaultGen := maker("default")
-	return IDGenerators {
+	return IDGenerators{
 		generators:       gens,
 		defaultGenerator: defaultGen,
 	}
 }
+
+type GeneratorMakerFunc func(typeString string) IDGenerator
