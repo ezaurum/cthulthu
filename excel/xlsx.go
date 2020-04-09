@@ -1,4 +1,4 @@
-package xlsx
+package excel
 
 import (
 	"github.com/tealeg/xlsx"

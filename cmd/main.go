@@ -4,7 +4,7 @@ import (
 	"github.com/ezaurum/cthulthu/config"
 	"github.com/ezaurum/cthulthu/generators"
 	"github.com/ezaurum/cthulthu/generators/snowflake"
-	"github.com/ezaurum/cthulthu/helper"
+	"github.com/ezaurum/cthulthu/strcheck"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	becho "github.com/ezaurum/boongeoppang/echo"
@@ -31,7 +31,7 @@ func Run(config *config.Config) {
 	e := echo.New()
 
 	// 템틀릿 렌더러 설정
-	if !helper.IsEmpty(config.Dir.Template) {
+	if !strcheck.IsEmpty(config.Dir.Template) {
 		if e.Debug {
 			e.Renderer = becho.NewDebug(config.Dir.Template, config.FuncMap)
 		} else {
@@ -40,7 +40,7 @@ func Run(config *config.Config) {
 	}
 
 	// 스태틱 파일 설정
-	if !helper.IsEmpty(config.Dir.Static) {
+	if !strcheck.IsEmpty(config.Dir.Static) {
 		e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 			Root:    config.Dir.Static,
 			Skipper: middleware.DefaultSkipper,

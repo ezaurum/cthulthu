@@ -1,6 +1,7 @@
-package helper
+package strcheck
 
 import (
+	"regexp"
 	"strings"
 )
 
@@ -42,3 +43,14 @@ func ValidatePhoneNumber(phone string, countryCode string) (bool, string) {
 	return true, phone
 }
 
+func IsEmpty(target string) bool {
+	return len(target) < 1
+}
+
+func ExtractNumber(phone string) string {
+	return strings.Join(OnlyNumberReg.FindAllString(phone, -1), "")
+}
+
+var (
+	OnlyNumberReg = regexp.MustCompile("[0-9]+")
+)
