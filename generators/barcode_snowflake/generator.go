@@ -100,7 +100,7 @@ func (n *barcodeStringGenerator) GenerateID() ID {
 		(n.node << StepBits) | (n.step)))
 
 	/*r := ID((now-Epoch)<<timeShift |
-			(n.node << StepBits) | (n.step))*/
+	(n.node << StepBits) | (n.step))*/
 
 	n.mu.Unlock()
 	return r

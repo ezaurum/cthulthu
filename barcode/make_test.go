@@ -32,7 +32,7 @@ func TestMakeBarCode2(t *testing.T) {
 func TestMakeBarCodeWithString(t *testing.T) {
 	//generate := fmt.Sprintf("%X", snowflake.New(0).GenerateInt64())[3:]
 	generate := snowflake.New(0).Generate()
-	img, err := MakeBarCodeWithString(generate, "128", 100,10, 32.0, 72.0)
+	img, err := MakeBarCodeWithString(generate, "128", 100, 10, 32.0, 72.0)
 
 	paint.CreateJPEG(generate+".jpg", img)
 
@@ -62,7 +62,7 @@ func TestMakeBarCodeWithString2(t *testing.T) {
 	MakeMMSBarCodeFile(generate[0:8], generate+"TestMakeBarCodeWithString2-128.jpg", nil, map[string]interface{}{
 		"withCodeString": true,
 		"paddingLeft":    200,
-		"paddingBottom":     20,
+		"paddingBottom":  20,
 		"fontSize":       48.0,
 		"barcodeType":    "128",
 	})
@@ -76,14 +76,14 @@ func TestMakeBarCodeWithString3(t *testing.T) {
 	e, b := MakeMMSBarCodeFile(generate[0:12], generate+"TestMakeBarCodeWithString3.jpg", jpeg, map[string]interface{}{
 		"withCodeString": true,
 		"paddingLeft":    140,
-		"paddingBottom":     20,
+		"paddingBottom":  20,
 		"fontSize":       48.0,
 		"barcodeType":    "128",
 	})
 	e, b = MakeMMSBarCodeFile(fmt.Sprintf("%X", generate), generate+"TestMakeBarCodeWithString3-2.jpg", jpeg, map[string]interface{}{
 		"withCodeString": true,
 		"paddingLeft":    200,
-		"paddingBottom":     20,
+		"paddingBottom":  20,
 		"fontSize":       48.0,
 		"barcodeType":    "128",
 	})

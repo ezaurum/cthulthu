@@ -115,10 +115,10 @@ func MakeMMSBarCodeFile(codeString string,
 	var barCodeBounds image.Rectangle
 	if nil != defaultImage {
 		barCodeBounds = image.Rect(paddingA,
-			maxPoint.Y-ImageHeight + 30, paddingA+barcodeWidth, maxPoint.Y)
+			maxPoint.Y-ImageHeight+30, paddingA+barcodeWidth, maxPoint.Y)
 	} else {
 		barCodeBounds = image.Rect(paddingA,
-			maxPoint.Y-ImageHeight + 30, paddingA+barcodeWidth, maxPoint.Y)
+			maxPoint.Y-ImageHeight+30, paddingA+barcodeWidth, maxPoint.Y)
 	}
 
 	if nil != defaultImage {

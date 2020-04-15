@@ -3,9 +3,9 @@ package database
 import (
 	"github.com/ezaurum/cthulthu/generators"
 	"github.com/jinzhu/gorm"
-	"reflect"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"reflect"
 )
 
 func assignIDWhenNotAssigned(generators generators.IDGenerators) func(scope *gorm.Scope) {
@@ -31,7 +31,7 @@ func assignIDWhenNotAssigned(generators generators.IDGenerators) func(scope *gor
 	}
 }
 
-func RegisterAutoIDAssign(db2 *gorm.DB, generators generators.IDGenerators) {
-	db2.Callback().Create().Before("gorm:create").
+func RegisterAutoIDAssign(db *gorm.DB, generators generators.IDGenerators) {
+	db.Callback().Create().Before("gorm:create").
 		Register("assign_int64_id", assignIDWhenNotAssigned(generators))
 }

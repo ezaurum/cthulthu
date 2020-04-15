@@ -31,7 +31,7 @@ func TestGetNewSerial(t *testing.T) {
 	c := make(chan string, keyCount)
 	go func() {
 		defer wg.Done()
-		for i:=0; i< waitGroups * keyCount ; i++ {
+		for i := 0; i < waitGroups*keyCount; i++ {
 			key := <-c
 			keys[key] = true
 		}

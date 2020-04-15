@@ -2,10 +2,10 @@ package paint
 
 import (
 	"image"
-	"os"
 	"image/jpeg"
 	"image/png"
 	"log"
+	"os"
 )
 
 func CreateJPEG(outputFilename string, canvas image.Image) {
