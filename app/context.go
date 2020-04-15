@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"github.com/ezaurum/cthulthu/context"
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/generators"
@@ -21,9 +20,6 @@ func initialize() context.Context {
 	nodeNumber := node.ByIP()
 	log.Printf("node number: %d", nodeNumber)
 	ctx.SetNodeNumber(nodeNumber)
-
-	e := initEnforcer()
-	fmt.Println(e)
 
 	sn := snowflake.New(nodeNumber)
 	var idGenerators generators.IDGenerators
