@@ -38,5 +38,5 @@ g, alice, data_group_admin
 		fmt.Println(init)
 	}
 
-	app.Start()
+	app.Start("")
 }

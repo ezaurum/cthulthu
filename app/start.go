@@ -9,7 +9,7 @@ import (
 
 import _ "github.com/go-sql-driver/mysql"
 
-func Start() {
+func Start(overrideAddr string) {
 	initialize()
 	// 웹 초기화
 	e := echo.New()
@@ -20,6 +20,9 @@ func Start() {
 	addr := os.Getenv("SS_HOST_ADDR")
 	if len(addr) < 1 {
 		addr = ":9998"
+	}
+	if len(overrideAddr) > 0 {
+		addr = overrideAddr
 	}
 	log.Fatal(e.Start(addr))
 }
