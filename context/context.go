@@ -114,8 +114,21 @@ func (a *app) InitRoute(e *echo.Echo) error {
 			e.GET(handler.Path, DefaultHandler(a, handler.HandlerFunc))
 		case http.MethodPost:
 			e.POST(handler.Path, DefaultHandler(a, handler.HandlerFunc))
+		case http.MethodPatch:
+			e.PATCH(handler.Path, DefaultHandler(a, handler.HandlerFunc))
+		case http.MethodPut:
+			e.PUT(handler.Path, DefaultHandler(a, handler.HandlerFunc))
+		case http.MethodDelete:
+			e.DELETE(handler.Path, DefaultHandler(a, handler.HandlerFunc))
+		case http.MethodConnect:
+			e.CONNECT(handler.Path, DefaultHandler(a, handler.HandlerFunc))
+		case http.MethodOptions:
+			e.OPTIONS(handler.Path, DefaultHandler(a, handler.HandlerFunc))
+		case http.MethodTrace:
+			e.TRACE(handler.Path, DefaultHandler(a, handler.HandlerFunc))
+		case http.MethodHead:
+			e.HEAD(handler.Path, DefaultHandler(a, handler.HandlerFunc))
 		}
-
 	}
 	return nil
 }
