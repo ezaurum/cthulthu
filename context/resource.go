@@ -9,10 +9,3 @@ type Resource struct {
 	Type         interface{}
 	ResourceType string
 }
-
-type HandlerFuncResource struct {
-	Resource
-	Method      string
-	Path        string
-	HandlerFunc RequestHandlerFunc
-}

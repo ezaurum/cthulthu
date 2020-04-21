@@ -5,10 +5,6 @@ import (
 	"net/http"
 )
 
-type ResponseWriter interface {
-	Complete(c echo.Context) error
-}
-
 type resWriter struct {
 	Result     interface{}
 	ResultType string

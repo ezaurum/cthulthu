@@ -5,7 +5,6 @@ import (
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/generators"
 	"github.com/labstack/echo/v4"
-	"net/http"
 	"reflect"
 	"strings"
 	"sync"
@@ -13,7 +12,6 @@ import (
 
 // 어플리케이션 레벨 콘텍스트, 싱글톤
 type Context interface {
-	Router
 	AddPersistedResource(interface{}) Resource
 	AddAllPersistedResource(...interface{}) []Resource
 	SetRepository(repository database.Repository)
@@ -24,16 +22,23 @@ type Context interface {
 	Debug() bool
 	ResourceInterfaces() ([]interface{}, error)
 	SetIDGenerators(idGenerators generators.IDGenerators)
-	InitRoute(e *echo.Echo) error
+	Router
+	InitRoute(*echo.Echo) error
 }
 
+var _ Context = &app{}
+
 type app struct {
-	router
 	nodeNumber         int64
 	IDGenerators       generators.IDGenerators
 	debug              bool
 	repository         database.Repository
 	persistedResources []Resource
+	router
+}
+
+func (a *app) InitRoute(e *echo.Echo) error {
+	return a.router.Assign(e, a)
 }
 
 func (a *app) SetNodeNumber(number int64) {
@@ -107,35 +112,10 @@ func (a *app) AddPersistedResource(resourceType interface{}) Resource {
 	return r
 }
 
-func (a *app) InitRoute(e *echo.Echo) error {
-	for _, handler := range a.handlers {
-		switch handler.Method {
-		case http.MethodGet:
-			e.GET(handler.Path, DefaultHandler(a, handler.HandlerFunc))
-		case http.MethodPost:
-			e.POST(handler.Path, DefaultHandler(a, handler.HandlerFunc))
-		case http.MethodPatch:
-			e.PATCH(handler.Path, DefaultHandler(a, handler.HandlerFunc))
-		case http.MethodPut:
-			e.PUT(handler.Path, DefaultHandler(a, handler.HandlerFunc))
-		case http.MethodDelete:
-			e.DELETE(handler.Path, DefaultHandler(a, handler.HandlerFunc))
-		case http.MethodConnect:
-			e.CONNECT(handler.Path, DefaultHandler(a, handler.HandlerFunc))
-		case http.MethodOptions:
-			e.OPTIONS(handler.Path, DefaultHandler(a, handler.HandlerFunc))
-		case http.MethodTrace:
-			e.TRACE(handler.Path, DefaultHandler(a, handler.HandlerFunc))
-		case http.MethodHead:
-			e.HEAD(handler.Path, DefaultHandler(a, handler.HandlerFunc))
-		}
-	}
-	return nil
-}
-
 var ErrResourceInvalid = errors.New("resource invalid")
 
 const (
-	PersistedResourceType   = "resource.type.persisted"
-	HandlerFuncResourceType = "resource.type.handlerfunc"
+	PersistedResourceType        = "resource.type.persisted"
+	HandlerFuncResourceType      = "resource.type.handlerFunc"
+	GroupHandlerFuncResourceType = "resource.type.groupHandlerFunc"
 )
