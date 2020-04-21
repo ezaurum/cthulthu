@@ -5,14 +5,13 @@ import (
 )
 
 func (a *router) AddHandler(pathString string, method string, handlerFunc ...RequestHandlerFunc) {
-	joinedPath := a.JoinedPath(pathString)
 	a.handlers = append(a.handlers, HandlerFuncResource{
 		Resource: Resource{
 			Name:         "",
 			ResourceType: HandlerFuncResourceType,
 		},
 		Method:      method,
-		Path:        joinedPath,
+		Path:        pathString,
 		HandlerFunc: handlerFunc,
 	})
 }

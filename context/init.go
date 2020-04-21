@@ -35,7 +35,7 @@ func (a *router) Assign(e *echo.Echo, ctx Context, parentHandlers ...RequestHand
 	}
 
 	for _, child := range a.children {
-		child.Assign(e, ctx, groupHandlers...)
+		_ = child.Assign(e, ctx, groupHandlers...)
 	}
 
 	return nil

@@ -3,10 +3,17 @@ package main
 import (
 	"fmt"
 	"github.com/ezaurum/cthulthu/app"
+	"github.com/ezaurum/cthulthu/context"
 	"github.com/ezaurum/cthulthu/grant"
 )
 
 func main() {
+	ctx := context.Ctx()
+	gg := ctx.Group("/v3/kamen-rider")
+	gg.GET("", func(c *context.Request) error {
+		return nil
+	})
+
 	// Initialize the model from a string.
 	text :=
 		`
@@ -38,5 +45,5 @@ g, alice, data_group_admin
 		fmt.Println(init)
 	}
 
-	app.Start("")
+	app.Start(":9997")
 }
