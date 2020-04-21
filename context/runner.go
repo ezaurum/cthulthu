@@ -8,8 +8,6 @@ type Runner interface {
 
 var _ Runner = &Request{}
 
-type RequestHandlerFunc func(c *Request) error
-
 func (r *Request) Run(logic RequestHandlerFunc) error {
 	return func() error {
 		defer r.OnPanic()

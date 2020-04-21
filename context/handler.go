@@ -6,6 +6,19 @@ import (
 	"net/http"
 )
 
+type HandlerFuncResource struct {
+	Resource
+	Method      string
+	Path        string
+	HandlerFunc []RequestHandlerFunc
+}
+
+type RequestHandlerFunc func(c *Request) error
+
+type ResponseWriter interface {
+	Complete(c echo.Context) error
+}
+
 // 세션 사용, 트랜잭션 사용
 func DefaultHandler(ctx Context, logicArray ...RequestHandlerFunc) func(c echo.Context) error {
 	return func(c echo.Context) error {
