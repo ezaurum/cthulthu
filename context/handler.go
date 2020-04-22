@@ -16,11 +16,6 @@ type HandlerFuncResource struct {
 
 type RequestHandlerFunc func(c *Request) error
 
-type ResponseWriter interface {
-	Complete(c echo.Context) error
-	JSON(httpCode int, result interface{}) error
-}
-
 // 세션 사용, 트랜잭션 사용
 func DefaultHandler(ctx Context, logicArray ...RequestHandlerFunc) func(c echo.Context) error {
 	return func(c echo.Context) error {
