@@ -15,6 +15,7 @@ type Request struct {
 	ResourceName string
 	Grant        string
 	echoContext  echo.Context
+	Notify       func(string, interface{})
 }
 
 func New(ctx echo.Context) *Request {
