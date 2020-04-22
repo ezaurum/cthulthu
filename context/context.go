@@ -25,7 +25,10 @@ type Context interface {
 	SetIDGenerators(idGenerators generators.IDGenerators)
 	Router
 	InitRoute(*echo.Echo) error
+
+	// event notifier
 	SetEventNotifier(notifierMap *owlbear.NotifierMap)
+	Notifier
 }
 
 var _ Context = &app{}
