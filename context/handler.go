@@ -106,5 +106,6 @@ func newRequest(c echo.Context, ctx Context) *Request {
 	reader := repo.Reader()
 	// 컨텍스트 생성
 	r := NewWithDB(c, writer, reader)
+	r.Notify = ctx.Notify
 	return r
 }
