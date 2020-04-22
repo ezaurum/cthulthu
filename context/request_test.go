@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/ezaurum/cthulthu/context"
 	"github.com/ezaurum/cthulthu/database"
+	"github.com/ezaurum/cthulthu/errres"
 	"github.com/ezaurum/cthulthu/test"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -68,7 +69,7 @@ func TestTxHandler(t *testing.T) {
 	handler := context.DefaultHandler(ctx, func(c *context.Request) error {
 		var reqJ reqJSON
 		if err := c.Bind(&reqJ); nil != err {
-			return err
+			return errres.BadRequest("bind error", err)
 		}
 		c.Tx().Create(&reqJSON{
 			Action: "test0",
