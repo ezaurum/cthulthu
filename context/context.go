@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/generators"
+	"github.com/ezaurum/owlbear"
 	"github.com/labstack/echo/v4"
 	"reflect"
 	"strings"
@@ -24,6 +25,7 @@ type Context interface {
 	SetIDGenerators(idGenerators generators.IDGenerators)
 	Router
 	InitRoute(*echo.Echo) error
+	SetEventNotifier(notifierMap *owlbear.NotifierMap)
 }
 
 var _ Context = &app{}
@@ -35,6 +37,11 @@ type app struct {
 	repository         database.Repository
 	persistedResources []Resource
 	router
+	eventNotifier *owlbear.NotifierMap
+}
+
+func (a *app) SetEventNotifier(notifierMap *owlbear.NotifierMap) {
+	a.eventNotifier = notifierMap
 }
 
 func (a *app) InitRoute(e *echo.Echo) error {
@@ -67,7 +74,9 @@ var once sync.Once
 func Ctx() Context {
 	if nil == singleton {
 		once.Do(func() {
-			singleton = &app{}
+			singleton = &app{
+				eventNotifier: owlbear.New(),
+			}
 		})
 	}
 	return singleton
