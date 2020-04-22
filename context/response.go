@@ -12,6 +12,13 @@ type resWriter struct {
 	ResultType string
 }
 
+func (r *resWriter) JSON(httpCode int, result interface{}) error {
+	r.Result = result
+	r.StatusCode = httpCode
+	r.ResultType = echo.MIMEApplicationJSONCharsetUTF8
+	return nil
+}
+
 var _ ResponseWriter = &resWriter{}
 
 func (r *resWriter) Complete(c echo.Context) error {
