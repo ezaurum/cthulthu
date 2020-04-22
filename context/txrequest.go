@@ -1,7 +1,6 @@
 package context
 
 import (
-	"fmt"
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/tx"
 	"github.com/jinzhu/gorm"
@@ -14,10 +13,8 @@ type txRequest struct {
 }
 
 func (r *txRequest) SetTxError(err error) {
-	fmt.Println(err)
 	if nil != r.Transaction {
 		r.Transaction.Error = err
-		fmt.Println(r.Transaction.Error)
 	}
 }
 
