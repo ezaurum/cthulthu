@@ -10,7 +10,7 @@ import (
 import _ "github.com/go-sql-driver/mysql"
 
 func Start(overrideAddr string) {
-	initialize()
+	Initialize()
 	// 웹 초기화
 	e := echo.New()
 	if err := context.Ctx().InitRoute(e); nil != err {
