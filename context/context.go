@@ -29,18 +29,24 @@ type Context interface {
 	// event notifier
 	SetEventNotifier(notifierMap *owlbear.NotifierMap)
 	Notifier
+	SessionConfig
 }
 
 var _ Context = &app{}
 
 type app struct {
-	nodeNumber         int64
-	IDGenerators       generators.IDGenerators
-	debug              bool
+	nodeNumber   int64
+	IDGenerators generators.IDGenerators
+	debug        bool
+
 	repository         database.Repository
 	persistedResources []Resource
 	router
-	eventNotifier *owlbear.NotifierMap
+	eventNotifier       *owlbear.NotifierMap
+	sessionCookieName   string
+	domain              string
+	sessionLifeLength   int
+	persistedCookieName string
 }
 
 func (a *app) SetEventNotifier(notifierMap *owlbear.NotifierMap) {
