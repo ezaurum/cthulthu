@@ -8,6 +8,7 @@ import (
 type ResponseWriter interface {
 	Complete(c echo.Context) error
 	JSON(httpCode int, result interface{}) error
+	SendComplete(c bool)
 }
 
 type resWriter struct {
@@ -15,6 +16,11 @@ type resWriter struct {
 	Error      error
 	Result     interface{}
 	ResultType string
+	Sent       bool
+}
+
+func (r *resWriter) SendComplete(c bool) {
+	r.Sent = c
 }
 
 func (r *resWriter) JSON(httpCode int, result interface{}) error {
@@ -34,6 +40,9 @@ func (r *resWriter) NoContent(httpCode int) error {
 var _ ResponseWriter = &resWriter{}
 
 func (r *resWriter) Complete(c echo.Context) error {
+	if r.Sent {
+		return nil
+	}
 	if r.StatusCode != 0 {
 		r.StatusCode = http.StatusOK
 	}
