@@ -25,14 +25,11 @@ func DefaultHandler(ctx Context, logicArray ...RequestHandlerFunc) func(c echo.C
 		// 쿠키 읽기
 		r.Cookie = cookie.New(c.Request(), c.Response())
 
-		scn := "session-cookie-name"
-		domain := "localhost"
-		// 세션 읽기
-		//todo
-		maxAge := 3600
+		scn := ctx.SessionCookieName()
+		domain := ctx.Domain()
+		maxAge := ctx.SessionLifeLength()
 		r.LoadSession(scn, maxAge)
 
-		//todo 권한 처리
 		err := r.RunAll(logicArray)
 
 		// 트랜잭션 완료
@@ -51,8 +48,7 @@ func DefaultHandler(ctx Context, logicArray ...RequestHandlerFunc) func(c echo.C
 		}
 
 		// 세션 쓰기 - 쿠키로
-		clientCookieName := "ss-cck"
-		r.SaveSession(scn, clientCookieName, domain)
+		r.SaveSession(scn, ctx.PersistedCookieName() , domain)
 		// 쿠키 쓰기
 		r.Cookie.Write()
 
