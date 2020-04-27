@@ -54,7 +54,7 @@ func (a *app) SetEventNotifier(notifierMap *owlbear.NotifierMap) {
 }
 
 func (a *app) InitRoute(e *echo.Echo) error {
-	return a.router.Assign(e, a)
+	return a.Assign(e, a)
 }
 
 func (a *app) SetNodeNumber(number int64) {

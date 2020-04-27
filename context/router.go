@@ -1,6 +1,7 @@
 package context
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -17,6 +18,9 @@ func (a *router) Assign(e *echo.Echo, ctx Application, parentHandlers ...Request
 		handlerFuncs := append(groupHandlers, handler.HandlerFunc...)
 		joinedPath := a.JoinedPath(handler.Path)
 		defaultHandler := DefaultHandler(ctx, handlerFuncs...)
+		if ctx.Debug() {
+			fmt.Printf("%s:%s", handler.Method, joinedPath)
+		}
 
 		switch handler.Method {
 		case http.MethodGet:
