@@ -23,7 +23,7 @@ func TestDefaultHandler(t *testing.T) {
 
 	// 테스트 DB
 	repo, closeFunc := test.NewRepo(t, "handler")
-	ctx := context.Ctx()
+	ctx := context.App()
 	ctx.SetRepository(repo)
 	defer closeFunc()
 
@@ -53,7 +53,7 @@ func TestTxHandler(t *testing.T) {
 
 	// 테스트 db
 	repo, closeFunc := test.NewRepo(t, "handler")
-	ctx := context.Ctx()
+	ctx := context.App()
 	ctx.SetRepository(repo)
 	defer closeFunc()
 

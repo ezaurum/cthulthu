@@ -13,7 +13,7 @@ func Start(overrideAddr string) {
 	Initialize()
 	// 웹 초기화
 	e := echo.New()
-	if err := context.Ctx().InitRoute(e); nil != err {
+	if err := context.App().InitRoute(e); nil != err {
 		log.Fatal("route error", err)
 	}
 

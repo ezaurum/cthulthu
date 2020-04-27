@@ -4,6 +4,20 @@ import (
 	"net/http"
 )
 
+type HandlerSetter interface {
+	Handlers() []HandlerFuncResource
+	GET(path string, handlerFunc ...RequestHandlerFunc)
+	POST(path string, handlerFunc ...RequestHandlerFunc)
+	PUT(path string, handlerFunc ...RequestHandlerFunc)
+	DELETE(path string, handlerFunc ...RequestHandlerFunc)
+	PATCH(path string, handlerFunc ...RequestHandlerFunc)
+	TRACE(path string, handlerFunc ...RequestHandlerFunc)
+	OPTION(path string, handlerFunc ...RequestHandlerFunc)
+	HEAD(path string, handlerFunc ...RequestHandlerFunc)
+	CONNECT(path string, handlerFunc ...RequestHandlerFunc)
+	AddHandler(path string, method string, handlerFunc ...RequestHandlerFunc)
+}
+
 func (a *router) AddHandler(pathString string, method string, handlerFunc ...RequestHandlerFunc) {
 	a.handlers = append(a.handlers, HandlerFuncResource{
 		Resource: Resource{
