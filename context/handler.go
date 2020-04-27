@@ -17,7 +17,7 @@ type HandlerFuncResource struct {
 type RequestHandlerFunc func(c *Request) error
 
 // 세션 사용, 트랜잭션 사용
-func DefaultHandler(ctx Context, logicArray ...RequestHandlerFunc) func(c echo.Context) error {
+func DefaultHandler(ctx Application, logicArray ...RequestHandlerFunc) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		r := newRequest(c, ctx)
 		r.ResultType = c.Request().Header.Get("Content-Type")
@@ -57,7 +57,7 @@ func DefaultHandler(ctx Context, logicArray ...RequestHandlerFunc) func(c echo.C
 }
 
 // 세션 사용, 트랜잭션 미 사용
-func ReadOnlyHandler(ctx Context, logicArray ...RequestHandlerFunc) func(c echo.Context) error {
+func ReadOnlyHandler(ctx Application, logicArray ...RequestHandlerFunc) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		r := newRequest(c, ctx)
 		r.ResultType = c.Request().Header.Get("Content-Type")
@@ -91,7 +91,7 @@ func ReadOnlyHandler(ctx Context, logicArray ...RequestHandlerFunc) func(c echo.
 	}
 }
 
-func newRequest(c echo.Context, ctx Context) *Request {
+func newRequest(c echo.Context, ctx Application) *Request {
 	repo := ctx.Repository()
 	writer := repo.Writer()
 	reader := repo.Reader()

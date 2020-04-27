@@ -12,7 +12,7 @@ import (
 )
 
 // 어플리케이션 레벨 콘텍스트, 싱글톤
-type Context interface {
+type Application interface {
 	AddPersistedResource(interface{}) Resource
 	AddAllPersistedResource(...interface{}) []Resource
 	SetRepository(repository database.Repository)
@@ -32,7 +32,7 @@ type Context interface {
 	SessionConfig
 }
 
-var _ Context = &app{}
+var _ Application = &app{}
 
 type app struct {
 	nodeNumber   int64
@@ -77,18 +77,18 @@ func (a *app) SetIDGenerators(idGenerators generators.IDGenerators) {
 	a.IDGenerators = idGenerators
 }
 
-var singleton Context
+var _app Application
 var once sync.Once
 
-func Ctx() Context {
-	if nil == singleton {
+func App() Application {
+	if nil == _app {
 		once.Do(func() {
-			singleton = &app{
+			_app = &app{
 				eventNotifier: owlbear.New(),
 			}
 		})
 	}
-	return singleton
+	return _app
 }
 
 func (a *app) SetRepository(repository database.Repository) {

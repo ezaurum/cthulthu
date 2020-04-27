@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	ctx := context.Ctx()
+	ctx := context.App()
 	gg := ctx.Group("/v3/kamen-rider")
 	gg.GET("", func(c *context.Request) error {
 		return nil

@@ -17,6 +17,7 @@ type HttpError struct {
 	Message    string `json:"message"`
 	Code       int    `json:"code"`
 	InnerError error
+	Data       interface{} `json:"data"`
 }
 
 func (he *HttpError) Error() string {
@@ -49,5 +50,26 @@ func WrapWithCode(code int, message string, err error) *HttpError {
 func BadRequest(message string, err error) *HttpError {
 	erro := NewWithCode(http.StatusBadRequest, message)
 	erro.InnerError = err
+	return erro
+}
+
+func BadReq(message string, err error, data interface{}) *HttpError {
+	erro := NewWithCode(http.StatusBadRequest, message)
+	erro.InnerError = err
+	erro.Data = data
+	return erro
+}
+
+func Dup(message string, err error, data interface{}) *HttpError {
+	erro := NewWithCode(http.StatusConflict, message)
+	erro.InnerError = err
+	erro.Data = data
+	return erro
+}
+
+func Unauth(message string, err error, data interface{}) *HttpError {
+	erro := NewWithCode(http.StatusUnauthorized, message)
+	erro.InnerError = err
+	erro.Data = data
 	return erro
 }

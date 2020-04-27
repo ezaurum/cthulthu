@@ -11,8 +11,8 @@ import (
 	"strings"
 )
 
-func Initialize() context.Context {
-	var ctx = context.Ctx()
+func Initialize() context.Application {
+	var ctx = context.App()
 	if dbg := os.Getenv("SS_DEBUG"); len(dbg) > 0 && strings.ToLower(dbg) != "false" {
 		ctx.SetDebug(true)
 	}
