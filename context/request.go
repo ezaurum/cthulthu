@@ -5,6 +5,7 @@ import (
 	"github.com/ezaurum/cthulthu/errres"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"net/http"
 )
 
 type Request struct {
@@ -48,6 +49,13 @@ func (r *Request) HandlerError() error {
 	}
 }
 
-func (r *Request) Response() error {
+func (r *Request) SendResponse() error {
 	return r.Complete(r.echoContext)
+}
+
+func (r *Request) Request() *http.Request {
+	return r.Context().Request()
+}
+func (r *Request) Response() http.ResponseWriter {
+	return r.Context().Response()
 }

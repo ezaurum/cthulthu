@@ -1,10 +1,10 @@
-package context_test
+package request_test
 
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/ezaurum/cthulthu/context"
+	"github.com/ezaurum/cthulthu/context/request"
 	"github.com/ezaurum/cthulthu/database"
 	"github.com/ezaurum/cthulthu/errres"
 	"github.com/ezaurum/cthulthu/test"
@@ -28,7 +28,7 @@ func TestDefaultHandler(t *testing.T) {
 	defer closeFunc()
 
 	// 테스트 핸들러
-	handler := context.DefaultHandler(ctx, func(c *context.Request) error {
+	handler := request.DefaultHandler(ctx, func(c *context.Request) error {
 		c.ResultType = echo.MIMEApplicationJSONCharsetUTF8
 		c.Result = "OK"
 		return nil
@@ -66,7 +66,7 @@ func TestTxHandler(t *testing.T) {
 	repo.Writer().AutoMigrate(&reqJSON{})
 
 	// 테스트 핸들러
-	handler := context.DefaultHandler(ctx, func(c *context.Request) error {
+	handler := request.DefaultHandler(ctx, func(c *context.Request) error {
 		var reqJ reqJSON
 		if err := c.Bind(&reqJ); nil != err {
 			return errres.BadRequest("bind error", err)
@@ -114,10 +114,8 @@ func TestTxHandler(t *testing.T) {
 
 	c1 := e.NewContext(req1, rec1)
 	err1 := handler(c1)
-	if assert.NoError(t, err1) {
-		assert.NotEqual(t, http.StatusOK, rec1.Code)
-		fmt.Println(rec1.Body.String())
-	}
+	assert.NotEqual(t, http.StatusOK, rec1.Code)
+	assert.NoError(t, err1)
 
 	// 성공
 	req2 := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"action":"success"}`))

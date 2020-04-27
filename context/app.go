@@ -24,13 +24,11 @@ type Application interface {
 	ResourceInterfaces() ([]interface{}, error)
 	SetIDGenerators(idGenerators generators.IDGenerators)
 	Router
-	InitRoute(*echo.Echo) error
+	InitRoute(*echo.Echo, AssignFunc) error
 
 	// event notifier
 	SetEventNotifier(notifierMap *owlbear.NotifierMap)
 	Notifier
-	SessionConfig
-	TokenConfig
 }
 
 var _ Application = &app{}
@@ -44,19 +42,14 @@ type app struct {
 	persistedResources []Resource
 	router
 	eventNotifier       *owlbear.NotifierMap
-	sessionCookieName   string
-	domain              string
-	sessionLifeLength   int
-	persistedCookieName string
-	tokenName           string
 }
 
 func (a *app) SetEventNotifier(notifierMap *owlbear.NotifierMap) {
 	a.eventNotifier = notifierMap
 }
 
-func (a *app) InitRoute(e *echo.Echo) error {
-	return a.Assign(e, a)
+func (a *app) InitRoute(e *echo.Echo, handlerFunc AssignFunc) error {
+	return a.Assign(e, a, handlerFunc)
 }
 
 func (a *app) SetNodeNumber(number int64) {

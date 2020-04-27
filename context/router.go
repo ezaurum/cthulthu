@@ -9,17 +9,19 @@ import (
 type Router interface {
 	HandlerSetter
 	RouteGroup
-	Assign(e *echo.Echo, ctx Application, handlers ...RequestHandlerFunc) error
+	Assign(e *echo.Echo, ctx Application, assignFunc AssignFunc, handlers ...RequestHandlerFunc) error
 }
 
-func (a *router) Assign(e *echo.Echo, ctx Application, parentHandlers ...RequestHandlerFunc) error {
+type AssignFunc func(ctx Application, logicArray ...RequestHandlerFunc) echo.HandlerFunc
+
+func (a *router) Assign(e *echo.Echo, ctx Application, assignFunc AssignFunc, parentHandlers ...RequestHandlerFunc) error {
 	groupHandlers := append(parentHandlers, a.groupHandlers...)
 	for _, handler := range a.handlers {
 		handlerFuncs := append(groupHandlers, handler.HandlerFunc...)
 		joinedPath := a.JoinedPath(handler.Path)
-		defaultHandler := DefaultHandler(ctx, handlerFuncs...)
+		defaultHandler := assignFunc(ctx, handlerFuncs...)
 		if ctx.Debug() {
-			fmt.Printf("%s:%s", handler.Method, joinedPath)
+			fmt.Printf("%s:%s\n", handler.Method, joinedPath)
 		}
 
 		switch handler.Method {
@@ -45,7 +47,7 @@ func (a *router) Assign(e *echo.Echo, ctx Application, parentHandlers ...Request
 	}
 
 	for _, child := range a.children {
-		_ = child.Assign(e, ctx, groupHandlers...)
+		_ = child.Assign(e, ctx, assignFunc, groupHandlers...)
 	}
 
 	return nil
