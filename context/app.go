@@ -30,6 +30,7 @@ type Application interface {
 	SetEventNotifier(notifierMap *owlbear.NotifierMap)
 	Notifier
 	SessionConfig
+	TokenConfig
 }
 
 var _ Application = &app{}
@@ -47,6 +48,7 @@ type app struct {
 	domain              string
 	sessionLifeLength   int
 	persistedCookieName string
+	tokenName           string
 }
 
 func (a *app) SetEventNotifier(notifierMap *owlbear.NotifierMap) {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ezaurum/cthulthu/cookie"
 	"github.com/ezaurum/cthulthu/session"
+	"github.com/labstack/echo/v4"
 )
 
 type sessionRequest struct {
@@ -11,25 +12,56 @@ type sessionRequest struct {
 	Session *session.Session
 }
 
-func (r *sessionRequest) LoadSession(scn string, maxAge int) {
-	if ss, err := session.FromCookie(r.Cookie.Get(scn), maxAge); nil == err {
+func PopulateSessionFromCookie(c echo.Context, r *Request, ctx Application) error {
+	// 쿠키 읽기
+	r.Cookie = cookie.New(c.Request(), c.Response())
+
+	scn := ctx.SessionCookieName()
+	maxAge := ctx.SessionLifeLength()
+
+	if ss, err := session.FromCookie(r.Cookie.Get(scn)); nil == err {
+		ss.Extends()
 		r.Session = ss
+		return nil
 	} else {
-		//todo 세션 생성 에러 처리
+		//세션 생성 에러 처리
 		switch err {
 		case session.ErrSessionEmpty:
-			r.Session = ss
+			fallthrough
+		case session.ErrSessionExpired:
+			sss, _ := session.PopulateAnonymous(maxAge)
+			r.Session = &sss
+			return nil
+		default:
+			fmt.Println("load session error " + err.Error())
+			return err
 		}
-		fmt.Println(err)
 	}
 }
 
-func (r *sessionRequest) SaveSession(scn string, clientCookieName string, domain string) {
+func (r *sessionRequest) SaveSession(scn string, clientCookieName string, domain string) error {
 	if httpCookie, clientCookie, err := r.Session.ToCookie(scn, clientCookieName, domain); nil != err {
-		//todo 에러 정리
-		fmt.Println(err)
+		return err
 	} else {
 		r.Cookie.Set(httpCookie)
 		r.Cookie.Set(clientCookie)
+		return nil
 	}
+	return nil
+}
+
+func PopulateSessionFromHeader(r *Request, token string) {
+	sss, _ := session.PopulateAnonymous(100)
+	sss.Extends()
+	r.Session = &sss
+}
+
+func WriteSessionToCookie(r *Request, ctx Application) error {
+	// 세션 쓰기 - 쿠키 jar에 저장
+	if err := r.SaveSession(ctx.SessionCookieName(), ctx.PersistedCookieName(), ctx.Domain()); nil != err {
+		return err
+	}
+	// 쿠키 쓰기
+	r.Cookie.Write()
+	return nil
 }
