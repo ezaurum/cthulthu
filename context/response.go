@@ -48,6 +48,7 @@ func (r *resWriter) Complete(c echo.Context) error {
 	}
 	// 에러 없는 경우
 	switch r.ResultType {
+	// json
 	case echo.MIMEApplicationJSON:
 		fallthrough
 	case echo.MIMEApplicationJSONCharsetUTF8:
@@ -56,12 +57,15 @@ func (r *resWriter) Complete(c echo.Context) error {
 		fallthrough
 	default:
 		return c.JSON(r.StatusCode, r.Result)
-	//todo 엑셀
-	//todo 이미지
+	// html
+	case echo.MIMETextHTML:
+		fallthrough
+	case echo.MIMETextHTMLCharsetUTF8:
+		fallthrough
+	case "html":
+		return c.HTML(r.StatusCode, r.Result.(string))
+	// 없음
 	case "none":
 		return c.NoContent(r.StatusCode)
-	case "html":
-		//todo
-		return c.HTML(r.StatusCode, "todo")
 	}
 }

@@ -10,11 +10,12 @@ import (
 )
 
 func Serve(c echo.Context, buffer *bytes.Buffer, filename string) {
-	reader := bytes.NewReader(buffer.Bytes())
 
-	c.Response().Header().Set(echo.HeaderContentDisposition, fmt.Sprintf("%s; filename=%q", "attatchment", filename))
+	response := c.Response()
+	request := c.Request()
+	response.Header().Set(echo.HeaderContentDisposition, fmt.Sprintf("%s; filename=%q", "attatchment", filename))
 
-	http.ServeContent(c.Response(), c.Request(), "attendant-point.xlsx", time.Now(), reader)
+	http.ServeContent(response, request, filename, time.Now(), bytes.NewReader(buffer.Bytes()))
 }
 
 func NewSheet(file *xlsx.File, name string) (*xlsx.Sheet, error) {
