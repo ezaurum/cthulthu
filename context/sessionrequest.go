@@ -50,10 +50,13 @@ func (r *sessionRequest) SaveSession(scn string, clientCookieName string, domain
 	return nil
 }
 
-func PopulateSessionFromHeader(r *Request, token string) {
-	sss, _ := session.PopulateAnonymous(100)
-	sss.Extends()
-	r.Session = &sss
+func PopulateSessionFromHeader(r *Request, token string) error {
+	if fromToken, err := session.FromToken(token); nil != err {
+		return err
+	} else {
+		r.Session = fromToken
+		return nil
+	}
 }
 
 func WriteSessionToCookie(r *Request, ctx Application) error {
