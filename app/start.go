@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/ezaurum/cthulthu/context"
+	"github.com/ezaurum/cthulthu/context/request"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"os"
@@ -13,7 +14,7 @@ func Start(overrideAddr string) {
 	Initialize()
 	// 웹 초기화
 	e := echo.New()
-	if err := context.App().InitRoute(e); nil != err {
+	if err := context.App().InitRoute(e, request.DefaultHandler); nil != err {
 		log.Fatal("route error", err)
 	}
 
