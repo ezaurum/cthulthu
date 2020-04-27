@@ -22,7 +22,7 @@ type ClientSession struct {
 	Type        string `json:"type"`
 	AccountName string `json:"account_name,omitempty"`
 	Name        string `json:"name,omitempty"`
-	MaxAge      int    `json:"-"`
+	MaxAge      int    `json:"max_age"`
 }
 
 func Populate(cs ClientSession) Session {
@@ -31,33 +31,45 @@ func Populate(cs ClientSession) Session {
 		ClientSession: cs,
 		CreatedAt:     now,
 		UpdatedAt:     now,
-		//todo 처리
-		ExpiresAt: now.AddDate(0, 1, 1),
+		ExpiresAt:     now.Add(time.Second * time.Duration(cs.MaxAge)),
 	}
 }
 
-func PopulateAnonymous() (Session, error) {
+func (s *Session) Extends() {
+	now := time.Now()
+	s.UpdatedAt = now
+	s.ExpiresAt = now.Add(time.Second * time.Duration(s.MaxAge))
+}
+
+func PopulateAnonymous(maxAge int) (Session, error) {
 	cs := ClientSession{
-		Type: AnonymousType,
+		Type:   AnonymousType,
+		MaxAge: maxAge,
 	}
 	s := Populate(cs)
 
 	return s, nil
 }
 
-func FromCookie(cookie *http.Cookie, maxAge int) (*Session, error) {
+func FromToken(token string) (*Session, error) {
+	var s Session
+	if err := conv.FromBase64Json(token, &s); nil != err {
+		return &s, fmt.Errorf("error in convert to base64 %v, %w", s, err)
+	}
+	return &s, nil
+}
+
+func FromCookie(cookie *http.Cookie) (*Session, error) {
 	var s Session
 	if nil == cookie {
-		s, _ = PopulateAnonymous()
-		s.ClientSession.MaxAge = maxAge
-		return &s, ErrSessionEmpty
+		return nil, ErrSessionEmpty
 	}
 	if err := conv.FromBase64Json(cookie.Value, &s); nil != err {
 		return &s, fmt.Errorf("error in convert to base64 %v, %w", s, err)
 	}
 	now := time.Now()
 	if s.ExpiresAt.Before(now) {
-		return &s, ErrSessionExpired
+		return nil, ErrSessionExpired
 	}
 	return &s, nil
 }
