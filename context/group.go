@@ -18,7 +18,7 @@ func (a *router) AddGroupHandler(handlerFunc ...RequestHandlerFunc) {
 func (a *router) JoinedPath(pathString string) string {
 	join := path.Join(a.basePath, pathString)
 	if a.parent != nil {
-		a.parent.JoinedPath(join)
+		join = a.parent.JoinedPath(join)
 	}
 	return join
 }

@@ -11,5 +11,5 @@ func TestGroup(t *testing.T) {
 	g := r.Group("test")
 	gg := g.Group("//gogo")
 
-	assert.Equal(t, "/gogo/:id", gg.JoinedPath("/:id"))
+	assert.Equal(t, "test/gogo/:id", gg.JoinedPath("/:id"))
 }
