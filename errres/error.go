@@ -59,3 +59,17 @@ func BadReq(message string, err error, data interface{}) *HttpError {
 	erro.Data = data
 	return erro
 }
+
+func Dup(message string, err error, data interface{}) *HttpError {
+	erro := NewWithCode(http.StatusConflict, message)
+	erro.InnerError = err
+	erro.Data = data
+	return erro
+}
+
+func Unauth(message string, err error, data interface{}) *HttpError {
+	erro := NewWithCode(http.StatusUnauthorized, message)
+	erro.InnerError = err
+	erro.Data = data
+	return erro
+}
