@@ -14,6 +14,7 @@ type Request struct {
 	resWriter
 	Resource     interface{}
 	ResourceName string
+	ResourceOwnerID      int64
 	Grant        string
 	echoContext  echo.Context
 	Notify       func(string, interface{})
