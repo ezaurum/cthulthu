@@ -23,6 +23,7 @@ type Application interface {
 	Debug() bool
 	ResourceInterfaces() ([]interface{}, error)
 	SetIDGenerators(idGenerators generators.IDGenerators)
+	Generators() *generators.IDGenerators
 	Router
 	InitRoute(*echo.Echo, AssignFunc) error
 
@@ -41,7 +42,7 @@ type app struct {
 	repository         database.Repository
 	persistedResources []Resource
 	router
-	eventNotifier       *owlbear.NotifierMap
+	eventNotifier *owlbear.NotifierMap
 }
 
 func (a *app) SetEventNotifier(notifierMap *owlbear.NotifierMap) {
@@ -70,6 +71,10 @@ func (a *app) Debug() bool {
 
 func (a *app) SetIDGenerators(idGenerators generators.IDGenerators) {
 	a.IDGenerators = idGenerators
+}
+
+func (a *app) Generators() *generators.IDGenerators {
+	return &a.IDGenerators
 }
 
 var _app Application
