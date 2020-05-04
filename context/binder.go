@@ -1,5 +1,7 @@
 package context
 
+import "github.com/ezaurum/cthulthu/errres"
+
 type Binder interface {
 	Bind(i interface{}) error
 	Param(string) string
@@ -9,7 +11,10 @@ type Binder interface {
 var _ Binder = &Request{}
 
 func (r *Request) Bind(i interface{}) error {
-	return r.Context().Bind(i)
+	if err := r.Context().Bind(i); nil != err {
+		return errres.BadReq("error bind", err, i)
+	}
+	return nil
 }
 
 func (r *Request) Param(name string) string {
