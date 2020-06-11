@@ -49,7 +49,6 @@ func query(q Param, w *gorm.DB, out interface{}) (*Response, error) {
 			w = w.Where(fmt.Sprintf(exactPattern, k, v))
 			resultLinkQueryString += fmt.Sprintf("&%s=%v", k, v)
 		}
-		fmt.Println(resultLinkQueryString)
 	}
 	if len(q.OrderBy) > 0 {
 		split := strings.Split(q.OrderBy, ",")

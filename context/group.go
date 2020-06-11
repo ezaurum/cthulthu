@@ -2,6 +2,7 @@ package context
 
 import (
 	"path"
+	"strings"
 )
 
 type RouteGroup interface {
@@ -16,7 +17,12 @@ func (a *router) AddGroupHandler(handlerFunc ...RequestHandlerFunc) {
 }
 
 func (a *router) JoinedPath(pathString string) string {
-	join := path.Join(a.basePath, pathString)
+	var join string
+	if strings.HasPrefix(pathString, ".") {
+		join = a.basePath + pathString
+	} else {
+		join = path.Join(a.basePath, pathString)
+	}
 	if a.parent != nil {
 		join = a.parent.JoinedPath(join)
 	}
