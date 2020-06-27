@@ -3,7 +3,6 @@ package tx
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
-	"time"
 )
 
 type Request struct {
@@ -36,13 +35,9 @@ func (rq *Request) Rollback() error {
 func New(db *gorm.DB) *Request {
 	b := db.Begin()
 	if nil != b.Error {
-		time.Sleep(time.Millisecond * 200)
-		b := db.Begin()
-		if nil != b.Error {
-			return &Request{
-				Transaction: b,
-				Error:       b.Error,
-			}
+		return &Request{
+			Transaction: b,
+			Error:       b.Error,
 		}
 	}
 
