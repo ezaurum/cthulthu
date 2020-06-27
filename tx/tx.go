@@ -34,6 +34,13 @@ func (rq *Request) Rollback() error {
 
 func New(db *gorm.DB) *Request {
 	b := db.Begin()
+	if nil != b.Error {
+		return &Request{
+			Transaction: b,
+			Error:       b.Error,
+		}
+	}
+
 	return &Request{
 		Transaction: b,
 		Error:       nil,

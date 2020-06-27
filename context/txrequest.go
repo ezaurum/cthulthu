@@ -78,14 +78,16 @@ func (r *txRequest) TxError() error {
 }
 
 func (r *txRequest) Tx() *gorm.DB {
-	if nil != r.Transaction {
-		if r.Transaction.Error != nil {
-			// 롤백 되었는데 모르고 Tx를 호출하면 nil을 반환한다
-			// 구조상 에러처리를 따로 넣으면 번잡스러워진다
-			return nil
-		}
+	if nil != r.Transaction && r.Transaction.Error != nil {
 		return r.Transaction.Transaction
 	} else {
-		return r.StartTx(r.writeDB)
+		r.StartTx(r.writeDB)
 	}
+
+	if r.Transaction.Error != nil {
+		// 롤백 되었는데 모르고 Tx를 호출하거나 잘못되면 nil을 반환한다
+		// 구조상 에러처리를 따로 넣으면 번잡스러워진다
+		return nil
+	}
+	return r.Transaction.Transaction
 }
