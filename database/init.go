@@ -28,6 +28,28 @@ func New(generators generators.IDGenerators, debug bool) (Repository, error) {
 	return NewRepository(masterCS, slaveCS), nil
 }
 
+func NewWithOptions(generators generators.IDGenerators, debug bool, max, idle int) (Repository, error) {
+	masterCS := masterCS()
+	masterCS.MaxIdleConnection = idle
+	masterCS.MaxOpenConnection = max
+	masterCS.Debug = debug
+	if _, err := masterCS.Open(); nil != err {
+		return nil, err
+	} else {
+		masterCS.AssignGenerators(generators)
+	}
+
+	slaveCS := slaveCS()
+	slaveCS.Debug = debug
+	slaveCS.MaxIdleConnection = idle
+	slaveCS.MaxOpenConnection = max
+	if _, err := slaveCS.Open(); nil != err {
+		return nil, err
+	}
+
+	return NewRepository(masterCS, slaveCS), nil
+}
+
 func masterCS() *DBConnection {
 	cs := NewConnection()
 	if addr := env("SS_MDB_ADDR"); len(addr) > 0 {
