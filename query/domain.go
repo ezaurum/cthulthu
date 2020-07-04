@@ -14,6 +14,8 @@ type Param struct {
 	Limit       int                    `json:"limit,omitempty" query:"l"`
 	QueryExact  string                 `json:"query_exact,omitempty" query:"qx"`
 	QueryValues map[string]interface{} `json:"-"`
+	After       int64                  `json:"after_id,string,omitempty" query:"afi"`
+	Before      int64                  `json:"before_id,string,omitempty" query:"bfi"`
 }
 
 type NavigationLinks struct {

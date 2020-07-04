@@ -65,6 +65,12 @@ func query(q Param, w *gorm.DB, out interface{}) (*Response, error) {
 	if q.Start > 0 {
 		w = w.Offset(q.Start)
 	}
+	if q.After != 0 {
+		w = w.Where("id > ?", q.After)
+	}
+	if q.Before != 0 {
+		w = w.Where("id < ?", q.Before)
+	}
 	if f := w.Find(out); nil != f.Error && f.Error != gorm.ErrRecordNotFound {
 		return nil, f.Error
 	}
