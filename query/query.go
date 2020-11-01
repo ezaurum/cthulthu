@@ -20,14 +20,23 @@ func Query(q Param, db *gorm.DB, out interface{}) (*Response, error) {
 const (
 	exactPattern  = "%s = '%v'"
 	queryPattern  = "%s like '%%%s%%'"
-	queryPattern2 = "OR " + queryPattern
+	queryPattern2 = " OR " + queryPattern
 )
+
+func makeLinkedQuery(queryTarget, queryString string) string {
+	split := strings.Split(queryTarget, ",")
+	qs := fmt.Sprintf(queryPattern, split[0], queryString)
+	for _, s := range split[1:] {
+		qs += fmt.Sprintf(queryPattern2, s, queryString)
+	}
+	return qs
+}
 
 func query(q Param, w *gorm.DB, out interface{}) (*Response, error) {
 	resultLinkQueryString := ""
-	queryString := q.QueryString
+	queryString, _ := url.QueryUnescape(q.QueryString)
 	if len(queryString) > 0 && len(q.QueryTarget) > 0 {
-		queryString, _ = url.QueryUnescape(queryString)
+		makeLinkedQuery(q.QueryTarget, queryString)
 		split := strings.Split(q.QueryTarget, ",")
 		queryString := fmt.Sprintf(queryPattern, split[0], queryString)
 		for _, s := range split[1:] {
