@@ -36,13 +36,8 @@ func query(q Param, w *gorm.DB, out interface{}) (*Response, error) {
 	resultLinkQueryString := ""
 	queryString, _ := url.QueryUnescape(q.QueryString)
 	if len(queryString) > 0 && len(q.QueryTarget) > 0 {
-		makeLinkedQuery(q.QueryTarget, queryString)
-		split := strings.Split(q.QueryTarget, ",")
-		queryString := fmt.Sprintf(queryPattern, split[0], queryString)
-		for _, s := range split[1:] {
-			queryString += fmt.Sprintf(queryPattern2, s, queryString)
-		}
-		w = w.Where(queryString)
+		lqs := makeLinkedQuery(q.QueryTarget, queryString)
+		w = w.Where(lqs)
 		resultLinkQueryString += fmt.Sprintf("&q=%s&qt=%s", q.QueryString, q.QueryTarget)
 	}
 	if len(q.QueryExact) > 0 {
