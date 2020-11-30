@@ -3,7 +3,6 @@ package httpsender
 import (
 	"bytes"
 	"encoding/json"
-	"encoding/xml"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
@@ -44,7 +43,7 @@ func SendJSON(sendURL string, requestObject interface{}, responseObject interfac
 	if 400 <= code {
 		return errors.WithMessage(errors.Errorf("status error %d", code), s)
 	}
-	err = xml.Unmarshal(resBody, responseObject)
+	err = json.Unmarshal(resBody, responseObject)
 	if nil != err {
 		return err
 	}
