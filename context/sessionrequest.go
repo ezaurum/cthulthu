@@ -11,7 +11,7 @@ type sessionRequest struct {
 	Session *session.Session
 }
 
-type SessionCookiePopulatorFunc func(c echo.Context, r *Request, ctx Application) error
+type SessionCookiePopulateFunc func(c echo.Context, r *Request, ctx Application) error
 type SessionCookieWriterFunc func(r *Request, ctx Application) error
 
 func (r *sessionRequest) SaveSession(scn string, clientCookieName string, domain string) error {
