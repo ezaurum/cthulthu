@@ -1,7 +1,7 @@
 package context
 
 import (
-	"github.com/ezaurum/cthulthu/cookie"
+	cookie "github.com/ezaurum/cookie-jar"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/labstack/echo/v4"
 )
@@ -11,7 +11,7 @@ type sessionRequest struct {
 	Session *session.Session
 }
 
-type SessionCookiePopulatorFunc func(c echo.Context, r *Request, ctx Application) error
+type SessionCookiePopulateFunc func(c echo.Context, r *Request, ctx Application) error
 type SessionCookieWriterFunc func(r *Request, ctx Application) error
 
 func (r *sessionRequest) SaveSession(scn string, clientCookieName string, domain string) error {
