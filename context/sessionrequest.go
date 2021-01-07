@@ -1,7 +1,7 @@
 package context
 
 import (
-	"github.com/ezaurum/cthulthu/cookie"
+	cookie "github.com/ezaurum/cookie-jar"
 	"github.com/ezaurum/cthulthu/session"
 	"github.com/labstack/echo/v4"
 )
