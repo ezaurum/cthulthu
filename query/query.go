@@ -55,6 +55,7 @@ func query(q Param, w *gorm.DB, out interface{}) (*Response, error) {
 		}
 	}
 	tw := w
+	countOut := reflect.New(reflect.ValueOf(out).Elem().Type()).Interface()
 	if len(q.OrderBy) > 0 {
 		split := strings.Split(q.OrderBy, ",")
 		for _, s := range split {
@@ -79,9 +80,8 @@ func query(q Param, w *gorm.DB, out interface{}) (*Response, error) {
 	if f := w.Find(out); nil != f.Error && f.Error != gorm.ErrRecordNotFound {
 		return nil, f.Error
 	}
-	parsedInput := reflect.New(reflect.TypeOf(out).Elem())
 	var count int
-	if c := tw.Find(parsedInput).Count(&count); nil != c.Error && c.Error != gorm.ErrRecordNotFound {
+	if c := tw.Find(&countOut).Count(&count); nil != c.Error && c.Error != gorm.ErrRecordNotFound {
 		return nil, c.Error
 	}
 
