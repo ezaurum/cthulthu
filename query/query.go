@@ -79,8 +79,9 @@ func query(q Param, w *gorm.DB, out interface{}) (*Response, error) {
 	if f := w.Find(out); nil != f.Error && f.Error != gorm.ErrRecordNotFound {
 		return nil, f.Error
 	}
+	parsedInput := reflect.New(reflect.TypeOf(out).Elem())
 	var count int
-	if c := tw.Count(&count); nil != c.Error && c.Error != gorm.ErrRecordNotFound {
+	if c := tw.Find(parsedInput).Count(&count); nil != c.Error && c.Error != gorm.ErrRecordNotFound {
 		return nil, c.Error
 	}
 
