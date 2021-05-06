@@ -54,6 +54,7 @@ func query(q Param, w *gorm.DB, out interface{}) (*Response, error) {
 			resultLinkQueryString += fmt.Sprintf("&%s=%v", k, v)
 		}
 	}
+	tw := w
 	if len(q.OrderBy) > 0 {
 		split := strings.Split(q.OrderBy, ",")
 		for _, s := range split {
@@ -78,8 +79,16 @@ func query(q Param, w *gorm.DB, out interface{}) (*Response, error) {
 	if f := w.Find(out); nil != f.Error && f.Error != gorm.ErrRecordNotFound {
 		return nil, f.Error
 	}
+	var count int
+	if c := tw.Count(&count); nil != c.Error && c.Error != gorm.ErrRecordNotFound {
+		return nil, c.Error
+	}
 
-	return response(q, resultLinkQueryString, out)
+	r, err := response(q, resultLinkQueryString, out)
+	if nil != err && nil != r {
+		r.Total = count
+	}
+	return r, err
 }
 
 func response(q Param, resultLinkQueryString string, out interface{}) (*Response, error) {
