@@ -86,7 +86,7 @@ func query(q Param, w *gorm.DB, out interface{}) (*Response, error) {
 	}
 
 	r, err := response(q, resultLinkQueryString, out)
-	if nil != err && nil != r {
+	if nil != r {
 		r.Total = count
 	}
 	return r, err
