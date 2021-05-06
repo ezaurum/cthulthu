@@ -81,7 +81,7 @@ func query(q Param, w *gorm.DB, out interface{}) (*Response, error) {
 		return nil, f.Error
 	}
 	var count int
-	if c := tw.Find(&countOut).Count(&count); nil != c.Error && c.Error != gorm.ErrRecordNotFound {
+	if c := tw.Find(countOut).Count(&count); nil != c.Error && c.Error != gorm.ErrRecordNotFound {
 		return nil, c.Error
 	}
 
