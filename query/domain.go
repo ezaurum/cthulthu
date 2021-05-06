@@ -37,6 +37,8 @@ type Response struct {
 	Result interface{}     `json:"result"`
 	// 결과 크기
 	Size int `json:"size"`
+	// 전체 갯수
+	Total int `json:"total"`
 }
 
 type BulkActionRequest struct {
