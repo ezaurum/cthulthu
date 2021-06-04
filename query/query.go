@@ -45,7 +45,7 @@ func MakeResponse(q Param, orderedWhere *gorm.DB, unorderedWhere *gorm.DB, order
 
 	countOut := reflect.New(reflect.ValueOf(out).Elem().Type()).Interface()
 	var count int
-	if c := unorderedWhere.Find(countOut).Count(&count); nil != c.Error && c.Error != gorm.ErrRecordNotFound {
+	if c := unorderedWhere.Model(&countOut).Count(&count); nil != c.Error && c.Error != gorm.ErrRecordNotFound {
 		return nil, c.Error
 	}
 
@@ -60,7 +60,7 @@ func MakeResponse(q Param, orderedWhere *gorm.DB, unorderedWhere *gorm.DB, order
 func MakeQuery(q Param, rw *gorm.DB) (string, *gorm.DB, *gorm.DB) {
 	resultLinkQueryString, unorderedWhere := MakeRawQuery(q, rw)
 	orderedWhere, orderedResultString := MakeOrderQuery(q, unorderedWhere, resultLinkQueryString)
-	return orderedResultString, unorderedWhere, orderedWhere
+	return orderedResultString, orderedWhere, unorderedWhere
 }
 
 // MakeOrderQuery 이전 쿼리에다 정렬 관련 쿼리를 붙여준다
