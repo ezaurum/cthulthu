@@ -60,7 +60,7 @@ func MakeResponse(q Param, orderedWhere *gorm.DB, unorderedWhere *gorm.DB, order
 func MakeQuery(q Param, rw *gorm.DB) (string, *gorm.DB, *gorm.DB) {
 	resultLinkQueryString, unorderedWhere := MakeRawQuery(q, rw)
 	orderedWhere, orderedResultString := MakeOrderQuery(q, unorderedWhere, resultLinkQueryString)
-	return orderedResultString, unorderedWhere, orderedWhere
+	return orderedResultString, orderedWhere, unorderedWhere
 }
 
 // MakeOrderQuery 이전 쿼리에다 정렬 관련 쿼리를 붙여준다
