@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/pkg/errors"
+	"io"
 	"io/ioutil"
 	"net/http"
 )
@@ -16,7 +17,7 @@ func SendJSON(sendURL string, requestObject interface{}, responseObject interfac
 	if _, b := header["Accept"]; !b {
 		header["Accept"] = "application/json"
 	}
-	var buffer *bytes.Buffer
+	var buffer io.Reader = nil
 	if nil != requestObject {
 		marshal, e := json.Marshal(requestObject)
 		if e != nil {
