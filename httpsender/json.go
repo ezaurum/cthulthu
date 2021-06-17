@@ -16,13 +16,20 @@ func SendJSON(sendURL string, requestObject interface{}, responseObject interfac
 	if _, b := header["Accept"]; !b {
 		header["Accept"] = "application/json"
 	}
-
-	marshal, e := json.Marshal(requestObject)
-	if e != nil {
-		return e
+	var buffer *bytes.Buffer
+	if nil != requestObject {
+		marshal, e := json.Marshal(requestObject)
+		if e != nil {
+			return e
+		}
+		buffer = bytes.NewBuffer(marshal)
 	}
-	buffer := bytes.NewBuffer(marshal)
+
 	req, err := http.NewRequest(method, sendURL, buffer)
+	if nil != err {
+		return err
+	}
+
 	for k, v := range header {
 		req.Header.Set(k, v)
 	}
@@ -50,34 +57,34 @@ func SendJSON(sendURL string, requestObject interface{}, responseObject interfac
 	return nil
 }
 
-// 그냥 메세지 전송용 유틸
+// GetJSON 그냥 메세지 전송용 유틸
 func GetJSON(sendURL string,
 	responseObject interface{}, header map[string]string) error {
 	return SendJSON(sendURL, nil, responseObject, header, "GET")
 }
 
-// 그냥 메세지 전송용 유틸
+// PostJSON 그냥 메세지 전송용 유틸
 func PostJSON(sendURL string,
 	requestObject interface{},
 	responseObject interface{}, header map[string]string) error {
 	return SendJSON(sendURL, requestObject, responseObject, header, "POST")
 }
 
-// 그냥 메세지 전송용 유틸
+// PatchJSON 그냥 메세지 전송용 유틸
 func PatchJSON(sendURL string,
 	requestObject interface{},
 	responseObject interface{}, header map[string]string) error {
 	return SendJSON(sendURL, requestObject, responseObject, header, "PATCH")
 }
 
-// 그냥 메세지 전송용 유틸
+// PutJSON 그냥 메세지 전송용 유틸
 func PutJSON(sendURL string,
 	requestObject interface{},
 	responseObject interface{}, header map[string]string) error {
 	return SendJSON(sendURL, requestObject, responseObject, header, "PUT")
 }
 
-// 그냥 메세지 전송용 유틸
+// DeleteJSON 그냥 메세지 전송용 유틸
 func DeleteJSON(sendURL string,
 	requestObject interface{},
 	responseObject interface{}, header map[string]string) error {
