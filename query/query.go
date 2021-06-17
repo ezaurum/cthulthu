@@ -43,7 +43,6 @@ func MakeResponse(q Param, orderedWhere *gorm.DB, unorderedWhere *gorm.DB, order
 		return nil, f.Error
 	}
 
-	//countOut := reflect.New(reflect.ValueOf(out).Elem().Type()).Interface()
 	var count int
 	if c := unorderedWhere.Model(out).Count(&count); nil != c.Error && c.Error != gorm.ErrRecordNotFound {
 		return nil, c.Error
